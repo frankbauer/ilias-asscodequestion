@@ -51,7 +51,16 @@ function runPythonInTest(questionID){
     prog += lastCodeMirrorInstance.getDoc().getValue()+"\n";
     prog += document.getElementById("assCodeQuestionPostBox").innerText;    
     
-    runPython(prog)
+    //runPython(prog)
+    runJava("")
+}
+
+function runJava(prog){
+    JavaPoly.type('com.javapoly.demo.HomepageDemo').then(
+        function(HomepageDemo){
+            HomepageDemo.compileAndRun(document.getElementById('usercode').value);
+        }
+    );
 }
 
 function runPythonInSolution() { 

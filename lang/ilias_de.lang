@@ -6,3 +6,4 @@ any_text#:##Das könnte deine Antwort sein :)
 source_lang#:#Sprache
 code_prefix#:#Einführender Quellcode
 code_postfix#:#Abschließender Quellcode
+allow_run#:#Ausführen von Code (in unterstützten Sprachen) zulassen
