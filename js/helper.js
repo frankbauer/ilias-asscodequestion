@@ -6,10 +6,15 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 function initSolutionBox(useMode){
+    
      $("[class=assCodeQuestionCodeBox]").each(function(i, block) {  
+        var prog = document.getElementById("assCodeQuestionPreBox").innerText;
+         
         var editor = CodeMirror.fromTextArea(block, {
             lineNumbers: true, 
-            mode:useMode, theme:"solarized dark"
+            mode:useMode, 
+            theme:"solarized dark",
+            firstLineNumber: prog.split("\n").length+1
         });   
         var oid = block.id
         var noChange = false;
