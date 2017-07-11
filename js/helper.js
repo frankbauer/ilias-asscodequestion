@@ -54,13 +54,13 @@ function runPythonInTest(questionID){
     runPython(prog)
 }
 
-function runJava(prog){
+/*function runJava(prog){
     JavaPoly.type('com.javapoly.demo.HomepageDemo').then(
         function(HomepageDemo){
             HomepageDemo.compileAndRun(document.getElementById('usercode').value);
         }
     );
-}
+}*/
 
 function runPythonInSolution() { 
    var prog = document.getElementById("resultingCode").innerText;  
