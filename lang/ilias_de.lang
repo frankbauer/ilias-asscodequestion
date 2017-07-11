@@ -1,0 +1,8 @@
+// German Language File for assCodeQuestion Plugin
+<!-- language file start -->
+assCodeQuestion#:#Quelltext Frage
+label_value1#:#Dein Quelltext:
+any_text#:##Das könnte deine Antwort sein :)
+source_lang#:#Sprache
+code_prefix#:#Einführender Quellcode
+code_postfix#:#Abschließender Quellcode
