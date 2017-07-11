@@ -51,8 +51,7 @@ function runPythonInTest(questionID){
     prog += lastCodeMirrorInstance.getDoc().getValue()+"\n";
     prog += document.getElementById("assCodeQuestionPostBox").innerText;    
     
-    //runPython(prog)
-    runJava("")
+    runPython(prog)
 }
 
 function runJava(prog){
