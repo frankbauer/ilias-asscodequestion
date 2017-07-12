@@ -189,7 +189,13 @@ class assCodeQuestionGUI extends assQuestionGUI
 		$form->addItem($txt2);
 		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
 
-		
+		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
+		$txt3->usePurifier(false);				
+		$txt3->setUseRte(TRUE);		
+        $txt3->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt3->setValue($this->object->getBestSolution());
+		$form->addItem($txt3);
+		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
 
 
 		$this->populateTaxonomyFormSection($form);
@@ -230,6 +236,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 			$this->object->setLanguage((string) $_POST["source_lang"]);
 			$this->object->setPrefixCode((string) $_POST["code_prefix"]);
 			$this->object->setPostfixCode((string) $_POST["code_postfix"]);
+			$this->object->setBestSolution((string) $_POST["best_solution"]);
 			$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
 
 			$this->saveTaxonomyAssignments();

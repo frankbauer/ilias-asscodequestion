@@ -76,6 +76,15 @@ class assCodeQuestion extends assQuestion
 		$this->additional_data['postfixCode'] = $newCode;
 	}
 
+	function getBestSolution() {
+		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($this->additional_data['bestSolution']) ? $this->additional_data['bestSolution'] : ''));
+	}
+
+	function setBestSolution($newCode) {
+		$newCode = str_replace('<', '&lt;', $newCode);
+		$this->additional_data['bestSolution'] = $newCode;
+	}
+
 	/**
 	 * Get the plugin object
 	 *
