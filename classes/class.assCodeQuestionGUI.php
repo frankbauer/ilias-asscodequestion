@@ -387,12 +387,17 @@ class assCodeQuestionGUI extends assQuestionGUI
 		$show_question_text = TRUE
 	)
 	{
+		// get the solution template
+		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
+
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
 		if (($active_id > 0) && (!$show_correct_solution))
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
+
+			$template->setVariable("NAME_MODIFIER", "");
 		}
 		else
 		{
@@ -400,6 +405,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 			$solutions = array(array(
 				"value1" => $this->plugin->txt("any_text")				
 			));
+			$template->setVariable("NAME_MODIFIER", "_SOL");
 		}
 
 		// loop through the saved values if more records exist
@@ -410,8 +416,8 @@ class assCodeQuestionGUI extends assQuestionGUI
 			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
 		}
 
-		// get the solution template
-		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");		
+		
+			
 		$this->tpl->addOnLoadCode('runPythonInSolution();');
 
 		if (($active_id > 0) && (!$show_correct_solution))
@@ -432,7 +438,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 				// in this example we have ony one relevant input field (points)
 				// so we just need to tet the icon beneath this field
 				// question types with partial answers may have a more complex output
-				if ($this->object->getReachedPoints($active_id, $pass) == $this->object->getMaximumPoints())
+				/*if ($this->object->getReachedPoints($active_id, $pass) == $this->object->getMaximumPoints())
 				{
 					$template->setCurrentBlock("icon_ok");
 					$template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
@@ -445,7 +451,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 					$template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
 					$template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
 					$template->parseCurrentBlock();
-				}
+				}*/
 			}
 		}
 

@@ -39,10 +39,6 @@ function initSolutionBox(useMode){
         block.parentNode.removeChild(block)*/
     });
 }
-function printToOutput(text) { 
-    var mypre = document.getElementById("output"); 
-    mypre.innerHTML = mypre.innerHTML + text; 
-} 
 
 function builtinRead(x) {
     if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
@@ -69,24 +65,31 @@ function runPythonInTest(questionID){
 
 function runPythonInSolution() { 
    var prog = document.getElementById("resultingCode").innerText;  
-   runPython(prog);
+   runPython(prog, '');
+   prog = document.getElementById("resultingCode_SOL").innerText;  
+   runPython(prog, '_SOL');
 }
-function runPython(prog) { 
-   prog = prog.replaceAll("\t", "aaaa")
+function runPython(prog, modifier='') { 
+   prog = prog.replaceAll("\t", "  ")
    //alert(prog);
-   var mypre = document.getElementById("output"); 
-   mypre.innerHTML = ''; 
-   Sk.pre = "output";
-   Sk.configure({output:printToOutput, read:builtinRead}); 
-   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
-   var myPromise = Sk.misceval.asyncToPromise(function() {
-       return Sk.importMainWithBody("<stdin>", false, prog, true);
-   });
-   myPromise.then(function(mod) {
-       console.log('success');
-   },
-       function(err) {
-        printToOutput('<span style="color:red">'+err.toString()+'</span>');
-        console.log(err.toString());
-   });
+   var mypre = document.getElementById("output"+modifier); 
+   console.log(mypre)
+   if (mypre){
+    mypre.innerHTML = ''; 
+    Sk.pre = "output"+modifier;
+    Sk.configure({output:function(text) {
+        mypre.innerHTML = mypre.innerHTML + text; 
+    }, read:builtinRead}); 
+    //(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+    var myPromise = Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody("<stdin>", false, prog, true);
+    });
+    myPromise.then(function(mod) {
+        console.log('success', modifier, mod, mod.$d, mod.$d.s.v == "hello");
+    },
+        function(err) {
+             mypre.innerHTML = mypre.innerHTML + '<span style="color:red">'+err.toString()+'</span>';
+            console.log(err.toString());
+    });
+   }
 } 
