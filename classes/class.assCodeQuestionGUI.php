@@ -91,7 +91,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 		
 		$lngData = $this->getLanguageData();
 		//$this->tpl->addJavascript(self::URL_PATH.'/js/javapoly/javapoly.js');
-		if ($lngData['cmLanguage'] == "python") {
+		if ($lngData['cmLanguage'] == "python" && $this->object->getAllowRun()) {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
 		}
