@@ -11,8 +11,8 @@ ILIAS Example Question Plugin
 =============================
 
 Author:   Frank Bauer <frank.bauer@fau.de>
-Version:  1.0.2 (2015-02-19)
-Supports: ILIAS 4.4.3 - 5.0
+Version:  1.0.3 
+Supports: ILIAS 5.2 - 5.2
 
 Installation
 ------------
@@ -41,10 +41,6 @@ It adds no extra table to the database.
 Version History
 ===============
 
-Version 1.0.2 (2015-02-19)
---------------------------
-* new version for ILIAS 5.0
-
-Version 1.0.0
+Version 1.0.3
 -------------
-* Initial version for ILIAS 4.4.3
+* Initial version for ILIAS 5.2
