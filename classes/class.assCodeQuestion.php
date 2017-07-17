@@ -399,6 +399,38 @@ class assCodeQuestion extends assQuestion
 		return $this->calculateReachedPointsForSolution(empty($solutions) ? array() : end($solutions));
 	}
 
+	/**
+	* Sets the points, a learner has reached answering the question
+	*
+	* @param integer $user_id The database ID of the learner
+	* @param integer $test_id The database Id of the test containing the question
+	* @param integer $points The points the user has reached answering the question
+	* @return boolean true on success, otherwise false
+	* @access public
+	*/
+	function setReachedPoints($active_id, $points, $pass = NULL)
+	{
+		global $ilDB;
+		
+		if (($points > 0) && ($points <= $this->getPoints()))
+		{
+			if (is_null($pass))
+			{
+				$pass = $this->getSolutionMaxPass($active_id);
+			}
+			$affectedRows = $ilDB->manipulateF("UPDATE tst_test_result SET points = %s WHERE active_fi = %s AND question_fi = %s AND pass = %s",
+				array('float','integer','integer','integer'),
+				array($points, $active_id, $this->getId(), $pass)
+			);
+			self::_updateTestPassResults($active_id, $pass);
+			return TRUE;
+		}
+			else
+		{
+			return TRUE;
+		}
+	}
+
 
 	/**
 	 * Saves the learners input of the question to the database
