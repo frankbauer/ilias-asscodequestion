@@ -181,14 +181,6 @@ class assCodeQuestionGUI extends assQuestionGUI
 		$form->addItem($txt1);
 		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
 
-		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
-		$txt2->usePurifier(false);			
-		$txt2->setUseRte(TRUE);		
-        $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
-		$form->addItem($txt2);
-		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
-
 		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
 		$txt3->usePurifier(false);				
 		$txt3->setUseRte(TRUE);		
@@ -196,6 +188,14 @@ class assCodeQuestionGUI extends assQuestionGUI
 		$txt3->setValue($this->object->getBestSolution());
 		$form->addItem($txt3);
 		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+
+		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
+		$txt2->usePurifier(false);			
+		$txt2->setUseRte(TRUE);		
+        $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
+		$form->addItem($txt2);
+		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
 
 
 		$this->populateTaxonomyFormSection($form);
@@ -422,8 +422,10 @@ class assCodeQuestionGUI extends assQuestionGUI
 		{
 			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
 		}
-
 		
+		if ($this->isRenderPurposePrintPdf()) {
+			//$value1=str_replace("\n", "\n\n", $value1);
+		}
 			
 		$this->tpl->addOnLoadCode('runPythonInSolution();');
 
