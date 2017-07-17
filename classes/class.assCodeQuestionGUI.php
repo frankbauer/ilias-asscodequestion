@@ -295,7 +295,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 
 		$questionoutput = $this->getQuestionOutput($value1, $value2);
-		$this->tpl->addOnLoadCode("preparePythonSave(".$this->object->getId().");");
+		if ($this->getLanguage() == "python") {
+			$this->tpl->addOnLoadCode("preparePythonSave(".$this->object->getId().");");
+		}
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
