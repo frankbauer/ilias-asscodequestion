@@ -4,6 +4,7 @@ assCodeQuestion#:#Sourcecode Question
 label_value1#:#Your Sourcecode:
 any_text#:##This could be your answer :)
 source_lang#:#Source Language
-code_postfix#:#Prefixed Source
+code_prefix#:#Leading Sourcecode
+code_postfix#:#Trailing Sourcecode
 allow_run#:#Allow Codeexecution (in supported languages)
 best_solution#:#Best Solution
