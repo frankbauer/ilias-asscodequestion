@@ -103,6 +103,7 @@ class assCodeQuestionImport extends assQuestionImport
 		$this->object->setObjId($questionpool_id);
 		$this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
 		$this->object->setPoints($item->getMetadataEntry("POINTS"));
+		$this->object->setJSONEncodedAdditionalData($item->getMetadataEntry("ADDITIONAL_DATA"));
 		// additional content editing mode information
 		$this->object->setAdditionalContentEditingMode(
 			$this->fetchAdditionalContentEditingModeInformation($item)

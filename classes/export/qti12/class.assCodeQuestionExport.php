@@ -58,6 +58,12 @@ class assCodeQuestionExport extends assQuestionExport
 		$a_xml_writer->xmlElement("fieldentry", NULL, $this->object->getPoints());
 		$a_xml_writer->xmlEndTag("qtimetadatafield");
 
+		//plugin specific info
+		$a_xml_writer->xmlStartTag("qtimetadatafield");
+		$a_xml_writer->xmlElement("fieldlabel", NULL, "ADDITIONAL_DATA");
+		$a_xml_writer->xmlElement("fieldentry", NULL, $this->object->getJSONEncodedAdditionalData());
+		$a_xml_writer->xmlEndTag("qtimetadatafield");
+
 		// additional content editing information
 		$this->addAdditionalContentEditingModeInformation($a_xml_writer);
 		$this->addGeneralMetadata($a_xml_writer);

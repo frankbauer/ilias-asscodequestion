@@ -90,6 +90,14 @@ class assCodeQuestion extends assQuestion
 		$this->additional_data['bestSolution'] = $this->fixSentCode($newCode);
 	}
 
+	function setJSONEncodedAdditionalData($data) {
+		$this->additional_data = json_decode($data, true);
+	}
+
+	function getJSONEncodedAdditionalData(){
+		return json_encode($this->additional_data);
+	}
+
 	/**
 	 * Get the plugin object
 	 *
@@ -148,7 +156,7 @@ class assCodeQuestion extends assQuestion
 			),
 			array(
 				'question_fi' => array('integer', $ilDB->quote($this->getId(), 'integer')),
-				'data' => array('clob', json_encode($this->additional_data))
+				'data' => array('clob', $this->getJSONEncodedAdditionalData())
 			)
 		);
 
@@ -194,7 +202,7 @@ class assCodeQuestion extends assQuestion
 			. $ilDB->quote($question_id, 'integer'));
 
 		$data = $ilDB->fetchAssoc($result);
-		$this->additional_data = json_decode($data["data"], true);
+		$this->setJSONEncodedAdditionalData($data["data"]);
 
 		try
 		{
