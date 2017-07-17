@@ -100,7 +100,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css');
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css');
-		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css');
+		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
@@ -561,7 +561,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
 		$txt1->setValue($this->object->getPrefixCode());
 		$form->addItem($txt1);
-		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
 
 		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
 		$txt3->usePurifier(false);				
@@ -569,7 +569,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $txt3->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
 		$txt3->setValue($this->object->getBestSolution());
 		$form->addItem($txt3);
-		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
 
 		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
 		$txt2->usePurifier(false);			
@@ -577,7 +577,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
 		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
 		$form->addItem($txt2);
-		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
 
 		return $form;
 	}
