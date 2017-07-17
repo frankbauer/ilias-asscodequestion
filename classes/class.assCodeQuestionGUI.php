@@ -410,7 +410,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 		{
 			// show the correct solution
 			$solutions = array(array(
-				"value1" => $this->object->getBestSolution();
+				"value1" => $this->object->getBestSolution()
 			));
 			$template->setVariable("NAME_MODIFIER", "_SOL");
 		}

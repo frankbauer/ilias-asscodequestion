@@ -66,8 +66,11 @@ function runPythonInTest(questionID){
 function runPythonInSolution() { 
    var prog = document.getElementById("resultingCode").innerText;  
    runPython(prog, '');
-   prog = document.getElementById("resultingCode_SOL").innerText;  
-   runPython(prog, '_SOL');
+   var node = document.getElementById("resultingCode_SOL");
+   if (node) {
+    prog = node.innerText;  
+    runPython(prog, '_SOL');
+   }
 }
 function runPython(prog, modifier='') { 
    prog = prog.replaceAll("\t", "  ")
