@@ -1,7 +1,9 @@
 <?php
 
-include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
+require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 
 /**
  * Example class for question type plugins
@@ -10,7 +12,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
  * @version	$Id:  $
  * @ingroup ModulesTestQuestionPool
  */
-class assCodeQuestion extends assQuestion
+class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable
 {
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
@@ -147,7 +149,19 @@ class assCodeQuestion extends assQuestion
 		// a new question is created if the id is -1
 		// afterwards the new id is set
 		$this->saveQuestionDataToDb($original_id);
+		$this->saveAdditionalQuestionDataToDb();
+		$this->saveAnswerSpecificDataToDb();
+		
+		// save stuff like suggested solutions
+		// update the question time stamp and completion status
+		parent::saveToDb();
+	}
 
+	public function saveAdditionalQuestionDataToDb()
+	{
+		/** @var ilDBInterface $ilDB */
+		global $ilDB;
+		
 		// Now you can save additional data
 		// save data to DB
 		$ilDB->replace('il_qpl_qst_codeqst_dat',
@@ -159,10 +173,13 @@ class assCodeQuestion extends assQuestion
 				'data' => array('clob', $this->getJSONEncodedAdditionalData())
 			)
 		);
+	}
 
-		// save stuff like suggested solutions
-		// update the question time stamp and completion status
-		parent::saveToDb();
+	public function saveAnswerSpecificDataToDb()
+	{
+		/** @var ilDBInterface $ilDB */
+		global $ilDB;
+
 	}
 
 	/**
@@ -657,6 +674,21 @@ class assCodeQuestion extends assQuestion
 		$this->getPlugin()->includeClass("export/qti12/class.assCodeQuestionExport.php");
 		$export = new assCodeQuestionExport($this);
 		return $export->toXML($a_include_header, $a_include_binary, $a_shuffle, $test_output, $force_image_references);
+	}
+
+	/**
+	 * returns boolean wether it is possible to set
+	 * this question type as obligatory or not
+	 * considering the current question configuration
+	 *
+	 * (overwrites method in class assQuestion)
+	 *
+	 * @param integer $questionId
+	 * @return boolean $obligationPossible
+	 */
+	public static function isObligationPossible($questionId)
+	{
+		return true;
 	}
 }
 

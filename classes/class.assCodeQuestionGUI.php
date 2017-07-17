@@ -1,7 +1,9 @@
 <?php
 
-include_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
-include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
+require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
+require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiQuestionScoringAdjustable.php';
+require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoringAdjustable.php';
 
 /**
  * Example GUI class for question type plugins
@@ -12,7 +14,7 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
  *
  * @ilctrl_iscalledby assCodeQuestionGUI: ilObjQuestionPoolGUI, ilObjTestGUI, ilQuestionEditGUI, ilTestExpressPageObjectGUI
  */
-class assCodeQuestionGUI extends assQuestionGUI
+class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
 	/**
 	 * @const	string	URL base path for including special javascript and css files
@@ -135,67 +137,13 @@ class assCodeQuestionGUI extends assQuestionGUI
 		$form->setId("codeqst");
 
 		$this->addBasicQuestionFormProperties( $form );
+		$this->populateQuestionSpecificFormPart( $form );
+		$this->populateAnswerSpecificFormPart( $form );
 
 		// Here you can add question type specific form properties
-		// We only add an input field for the maximum points
-		// NOTE: in complex question types the maximum points are summed up by partial points
-		$points = new ilNumberInputGUI($lng->txt('maximum_points'),'points');
-		$points->setSize(3);
-		$points->setMinValue(1);
-		$points->allowDecimals(0);
-		$points->setRequired(true);
-		$points->setValue($this->object->getPoints());
-		$form->addItem($points);
+		
 
-		// Add Source Code Type Selection
-		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
-        $select->setOptions(array(
-			'c'=>'C', 
-			'c++'=>'C++',
-			'css'=>'CSS', 
-			'fortran'=>'Fortran', 
-			'html'=>'HTML', 
-			'java'=>'Java',
-			'javascript'=>'JavaScript',
-			'objectivec'=>'Objective-C',
-			'perl'=>'Perl',
-			'php'=>'PHP',
-			'python'=>'Python',
-			'ruby'=>'Ruby',
-			'sql'=>'SQL',
-			'xml'=>'XML')
-			);
-		$select->setValue($this->getLanguage());
-		$form->addItem($select);
-
-		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
-		$allowRun->setChecked($this->object->getAllowRun());
-		$allowRun->setValue('true');
-		$form->addItem($allowRun);
-
-		$txt1 = new ilTextAreaInputGUI($this->plugin->txt('code_prefix'), 'code_prefix');	
-		$txt1->usePurifier(false);				
-		$txt1->setUseRte(TRUE);		
-        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt1->setValue($this->object->getPrefixCode());
-		$form->addItem($txt1);
-		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
-
-		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
-		$txt3->usePurifier(false);				
-		$txt3->setUseRte(TRUE);		
-        $txt3->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt3->setValue($this->object->getBestSolution());
-		$form->addItem($txt3);
-		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
-
-		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
-		$txt2->usePurifier(false);			
-		$txt2->setUseRte(TRUE);		
-        $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
-		$form->addItem($txt2);
-		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+		
 
 
 		$this->populateTaxonomyFormSection($form);
@@ -230,14 +178,10 @@ class assCodeQuestionGUI extends assQuestionGUI
 		if (!$hasErrors)
 		{			
 			$this->writeQuestionGenericPostData();
+			$this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
+			$this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
 
-			// Here you can write the question type specific values
-			$this->object->setPoints((int) $_POST["points"]);
-			$this->object->setLanguage((string) $_POST["source_lang"]);
-			$this->object->setPrefixCode((string) $_POST["code_prefix"]);
-			$this->object->setPostfixCode((string) $_POST["code_postfix"]);
-			$this->object->setBestSolution((string) $_POST["best_solution"]);
-			$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
+			
 
 			$this->saveTaxonomyAssignments();
 			return 0;
@@ -426,8 +370,11 @@ class assCodeQuestionGUI extends assQuestionGUI
 		if ($this->isRenderPurposePrintPdf()) {
 			//$value1=str_replace("\n", "\n\n", $value1);
 		}
-			
-		$this->tpl->addOnLoadCode('runPythonInSolution();');
+		//$value1 = $this->getRenderPurpose()."-".$show_correct_solution."-".$show_question_only."-".$result_output;
+		
+		if ($this->getLanguage() == "python" && $this->object->getAllowRun()) {
+			$this->tpl->addOnLoadCode('runPythonInSolution();');
+		}
 
 		if (($active_id > 0) && (!$show_correct_solution))
 		{
@@ -504,7 +451,9 @@ class assCodeQuestionGUI extends assQuestionGUI
 	{
 		global $rbacsystem, $ilTabs;
 		
-		$this->ctrl->setParameterByClass("ilpageobjectgui", "q_id", $_GET["q_id"]);
+		$ilTabs->clearTargets();
+
+		$this->ctrl->setParameterByClass("ilAssQuestionPageGUI", "q_id", $_GET["q_id"]);
 		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 		$q_type = $this->object->getQuestionType();
 
@@ -527,10 +476,7 @@ class assCodeQuestionGUI extends assQuestionGUI
 			}
 	
 			// edit page
-			$ilTabs->addTarget("preview",
-				$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "preview"),
-				array("preview"),
-				"ilAssQuestionPageGUI", "", $force_active);
+			$this->addTab_QuestionPreview($ilTabs);
 		}
 
 		$force_active = false;
@@ -539,13 +485,12 @@ class assCodeQuestionGUI extends assQuestionGUI
 			$url = "";
 
 			if ($classname) $url = $this->ctrl->getLinkTargetByClass($classname, "editQuestion");
-			$commands = $_POST["cmd"];
+			
 
 			// edit question properties
-			$ilTabs->addTarget("edit_properties",
+			$ilTabs->addTarget("edit_question",
 				$url,
-				array("editQuestion", "save", "cancel", "cancelExplorer", "linkChilds", 
-				"parseQuestion", "saveEdit"),
+				array("editQuestion", "save", "saveEdit", "originalSyncForm"),
 				$classname, "", $force_active);
 		}
 
@@ -555,17 +500,8 @@ class assCodeQuestionGUI extends assQuestionGUI
 		// add tab for question hint within common class assQuestionGUI
 		$this->addTab_QuestionHints($ilTabs);
 
-		if ($_GET["q_id"])
-		{
-			$ilTabs->addTarget("solution_hint",
-				$this->ctrl->getLinkTargetByClass($classname, "suggestedsolution"),
-				array("suggestedsolution", "saveSuggestedSolution", "outSolutionExplorer", "cancel",
-					"addSuggestedSolution","cancelExplorer", "linkChilds", "removeSuggestedSolution"
-				),
-				$classname,
-				""
-			);
-		}
+		// add tab for question's suggested solution within common class assQuestionGUI
+		$this->addTab_SuggestedSolution($ilTabs, $classname);		
 
 		// Assessment of questions sub menu entry
 		if ($_GET["q_id"])
@@ -576,16 +512,136 @@ class assCodeQuestionGUI extends assQuestionGUI
 				$classname, "");
 		}
 		
-		if (($_GET["calling_test"] > 0) || ($_GET["test_ref_id"] > 0))
-		{
-			$ref_id = $_GET["calling_test"];
-			if (strlen($ref_id) == 0) $ref_id = $_GET["test_ref_id"];
-			$ilTabs->setBackTarget($this->lng->txt("backtocallingtest"), "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id");
-		}
-		else
-		{
-			$ilTabs->setBackTarget($this->lng->txt("qpl"), $this->ctrl->getLinkTargetByClass("ilobjquestionpoolgui", "questions"));
-		}
+		$this->addBackTab($ilTabs);
+	}
+
+	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
+	{
+		global $lng;
+
+		// We only add an input field for the maximum points
+		// NOTE: in complex question types the maximum points are summed up by partial points
+		$points = new ilNumberInputGUI($lng->txt('maximum_points'),'points');
+		$points->setSize(3);
+		$points->setMinValue(1);
+		$points->allowDecimals(0);
+		$points->setRequired(true);
+		$points->setValue($this->object->getPoints());
+		$form->addItem($points);
+
+		// Add Source Code Type Selection
+		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
+        $select->setOptions(array(
+			'c'=>'C', 
+			'c++'=>'C++',
+			'css'=>'CSS', 
+			'fortran'=>'Fortran', 
+			'html'=>'HTML', 
+			'java'=>'Java',
+			'javascript'=>'JavaScript',
+			'objectivec'=>'Objective-C',
+			'perl'=>'Perl',
+			'php'=>'PHP',
+			'python'=>'Python',
+			'ruby'=>'Ruby',
+			'sql'=>'SQL',
+			'xml'=>'XML')
+			);
+		$select->setValue($this->getLanguage());
+		$form->addItem($select);
+
+		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
+		$allowRun->setChecked($this->object->getAllowRun());
+		$allowRun->setValue('true');
+		$form->addItem($allowRun);
+
+		$txt1 = new ilTextAreaInputGUI($this->plugin->txt('code_prefix'), 'code_prefix');	
+		$txt1->usePurifier(false);				
+		$txt1->setUseRte(TRUE);		
+        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt1->setValue($this->object->getPrefixCode());
+		$form->addItem($txt1);
+		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+
+		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
+		$txt3->usePurifier(false);				
+		$txt3->setUseRte(TRUE);		
+        $txt3->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt3->setValue($this->object->getBestSolution());
+		$form->addItem($txt3);
+		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+
+		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
+		$txt2->usePurifier(false);			
+		$txt2->setUseRte(TRUE);		
+        $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
+		$form->addItem($txt2);
+		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized dark"});});');
+
+		return $form;
+	}
+
+	public function populateAnswerSpecificFormPart(\ilPropertyFormGUI $form)
+	{
+		
+	}
+
+	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
+	{
+		// Here you can write the question type specific values
+		$this->object->setPoints((int) $_POST["points"]);
+		$this->object->setLanguage((string) $_POST["source_lang"]);
+		$this->object->setPrefixCode((string) $_POST["code_prefix"]);
+		$this->object->setPostfixCode((string) $_POST["code_postfix"]);
+		$this->object->setBestSolution((string) $_POST["best_solution"]);
+		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
+	}
+
+	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)
+	{
+		
+	}
+
+	/**
+	 * Returns a list of postvars which will be suppressed in the form output when used in scoring adjustment.
+	 * The form elements will be shown disabled, so the users see the usual form but can only edit the settings, which
+	 * make sense in the given context.
+	 *
+	 * E.g. array('cloze_type', 'image_filename')
+	 *
+	 * @return string[]
+	 */
+	public function getAfterParticipationSuppressionAnswerPostVars()
+	{
+		return array();
+	}
+
+	/**
+	 * Returns a list of postvars which will be suppressed in the form output when used in scoring adjustment.
+	 * The form elements will be shown disabled, so the users see the usual form but can only edit the settings, which
+	 * make sense in the given context.
+	 *
+	 * E.g. array('cloze_type', 'image_filename')
+	 *
+	 * @return string[]
+	 */
+	public function getAfterParticipationSuppressionQuestionPostVars()
+	{
+		return array();
+	}
+
+	/**
+	 * Returns an html string containing a question specific representation of the answers so far
+	 * given in the test for use in the right column in the scoring adjustment user interface.
+	 *
+	 * @param array $relevant_answers
+	 *
+	 * @return string
+	 */
+	public function getAggregatedAnswersView($relevant_answers)
+	{
+		return ''; //print_r($relevant_answers,true);
 	}
 }
 ?>
