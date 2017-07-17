@@ -64,22 +64,24 @@ function runPythonInTest(questionID){
 }*/
 
 function runPythonInSolution() { 
-   var prog = document.getElementById("resultingCode").innerText;  
-   runPython(prog, '');
-   var node = document.getElementById("resultingCode_SOL");
-   if (node) {
-    prog = node.innerText;  
-    runPython(prog, '_SOL');
-   }
+    $("[name=resultingCode]").each(function(i, block) { 
+        block.setAttribute("name", "resultingCodeDone") //mark as processed
+        var node = document.getElementById(block.id+"Output")
+        var prog = block.innerText;  
+        runPython(prog, node);
+    });   
 }
-function runPython(prog, modifier='') { 
+function runPython(prog, mypre=undefined) { 
    prog = prog.replaceAll("\t", "  ")
    //alert(prog);
-   var mypre = document.getElementById("output"+modifier); 
-   console.log(mypre)
+   if (mypre===undefined) {
+    mypre = document.getElementById("output"); 
+    //console.log(mypre)
+   }
+   
    if (mypre){
     mypre.innerHTML = ''; 
-    Sk.pre = "output"+modifier;
+    Sk.pre = mypre.id;
     Sk.configure({output:function(text) {
         mypre.innerHTML = mypre.innerHTML + text; 
     }, read:builtinRead}); 
@@ -88,11 +90,11 @@ function runPython(prog, modifier='') {
         return Sk.importMainWithBody("<stdin>", false, prog, true);
     });
     myPromise.then(function(mod) {
-        console.log('success', modifier, mod, mod.$d, mod.$d.s.v == "hello");
+        //console.log('success', mypre.id, mod, mod.$d); 
     },
         function(err) {
              mypre.innerHTML = mypre.innerHTML + '<span style="color:red">'+err.toString()+'</span>';
-            console.log(err.toString());
+            //console.log(err.toString());
     });
    }
 } 
