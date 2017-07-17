@@ -42,6 +42,14 @@ class assCodeQuestion extends assQuestion
 		parent::__construct($title, $comment, $author, $owner, $question);
 	}
 
+	function fixLoadedCode($str){
+		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+	}
+
+	function fixSentCode($str){
+		return str_replace('<', '&lt;', $str);
+	}
+
 	function getLanguage() {
 		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
 	}
@@ -59,30 +67,27 @@ class assCodeQuestion extends assQuestion
 	}
 
 	function getPrefixCode() {
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($this->additional_data['prefixCode']) ? $this->additional_data['prefixCode'] : ''));
+		return $this->fixLoadedCode($this->additional_data['prefixCode']);
 	}
 
 	function setPrefixCode($newCode) {
-		$newCode = str_replace('<', '&lt;', $newCode);
-		$this->additional_data['prefixCode'] = $newCode;
+		$this->additional_data['prefixCode'] = $this->fixSentCode($newCode);
 	}
 
 	function getPostfixCode() {
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($this->additional_data['postfixCode']) ? $this->additional_data['postfixCode'] : ''));
+		return $this->fixLoadedCode($this->additional_data['postfixCode']);
 	}
 
 	function setPostfixCode($newCode) {
-		$newCode = str_replace('<', '&lt;', $newCode);
-		$this->additional_data['postfixCode'] = $newCode;
+		$this->additional_data['postfixCode'] = $this->fixSentCode($newCode);
 	}
 
 	function getBestSolution() {
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($this->additional_data['bestSolution']) ? $this->additional_data['bestSolution'] : ''));
+		return $this->fixLoadedCode($this->additional_data['bestSolution']);
 	}
 
 	function setBestSolution($newCode) {
-		$newCode = str_replace('<', '&lt;', $newCode);
-		$this->additional_data['bestSolution'] = $newCode;
+		$this->additional_data['bestSolution'] = $this->fixSentCode($newCode);
 	}
 
 	/**
