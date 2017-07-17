@@ -358,7 +358,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	protected function getSolutionSubmit()
 	{
 		return array(
-			'value1' => ilUtil::stripSlashes($_POST["question".$this->getId()."value1"])
+			'value1' => ilUtil::stripSlashes($_POST["question".$this->getId()."value1"]),
+			'value2' => ilUtil::stripSlashes($_POST["question".$this->getId()."result1"])
 		);
 	}
 
@@ -498,7 +499,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					// points, value1 and value2 are multi-purpose fields
 					// store here what you want from the POST data
 					// in our example we allow to enter these values directly
-					"value1"      => array("clob", $solution["value1"]),					
+					"value1"      => array("clob", $solution["value1"]),
+					"value2"      => array("clob", $solution["value2"]),					
 				),
 				array (
 					"solution_id" => array("integer", $row['solution_id']),
@@ -520,6 +522,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					// store here what you want from the POST data
 					// in our example we allow to enter these values directly
 					"value1"      => array("clob", $solution["value1"]),
+					"value2"      => array("clob", $solution["value2"]),
 			));
 		}});
 
@@ -624,7 +627,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		{
 			foreach ($solutions as $solution)
 			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";				
+				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
+				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";				
 			}
 		}
 
@@ -637,6 +641,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
 		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
 		$i++;
+
+		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
+		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
 		
 		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
 		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));

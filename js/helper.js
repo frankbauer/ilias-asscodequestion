@@ -46,13 +46,17 @@ function builtinRead(x) {
     return Sk.builtinFiles["files"][x];
 }
 
-function runPythonInTest(questionID){   
+function getPythonInTest(questionID){   
     var prog = document.getElementById("assCodeQuestionPreBox").innerText+"\n";
     //prog += document.getElementById(questionID).value+"\n";
     prog += lastCodeMirrorInstance.getDoc().getValue()+"\n";
     prog += document.getElementById("assCodeQuestionPostBox").innerText;    
     
-    runPython(prog)
+    return prog;
+}
+
+function runPythonInTest(questionID){   
+    runPython(getPythonInTest(questionID))
 }
 
 /*function runJava(prog){
@@ -98,3 +102,43 @@ function runPython(prog, mypre=undefined) {
     });
    }
 } 
+
+function runPythonForSave(form, target, questionID){
+    try {
+        var prog = getPythonInTest(questionID);
+        prog = prog.replaceAll("\t", "  ")
+    
+        target.value = '';
+        Sk.configure({output:function(text) {
+            try {
+                target.value += text;
+            } catch (err) {
+                console.log(err);
+            }
+            //alert("result: " + text + " " + questionID+", "+target)
+        }, read:builtinRead}); 
+        try {
+            eval(Sk.importMainWithBody("<stdin>", false, prog));
+        }
+        catch(err) {
+          target.value += '[err]'+err+'[/err]';
+        }    
+        //Sk.importMainWithBody("<stdin>", false, prog, false);     
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+function preparePythonSave(nr){
+    try {
+        var form = $('#taForm');    
+        var target = document.getElementById('question'+nr+'result1');    
+
+        form.submit(function() {
+            runPythonForSave(form, target, nr);
+            return true;
+        });
+    } catch (err) {
+        console.log(err);
+    }
+}

@@ -215,7 +215,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $template=nil, $show_question_text=true)
+	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false)
 	{
 		$this->prepareTemplate();
 		$language = $this->getLanguage();		
@@ -226,7 +226,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 		// fill the question output template
 		// in out example we have 1:1 relation for the database field
-
+		
 		if ($template == nil) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
@@ -240,6 +240,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
+		}	
+
+		$value2 = empty($value2) ? "" : ilUtil::prepareFormOutput($value2);
+		if ($htmlResults) {
+			$value2 = str_replace('[err]', '<span style="color:red">', $value2);
+			$value2 = str_replace('[/err]', '</span>', $value2);	
 		}
 
 		$template->setVariable("LANGUAGE", $language);
@@ -250,6 +256,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$template->setVariable("OPENING_CODE", $this->object->getPrefixCode());
 		$template->setVariable("VALUE1", empty($value1) ? "" : ilUtil::prepareFormOutput($value1));
+		$template->setVariable("RESULT1", $value2);
 		$template->setVariable("CLOSING_CODE", $this->object->getPostfixCode());
 
 		$questionoutput = $template->get();
@@ -283,10 +290,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			foreach ($solutions as $solution)
 			{
 				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
+				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";
 			}
 		}
 
-		$questionoutput = $this->getQuestionOutput($value1);
+		$questionoutput = $this->getQuestionOutput($value1, $value2);
+		$this->tpl->addOnLoadCode("preparePythonSave(".$this->object->getId().");");
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
@@ -305,7 +314,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$solution = $this->getPreviewSession()->getParticipantsSolution();
 		}
 
-		$questionoutput = $this->getQuestionOutput($solution['value1']);		
+		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
 		if(!$show_question_only)
 		{
 			// get page object output
@@ -354,7 +363,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			// show the correct solution
 			$solutions = array(array(
-				"value1" => $this->object->getBestSolution()
+				"value1" => $this->object->getBestSolution(),
+				"value2" => "..."
 			));
 			$template->setVariable("NAME_MODIFIER", "_SOL");
 		}
@@ -365,7 +375,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		foreach ($solutions as $solution)
 		{
 			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
+			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
 		}
+
+		
 		
 		if ($this->isRenderPurposePrintPdf()) {
 			//$value1=str_replace("\n", "\n\n", $value1);
@@ -411,7 +424,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}
 
-		$questionoutput = $this->getQuestionOutput($value1, $template, $show_question_text);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
