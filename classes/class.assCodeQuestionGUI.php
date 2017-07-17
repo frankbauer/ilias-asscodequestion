@@ -242,11 +242,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template->setVariable("QUESTIONTEXT", "");
 		}	
 
+		$value1 = empty($value1) ? "" : ilUtil::prepareFormOutput($value1);
+
 		$value2 = empty($value2) ? "" : ilUtil::prepareFormOutput($value2);
 		if ($htmlResults) {
 			$value2 = str_replace('[err]', '<span style="color:red">', $value2);
 			$value2 = str_replace('[/err]', '</span>', $value2);	
 		}
+
+		//This should work, however it seems to be ignored 
+		/*if ($this->isRenderPurposePrintPdf()) {
+			$value1 = str_replace("\t", "  ",$value1);
+			$value1 = str_replace(" ", "&nbsp;",$value1);
+			$value1 = str_replace("\n", "<br />", $value1);
+
+			$value2 = str_replace("\t", "  ",$value2);
+			$value2 = str_replace(" ", "&nbsp;",$value2);
+			$value2 = str_replace("\n", "<br />", $value2);
+		}*/
 
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
@@ -255,7 +268,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
 		$template->setVariable("OPENING_CODE", $this->object->getPrefixCode());
-		$template->setVariable("VALUE1", empty($value1) ? "" : ilUtil::prepareFormOutput($value1));
+		$template->setVariable("VALUE1", $value1);
 		$template->setVariable("RESULT1", $value2);
 		$template->setVariable("CLOSING_CODE", $this->object->getPostfixCode());
 
@@ -378,14 +391,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
 			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
-		}
-
-		
-		
-		if ($this->isRenderPurposePrintPdf()) {
-			//$value1=str_replace("\n", "\n\n", $value1);
-		}
-		//$value1 = $this->getRenderPurpose()."-".$show_correct_solution."-".$show_question_only."-".$result_output."-".$show_manual_scoring."|".$pass."|".$graphicalOutput."|".$active_id."|".$show_feedback."|".$show_question_text.".".$this->tpl->blockExists("css_file").".".$_GET['cmd'];
+		}		
 		
 		if ($this->getLanguage() == "python" && $this->object->getAllowRun()) {			
 			$this->tpl->addOnLoadCode('runPythonInSolution();');
@@ -424,7 +430,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 					$template->parseCurrentBlock();
 				}*/
 			}
-		}
+		}		
 
 		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true);
 		
@@ -435,6 +441,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 
 		$solutionoutput = $solutiontemplate->get();
+
+		if ($this->isRenderPurposePrintPdf()) {
+			$solutionoutput = str_replace("<pre", "\n<code",$solutionoutput);
+			$solutionoutput = str_replace("</pre", "</code",$solutionoutput);
+			$solutionoutput = str_replace("\t", "  ",$solutionoutput);
+			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
+			$solutionoutput = str_replace("\n", "<br />", $solutionoutput);
+		}		
 
 		//include everything we need to execute python code when we just want to display a brief answer
 		if ($_GET['cmd'] == 'getAnswerDetail' ) {
