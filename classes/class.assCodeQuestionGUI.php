@@ -442,13 +442,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$solutionoutput = $solutiontemplate->get();
 
-		if ($this->isRenderPurposePrintPdf()) {
+		/*if ($this->isRenderPurposePrintPdf()) {
 			$solutionoutput = str_replace("<pre", "\n<code",$solutionoutput);
 			$solutionoutput = str_replace("</pre", "</code",$solutionoutput);
 			$solutionoutput = str_replace("\t", "  ",$solutionoutput);
 			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
 			$solutionoutput = str_replace("\n", "<br />", $solutionoutput);
-		}		
+		}*/		
 
 		//include everything we need to execute python code when we just want to display a brief answer
 		if ($_GET['cmd'] == 'getAnswerDetail' ) {
