@@ -12,7 +12,7 @@ ILIAS Example Question Plugin
 
 Author:   Frank Bauer <frank.bauer@fau.de>
 Version:  1.0.3 
-Supports: ILIAS 5.2 - 5.2
+Supports: ILIAS 5.1 - 5.1
 
 Installation
 ------------
@@ -43,4 +43,4 @@ Version History
 
 Version 1.0.3
 -------------
-* Initial version for ILIAS 5.2
+* Initial version for ILIAS 5.1

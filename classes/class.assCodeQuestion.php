@@ -473,10 +473,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$solution = $this->getSolutionSubmit();
 
 		// lock to prevent race conditions
-		//$this->getProcessLocker()->requestUserSolutionUpdateLock();
-	  $this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-		global $ilDB;
-		global $ilUser;
+		$this->getProcessLocker()->requestUserSolutionUpdateLock();
+	  //$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+		//global $ilDB;
+		//global $ilUser;
 		// save the answers of the learner to tst_solution table
 		// this data is question type specific
 		// it is used used by calculateReachedPointsForSolution() in this class
@@ -524,10 +524,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					"value1"      => array("clob", $solution["value1"]),
 					"value2"      => array("clob", $solution["value2"]),
 			));
-		}});
+		}/*});*/
 
 		// unlock
-		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
 
 		// Check if the user has entered something
 		// Then set entered_values accordingly
