@@ -25,7 +25,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @const	string 	URL suffix to prevent caching of css files (increase with every change)
 	 * 					Note: this does not yet work with $tpl->addJavascript()
 	 */
-	const URL_SUFFIX = "?css_version=1.5.0";
+	const URL_SUFFIX = "?css_version=1.5.4";
 
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
@@ -98,9 +98,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
 		}
 
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css');
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css');
-		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css');
+		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
+		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
+		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
@@ -562,6 +562,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addBackTab($ilTabs);
 	}
 
+	public function createCodeEditorFormInput(\ilPropertyFormGUI $form, $name, $value){
+		/*$txt1 = new ilTextAreaInputGUI($this->plugin->txt($name), $name);	
+		$txt1->usePurifier(false);				
+		$txt1->setUseRte(TRUE);		
+        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
+		$txt1->setValue($value);
+		$form->addItem($txt1);*/
+		$item = new ilCustomInputGUI($this->plugin->txt($name));
+		$item->setInfo($this->plugin->txt($name.'_info'));
+		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
+		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
+		$tpl->setVariable("NAME", $name);
+		$item->setHTML($tpl->get());
+		$form->addItem($item);
+		/*$this->tpl->addOnLoadCode('$("[name='.$name.']").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');*/
+
+	}
+
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
 	{
 		global $lng;
@@ -602,29 +620,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$allowRun->setValue('true');
 		$form->addItem($allowRun);
 
-		$txt1 = new ilTextAreaInputGUI($this->plugin->txt('code_prefix'), 'code_prefix');	
-		$txt1->usePurifier(false);				
-		$txt1->setUseRte(TRUE);		
-        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt1->setValue($this->object->getPrefixCode());
-		$form->addItem($txt1);
-		$this->tpl->addOnLoadCode('$("[name=code_prefix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
-
-		$txt3 = new ilTextAreaInputGUI($this->plugin->txt('best_solution'), 'best_solution');	
-		$txt3->usePurifier(false);				
-		$txt3->setUseRte(TRUE);		
-        $txt3->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt3->setValue($this->object->getBestSolution());
-		$form->addItem($txt3);
-		$this->tpl->addOnLoadCode('$("[name=best_solution]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
-
-		$txt2 = new ilTextAreaInputGUI($this->plugin->txt('code_postfix'), 'code_postfix');	
-		$txt2->usePurifier(false);			
-		$txt2->setUseRte(TRUE);		
-        $txt2->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt2->setValue($this->object->prepareTextareaOutput($this->object->getPostfixCode()));
-		$form->addItem($txt2);
-		$this->tpl->addOnLoadCode('$("[name=code_postfix]").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');
+		$this->createCodeEditorFormInput($form, 'code_prefix', $this->object->getPrefixCode());
+		$this->createCodeEditorFormInput($form, 'best_solution', $this->object->getBestSolution());
+		$this->createCodeEditorFormInput($form, 'code_postfix', $this->object->getPostfixCode());
 
 		return $form;
 	}
