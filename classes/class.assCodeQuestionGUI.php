@@ -135,7 +135,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$form->setMultipart(TRUE);
 		$form->setTableWidth("100%");
 		$form->setId("codeqst");
-
+		$form->setDescription($this->plugin->txt('question_edit_info'));
 		$this->addBasicQuestionFormProperties( $form );
 		$this->populateQuestionSpecificFormPart( $form );
 		$this->populateAnswerSpecificFormPart( $form );
@@ -613,9 +613,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'xml'=>'XML')
 			);
 		$select->setValue($this->getLanguage());
+		$select->setInfo($this->plugin->txt('source_lang_info'));
 		$form->addItem($select);
 
 		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
+		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
 		$allowRun->setChecked($this->object->getAllowRun());
 		$allowRun->setValue('true');
 		$form->addItem($allowRun);
