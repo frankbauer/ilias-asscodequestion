@@ -137,7 +137,7 @@ function preparePythonSave(nr){
         var target = document.getElementById('question'+nr+'result1');    
 
         form.submit(function() {
-            runPythonForSave(form, target, nr);
+            //runPythonForSave(form, target, nr);
             return true;
         });
     } catch (err) {
