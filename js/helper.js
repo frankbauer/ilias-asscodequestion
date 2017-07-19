@@ -90,7 +90,7 @@ function runPython(prog, mypre=undefined) {
     Sk.pre = mypre.id;
     Sk.configure({output:function(text) {
         mypre.innerHTML = mypre.innerHTML + text; 
-    }, read:builtinRead}); 
+    }, read:builtinRead, execLimit:1000}); 
     //(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
     var myPromise = Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody("<stdin>", false, prog, true);
@@ -118,7 +118,7 @@ function runPythonForSave(form, target, questionID){
                 console.log(err);
             }
             //alert("result: " + text + " " + questionID+", "+target)
-        }, read:builtinRead}); 
+        }, read:builtinRead, execLimit:1000}); 
         try {
             eval(Sk.importMainWithBody("<stdin>", false, prog));
         }
