@@ -18,6 +18,10 @@ function initSolutionBox(useMode){
             theme:"solarized light",
             firstLineNumber: prog.split("\n").length+1
         });   
+        
+        // prevent conflicts with tiny
+        $('.CodeMirror textarea').addClass('noRTEditor');
+
         var oid = block.id
         var noChange = false;
         editor.on('change',function(cMirror){
