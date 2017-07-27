@@ -221,7 +221,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$language = $this->getLanguage();		
 		$runCode = "";
 		if ($language == "python" && $this->object->getAllowRun()) {
-			$runCode = '<input type="button" value="run" onclick="runPythonInTest(\'question'.$this->object->getId().'value1\')"><pre id="question'.$this->object->getID().'value1Output" style="display:none">...</pre>';
+			$runCode = '<input type="button" value="'.$this->plugin->txt('run_code').'" onclick="runPythonInTest(\'question'.$this->object->getId().'value1\')"><pre id="question'.$this->object->getID().'value1Output" style="display:none">...</pre>';
 		} 
 		
 		// fill the question output template

@@ -14,3 +14,4 @@ best_solution_info#:#Die vorgeschlagene Musterlösung.
 allow_run_info#:#Wenn <b>Python</b>-code programmiert wird, kann der Student während der Prüfung seinen eigenen Quellcode ausführen und das Ergebnis anzeigen lassen.
 source_lang_info#:#Die Programmiersprache die wir zur Einfärbung und Code-Ausführung verwenden.
 question_edit_info#:#Eine einfache Quellcode-Frage. Eingaben können mit Syntax-Highlighting versehen werden und (bei ausgewählten Sprachen) zur Laufzeit des Tests ausgeführt werden.<br>Innerhalb der Frage kann<b>[code][/code]</b> verwendet werden um Quellcode auszuzeichnen.
+run_code#:#Ausführen

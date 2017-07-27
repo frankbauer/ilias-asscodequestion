@@ -14,3 +14,4 @@ best_solution_info#:#The suggested best solution for this Question
 allow_run_info#:#If you use <b>Python</b> code, this will allow the Students to run the code and display it during the exam.
 source_lang_info#:#The Language we use for Sytax-Highlighting and when executing Code.
 question_edit_info#:#This is a basic SourceCode Question. It supports Syntax-Highlighting and (for select languages) Code Execution .<br>You may use <b>[code][/code]</b> in your Question-Text to insert a syntax-highlighted code-box.
+run_code#:#Run
