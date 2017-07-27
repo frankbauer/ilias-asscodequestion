@@ -221,7 +221,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$language = $this->getLanguage();		
 		$runCode = "";
 		if ($language == "python" && $this->object->getAllowRun()) {
-			$runCode = '<input type="button" value="run" onclick="runPythonInTest(\'question'.$this->object->getId().'value1\')"><pre id="output">...</pre>';
+			$runCode = '<input type="button" value="run" onclick="runPythonInTest(\'question'.$this->object->getId().'value1\')"><pre id="question'.$this->object->getID().'value1Output">...</pre>';
 		} 
 		
 		// fill the question output template
@@ -264,7 +264,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		//opening code
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
 		$tpl->setVariable("LANGUAGE", $language);
-		$id = "assCodeQuestionPreBox";
+		$id = "pre_question".$this->object->getId()."value1";
 		$tpl->setVariable("ID", $id);
 		$code = $this->object->getPrefixCode();
 		if (trim($code)!='') {
@@ -277,7 +277,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		//closing code
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
 		$tpl->setVariable("LANGUAGE", $language);
-		$id = "assCodeQuestionPostBox";
+		$id = "post_question".$this->object->getId()."value1";
 		$tpl->setVariable("ID", $id);
 		$code = $this->object->getPostfixCode();
 		if (trim($code)!='') {
