@@ -102,14 +102,15 @@ function runPython(prog, questionID, mypre=undefined) {
    if (mypre===undefined) {
     mypre = document.getElementById(questionID+"Output");     
    }
-    console.log(prog, mypre)
+   //console.log(prog, mypre)
    
    if (mypre){
+    mypre.style.display = '';
     mypre.innerHTML = ''; 
     Sk.pre = mypre.id;
     Sk.configure({output:function(text) {
         mypre.innerHTML = mypre.innerHTML + text; 
-        console.log(text, mypre.innerHTML, mypre)
+        //console.log(text, mypre.innerHTML, mypre)
     }, read:builtinRead, execLimit:1000}); 
     //(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
     var myPromise = Sk.misceval.asyncToPromise(function() {
