@@ -8,7 +8,8 @@ String.prototype.replaceAll = function(search, replacement) {
 function initSolutionBox(useMode){
     
      $(".assCodeQuestionCodeBox").each(function(i, block) {  
-         console.log(block);
+        console.log(block);
+        $(block).removeClass('assCodeQuestionCodeBox')
         var myPrev = document.getElementById("assCodeQuestionPreBox");
         var prog = myPrev ? myPrev.innerText : '';
          
