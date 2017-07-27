@@ -1,4 +1,4 @@
-var lastCodeMirrorInstance = null
+var lastCodeMirrorInstance = []
 
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
@@ -8,16 +8,21 @@ String.prototype.replaceAll = function(search, replacement) {
 function initSolutionBox(useMode){
     
      $(".assCodeQuestionCodeBox").each(function(i, block) {  
-         console.log(block);
-        var myPrev = document.getElementById("assCodeQuestionPreBox");
+        //console.log(block);
+        $(block).removeClass('assCodeQuestionCodeBox')
+        var myPrev = document.getElementById("pre_"+block.id);
         var prog = myPrev ? myPrev.innerText : '';
          
         var editor = CodeMirror.fromTextArea(block, {
             lineNumbers: true, 
             mode:useMode, 
             theme:"solarized light",
-            firstLineNumber: prog.split("\n").length+1
+            firstLineNumber: prog.trim()=='' ? 1 : prog.split("\n").length+1
         });   
+        
+        // prevent conflicts with tiny
+        $('.CodeMirror textarea').addClass('noRTEditor');
+
         var oid = block.id
         var noChange = false;
         editor.on('change',function(cMirror){
@@ -31,7 +36,7 @@ function initSolutionBox(useMode){
                 cm.replaceSelection(spaces);
             }
         });  
-        lastCodeMirrorInstance = editor
+        lastCodeMirrorInstance[block.id] = editor
         var inp = editor.display.input;
         
         /*inp.textarea.name = block.name
@@ -49,16 +54,30 @@ function builtinRead(x) {
 }
 
 function getPythonInTest(questionID){   
-    var prog = document.getElementById("assCodeQuestionPreBox").innerText+"\n";
-    //prog += document.getElementById(questionID).value+"\n";
-    prog += lastCodeMirrorInstance.getDoc().getValue()+"\n";
-    prog += document.getElementById("assCodeQuestionPostBox").innerText;    
+    var prog = "";
+    var el = document.getElementById("pre_"+questionID);
+    if (el) {
+        var code = el.innerText
+        if (code && code.trim()!='') {
+            prog = prog + code + "\n"
+        }
+    }
     
+    prog += lastCodeMirrorInstance[questionID].getDoc().getValue();
+
+    el = document.getElementById("post_"+questionID);    
+    if (el) {
+        var code = el.innerText
+        if (code && code.trim()!='') {
+            prog = prog + "\n" + code
+        }
+    }
+    //console.log(prog)
     return prog;
 }
 
 function runPythonInTest(questionID){   
-    runPython(getPythonInTest(questionID))
+    runPython(getPythonInTest(questionID), questionID)
 }
 
 /*function runJava(prog){
@@ -74,23 +93,25 @@ function runPythonInSolution() {
         block.setAttribute("name", "resultingCodeDone") //mark as processed
         var node = document.getElementById(block.id+"Output")
         var prog = block.innerText;  
-        runPython(prog, node);
+        runPython(prog, block.id, node);
     });   
 }
-function runPython(prog, mypre=undefined) { 
+function runPython(prog, questionID, mypre=undefined) { 
    prog = prog.replaceAll("\t", "  ")
-   //alert(prog);
+   
    if (mypre===undefined) {
-    mypre = document.getElementById("output"); 
-    //console.log(mypre)
+    mypre = document.getElementById(questionID+"Output");     
    }
+   //console.log(prog, mypre)
    
    if (mypre){
+    mypre.style.display = '';
     mypre.innerHTML = ''; 
     Sk.pre = mypre.id;
     Sk.configure({output:function(text) {
         mypre.innerHTML = mypre.innerHTML + text; 
-    }, read:builtinRead}); 
+        //console.log(text, mypre.innerHTML, mypre)
+    }, read:builtinRead, execLimit:1000}); 
     //(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
     var myPromise = Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody("<stdin>", false, prog, true);
@@ -118,7 +139,7 @@ function runPythonForSave(form, target, questionID){
                 console.log(err);
             }
             //alert("result: " + text + " " + questionID+", "+target)
-        }, read:builtinRead}); 
+        }, read:builtinRead, execLimit:1000}); 
         try {
             eval(Sk.importMainWithBody("<stdin>", false, prog));
         }
@@ -137,7 +158,7 @@ function preparePythonSave(nr){
         var target = document.getElementById('question'+nr+'result1');    
 
         form.submit(function() {
-            runPythonForSave(form, target, nr);
+            //runPythonForSave(form, target, nr);
             return true;
         });
     } catch (err) {
