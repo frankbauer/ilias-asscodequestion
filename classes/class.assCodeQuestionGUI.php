@@ -221,7 +221,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$language = $this->getLanguage();		
 		$runCode = "";
 		if ($language == "python" && $this->object->getAllowRun()) {
-			$runCode = '<input type="button" value="run" onclick="runPythonInTest(\'question'.$this->object->getId().'value1\')"><pre id="output">...</pre>';
+			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_python.html');
+			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
+			$tpl->setVariable("QUESTION_ID", $this->object->getId());
+			$runCode = $tpl->get();
 		} 
 		
 		// fill the question output template
@@ -261,6 +264,32 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$value2 = str_replace("\n", "<br />", $value2);
 		}*/
 
+		//opening code
+		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
+		$tpl->setVariable("LANGUAGE", $language);
+		$id = "pre_question".$this->object->getId()."value1";
+		$tpl->setVariable("ID", $id);
+		$code = $this->object->getPrefixCode();
+		if (trim($code)!='') {
+			$tpl->setVariable("CODE", $code);
+			$template->setVariable("OPENING_CODE_BOX", $tpl->get());
+		} else {
+			$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
+		}
+		
+		//closing code
+		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
+		$tpl->setVariable("LANGUAGE", $language);
+		$id = "post_question".$this->object->getId()."value1";
+		$tpl->setVariable("ID", $id);
+		$code = $this->object->getPostfixCode();
+		if (trim($code)!='') {
+			$tpl->setVariable("CODE", $code);
+			$template->setVariable("CLOSING_CODE_BOX", $tpl->get());		
+		} else {
+			$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
+		}
+
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
@@ -269,8 +298,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$template->setVariable("OPENING_CODE", $this->object->getPrefixCode());
 		$template->setVariable("VALUE1", $value1);
-		$template->setVariable("RESULT1", $value2);
 		$template->setVariable("CLOSING_CODE", $this->object->getPostfixCode());
+		$template->setVariable("RESULT1", $value2);		
 
 		$questionoutput = $template->get();
 		return $questionoutput;
@@ -410,7 +439,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				{
 					$reached_points = $this->object->calculateReachedPoints($active_id, $pass);
 				}
-
+				
 				// output of ok/not ok icons for user entered solutions
 				// in this example we have ony one relevant input field (points)
 				// so we just need to tet the icon beneath this field
