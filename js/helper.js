@@ -14,6 +14,14 @@ $(document).ready(function(){
                 var qLanguage = input.options[input.selectedIndex].value;
                 if (qLanguage !== 'python' && qLanguage !== 'javascript') {
                     $(this).prop('checked',false);
+                } else {
+                    if ($('input#allow_run_button').length) {
+                        $('input#allow_run_button').css('display','');
+                    }
+                }
+            } else {
+                if ($('input#allow_run_button').length) {
+                    $('input#allow_run_button').css('display','none');
                 }
             }
         });
@@ -79,18 +87,23 @@ function selectLanguage() {
     postEditor.setOption("mode",edMode);
     // if python or javascript show run button
     var qLanguage = input.options[input.selectedIndex].value;
-    if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
-            $('input#allow_run_button').css('display','');
-        } else {
-            $('input#allow_run_button').css('display','none');
-        }
-    }
-    // update checkboxk allow run
     if (qLanguage === 'python' || qLanguage === 'javascript') {
-        $('input#allow_run')[0].checked = true;
+        if ($('input#allow_run')[0].checked === true) {
+            // checkbox is checked
+            if ($('input#allow_run_button').length) {
+                $('input#allow_run_button').css('display','');
+            }
+        } else {
+            // check box is not checked
+            if ($('input#allow_run_button').length) {
+                $('input#allow_run_button').css('display','none');
+            }
+        }
     } else {
         $('input#allow_run')[0].checked = false;
+        if ($('input#allow_run_button').length) {
+            $('input#allow_run_button').css('display','none');
+        }
     }
 
 }
@@ -143,6 +156,8 @@ function initSolutionBox(useMode, qLanguage, questionID){
             lineNumbers: true, 
             mode:useMode,
             theme:"solarized light",
+            tabSize: 2,
+            autoCloseBrackets: true,
             firstLineNumber: firstLineNumber // prog.trim()=='' ? 1 : prog.split("\n").length+1
         });   
         
@@ -156,10 +171,12 @@ function initSolutionBox(useMode, qLanguage, questionID){
             var yourTextarea = document.getElementById(oid) 
             yourTextarea.value = cMirror.getValue(); 
         });   
-        editor.setOption("extraKeys", {
-            Tab: function(cm) {
-                var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                cm.replaceSelection(spaces);
+        //editor.setOption("extraKeys", {
+        editor.addKeyMap({
+            "Tab": function(cm) {
+                cm.execCommand("insertSoftTab");
+                //var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                //cm.replaceSelection(spaces);
             }
         });
         // adapt editor's heigh and set readonly if necessary
@@ -384,19 +401,15 @@ function runPythonInTest(questionID){
  */
 function runInTest(language,questionID){   
     var prog = getTotalSourcecode(questionID);
-    var maxLines = $('#max_lines-'+questionID).val();
-    var maxMS = $('#timeout_ms-'+questionID).val();
+    var maxLines = parseInt($('#max_lines-'+questionID).val());
+    var maxMS = parseInt($('#timeout_ms-'+questionID).val());
     // we don't know, what we get
-    if (typeof maxLines === 'number') {
-        maxLines = Math.round(maxLines);
-    } else {
+    if (isNaN(maxLines)) {
         maxLines = 20;
-    }
-    if (typeof maxMC === 'number') {
-        maxMC = Math.round(maxMC);
-    } else {
-        maxMC = 500;
-    }
+    } 
+    if (isNaN(maxMS)) {
+        maxMS = 1000;
+    } 
     var mypre = undefined;
     // This is necessary to intearctively change the language in the edit mode.
     // codeqst_edit_mode is a dummy language set by the PHP-script to avoid

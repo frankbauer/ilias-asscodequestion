@@ -71,14 +71,6 @@ var builtinRead = function(x) {
     return Sk.builtinFiles["files"][x];
 }
 
-/**
- * Check if the input is an integer
- * @param {number} x The input must be an integer
- */
-function isInteger(x) {
-    return Math.round(x) === x
-    //return (typeof x === 'number') && (x % 1 === 0);
-}
 
 /**
  * Wait until a message from main thread. The message must 
@@ -99,7 +91,7 @@ self.onmessage = function(e) {
             // process more the maxLines lines of output
             // keep the first maxLines
             var outf = function(text) { 
-                if (pyOut.split(/\r\n|\r|\n/).length < maxLines) {
+                if (pyOut.split(/\r\n|\r|\n/).length <= maxLines) {
                     pyOut += text; 
                 };
             }
