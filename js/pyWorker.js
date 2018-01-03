@@ -45,11 +45,17 @@ var maxLines = 20;
  */
 var maxMS    = 1000;
 /**
- * The standard output of the program. The output is collected in a string
- * with new lines.
+ * The standard output of the program. The output is collected into an array of strings.
+ * The number of entries in the array corresponds to the max. number of lines allowed
+ * in the output.
+ * @type {array} An array of string containing the lines of output
+ */
+var pyOut = [];
+/**
+ * String to collect a line of standard output
  * @type {string}
  */
-var pyOut = '';
+var outLine = '';
 /**
  * Some input for the program. This variable is not used at the moment
  * @type {array}
@@ -91,9 +97,21 @@ self.onmessage = function(e) {
             // process more the maxLines lines of output
             // keep the first maxLines
             var outf = function(text) { 
-                if (pyOut.split(/\r\n|\r|\n/).length <= maxLines) {
-                    pyOut += text; 
-                };
+                //if (pyOut.split(/\r\n|\r|\n/).length <= maxLines) {
+                //     pyOut += text; 
+                // };
+                if (text !== '\n') {
+                    // collect line elements
+                    outLine += text;
+                } else {
+                    // collect line into output
+                    outLine += text;
+                    pyOut.push(outLine);
+                    outLine = '';
+                }
+                if (pyOut.length > (maxLines+1)) {
+                    pyOut.shift();
+                }
             }
             Sk.configure({output:outf, read:builtinRead}); 
             var myPromise = Sk.misceval.asyncToPromise(function() {
@@ -102,7 +120,9 @@ self.onmessage = function(e) {
             
             myPromise.then(function(mod) {
                     // construct data message and send it to main thrad
-                    var messageData = {finished: 'success', stdOut: pyOut};
+                    //var messageData = {finished: 'success', stdOut: pyOut};
+                    pyOut.unshift('last ' + maxLines + ' lines of standard output\n');
+                    var messageData = {finished: 'success', stdOut: pyOut.join('')};
                     postMessage(['finished',messageData]);
                 },
                 function(err) {
