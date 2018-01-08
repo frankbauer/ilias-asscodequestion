@@ -7,8 +7,7 @@
  * @version $Id$
  */ 
 
-$res = $ilDB->queryF("SELECT * FROM qpl_qst_type WHERE type_tag = %s", array('text'), array('assCodeQuestion')
-);
+$res = $ilDB->queryF("SELECT * FROM qpl_qst_type WHERE type_tag = %s", array('text'), array('assCodeQuestion'));
 
 if ($res->numRows() == 0) 
 {
@@ -19,8 +18,7 @@ if ($res->numRows() == 0)
     $affectedRows = $ilDB->manipulateF(
 		"INSERT INTO qpl_qst_type (question_type_id, type_tag, plugin) VALUES (%s, %s, %s)",
 		array("integer", "text", "integer"),
-		array($max, 'assCodeQuestion',
-		1)
+		array($max, 'assCodeQuestion', 1)
     );
 }
 ?>
@@ -31,17 +29,22 @@ if ($res->numRows() == 0)
 	 *
 	 */
 
-	$fields = array(
-		'question_fi' => array(
-			'type' => 'integer',
-			'length' => 4
-		),
+	$val = $ilDB->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'il_qpl_qst_codeqst_dat'");
+	
+	if ($val->numRows() == 0) {
+		$fields = array(
+			'question_fi' => array(
+				'type' => 'integer',
+				'length' => 4
+			),
 
-		'data' => array(
-		'type' => 'clob'
-		)
-	);
+			'data' => array(
+			'type' => 'clob'
+			)
+		);
 
-	$ilDB->createTable("il_qpl_qst_codeqst_dat", $fields);
-	$ilDB->addPrimaryKey("il_qpl_qst_codeqst_dat", array("question_fi"));
+		$ilDB->createTable("il_qpl_qst_codeqst_dat", $fields);
+		$ilDB->addPrimaryKey("il_qpl_qst_codeqst_dat", array("question_fi"));
+	}
+	
 ?>
