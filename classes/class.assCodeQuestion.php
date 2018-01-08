@@ -68,6 +68,22 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['allowRun'] = (bool)$newValue;
 	}
 
+	function getTimeoutMS() {
+		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 500; 
+	}
+
+	function setTimeoutMS($newValue) {
+		$this->additional_data['timeoutMS'] = (int)$newValue;
+	}
+
+	function getMaxLines() {
+		return isset($this->additional_data['maxLines']) ? $this->additional_data['maxLines'] : 20; 
+	}
+	
+	function setMaxLines($newValue) {
+		$this->additional_data['maxLines'] = (int)$newValue;
+	}
+
 	function getPrefixCode() {
 		return $this->fixLoadedCode($this->additional_data['prefixCode']);
 	}
