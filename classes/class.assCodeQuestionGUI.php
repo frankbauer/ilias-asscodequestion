@@ -516,8 +516,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
 		}*/		
 
-		}*/		
-
 		//include everything we need to execute python code when we just want to display a brief answer
 		if ($_GET['cmd'] == 'getAnswerDetail' ) {
 			$lngData = $this->getLanguageData();
