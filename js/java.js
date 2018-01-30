@@ -84,6 +84,12 @@ var JavaExec = {
       console.log("here", jvmObject, err);
       jvmObject.runClass(className, args, cb);
     });
+  },
+
+  javac : function(args, cb) {
+    new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
+      jvmObject.runClass('util.Javac', args, cb);
+    });
   }
 };
 
@@ -97,9 +103,10 @@ var JavaExec = {
   console.log("res", res);
 
   JavaExec.reroutStdStreams();
-      
+  
+  JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {console.log('finished with', ecode)})
   setTimeout(function(e){
-      JavaExec.runClass('foo.Foo', ['argument1', 'argument2'], function(exitCode) {
+      JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
         if (exitCode === 0) {
           console.log("All is good");
         } else {
