@@ -12,7 +12,7 @@ $(document).ready(function(){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 } else {
                     if ($('input#allow_run_button').length) {
@@ -87,7 +87,7 @@ function selectLanguage() {
     postEditor.setOption("mode",edMode);
     // if python or javascript show run button
     var qLanguage = input.options[input.selectedIndex].value;
-    if (qLanguage === 'python' || qLanguage === 'javascript') {
+    if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
         if ($('input#allow_run')[0].checked === true) {
             // checkbox is checked
             if ($('input#allow_run_button').length) {
@@ -128,7 +128,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
     var currentLineNumber = 0;
      $(".assCodeQuestionCodeBox").each(function(i, block) {  
         // edit part
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
+        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
             if ( block.id.indexOf('pre_') !== -1) {
                 firstLineNumber = 1;
                 var myPrev = document.getElementById(block.id);
@@ -190,7 +190,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
     });
     // if Python or JavaScript display the run button
     if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
+        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
             $('input#allow_run_button').css('display','');
         } else {
             $('input#allow_run_button').css('display','none');
@@ -202,7 +202,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 }
             }
@@ -348,7 +348,7 @@ function getTotalSourcecode(questionID){
  * and define a log function to print the standard output of the program
  * @param {string} questionID 
  * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python or JavaScript program
+ * @param {string} prog  String containing the Python, Java or JavaScript program
  * @param {number} maxMS  Timeout to kill the worker
  * @param {numner} maxLines Maximum number of lines allowd in the standard output
  */
