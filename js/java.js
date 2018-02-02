@@ -9,7 +9,8 @@ if ('function' === typeof importScripts) {
 var JavaExec = {
   fs:null,
   options:{},
-  persistentFs:null,  
+  persistentFs:null, 
+  ready:false, 
 
   constructPersistantFs : function(cb) {
       if (BrowserFS.FileSystem.IndexedDB.isAvailable()) {
@@ -284,17 +285,29 @@ var JavaExec = {
     process.stdin.write('Some text');
   },
 
+  _whenReady(cb){
+    if (JavaExec.ready) {
+      cb()
+    } else {
+      setTimeout(JavaExec._whenReady.bind(null, cb), 100)
+    }
+  },
+
   runClass : function(className, args, cb) {
-    new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {
-      console.log("here", jvmObject, err);
-      jvmObject.runClass(className, args, cb);
-    });
+    JavaExec._whenReady(function(){
+      new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {
+        console.log("here", jvmObject, err);
+        jvmObject.runClass(className, args, cb);
+      })
+    })
   },
 
   javac : function(args, cb) {
-    new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
-      jvmObject.runClass('util.Javac', args, cb);
-    });
+    JavaExec._whenReady(function(){
+      new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
+        jvmObject.runClass('util.Javac', args, cb);
+      })
+    })
   }
 };
 
@@ -307,28 +320,23 @@ var JavaExec = {
       //JavaExec.printDirContent('sys/vendor');      
 
       JavaExec.reroutStdStreams();
-      
-      console.time('javac');
-      console.time('run');
-      JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {
-        console.log('finished with', ecode);
-        console.timeEnd('javac');
-
-        JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
-          if (exitCode === 0) {
-            console.log("All is good");
-          } else {
-            console.error("Failed")
-          }
-          console.timeEnd('run')
-        });
-      })
-      
-      
-      
-
+      JavaExec.ready = true;
     })
   })
+})();
 
-      
-  })();
+console.time('javac');
+console.time('run');
+JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {
+  console.log('finished with', ecode);
+  console.timeEnd('javac');
+
+  JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
+    if (exitCode === 0) {
+      console.log("All is good");
+    } else {
+      console.error("Failed")
+    }
+    console.timeEnd('run')
+  });
+})
