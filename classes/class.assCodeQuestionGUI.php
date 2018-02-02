@@ -100,9 +100,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
 		} else*/ if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&007');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&007');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&007');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&009');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&009');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&009');
 		}
 
 
