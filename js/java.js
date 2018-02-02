@@ -194,7 +194,7 @@ var JavaExec = {
           JavaExec.download(file.absPath, function (fileErr, fileBuffer){
             if (fileErr == null){
               let b = new Buffer(fileBuffer);
-              console.log(file, fileBuffer, b, Path.dirname(target));
+              //console.log("processing", file, fileBuffer, b, Path.dirname(target));
               let onWritten = function(err){                
                 if (err) console.error("Error writing File", err);
                 //else console.log("written", err, target, JavaExec.fs.existsSync(target), stats) 
@@ -309,17 +309,23 @@ var JavaExec = {
       JavaExec.reroutStdStreams();
       
       console.time('javac');
-      JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {console.log('finished with', ecode);console.timeEnd('javac');})
-      
       console.time('run');
-      JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
-        if (exitCode === 0) {
-          console.log("All is good");
-        } else {
-          console.error("Failed")
-        }
-        console.timeEnd('run')
-      });
+      JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {
+        console.log('finished with', ecode);
+        console.timeEnd('javac');
+
+        JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
+          if (exitCode === 0) {
+            console.log("All is good");
+          } else {
+            console.error("Failed")
+          }
+          console.timeEnd('run')
+        });
+      })
+      
+      
+      
 
     })
   })
