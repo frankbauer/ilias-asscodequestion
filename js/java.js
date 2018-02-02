@@ -128,7 +128,7 @@ var JavaExec = {
       let doMake = function(e){
         if (list.length>0){
           let what = list.pop();
-          console.log("mkdir", what);
+          //console.log("mkdir", what);
           JavaExec.fs.mkdir(what, doMake)
         } else {
           cb()
@@ -308,14 +308,17 @@ var JavaExec = {
 
       JavaExec.reroutStdStreams();
       
-      //JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {console.log('finished with', ecode)})
+      console.time('javac');
+      JavaExec.javac(['/sys/vendor/classes/foo/Foo.java'], function(ecode) {console.log('finished with', ecode);console.timeEnd('javac');})
       
+      console.time('run');
       JavaExec.runClass('foo.Foo', ['test', 1], function(exitCode) {
         if (exitCode === 0) {
           console.log("All is good");
         } else {
           console.error("Failed")
         }
+        console.timeEnd('run')
       });
 
     })
