@@ -45,8 +45,9 @@ var JavaExec = {
    */
   initialize : function(cb){
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
-    options.bootstrapClasspath.push("/sys/vendor/classes/"); 
-    options.classpath = ["/tmp/"]; 
+    options.bootstrapClasspath.push("/sys/classes/"); 
+    options.classpath = [".", "/tmp/"]; 
+    options.nativeClasspath = ["/sys/natives"];
     console.log("options", options); 
     
     JavaExec.options = options;
@@ -199,7 +200,7 @@ var JavaExec = {
 
     JavaExec.showMessage("Preparing <b>Java</b> Environment");
     //load file index
-    JavaExec.download(sourceFolder+"/listings.json", function(err, buffer){
+    JavaExec.download(sourceFolder+"/listings.json?v="+Date.now(), function(err, buffer){
       let Buffer = BrowserFS.BFSRequire('buffer').Buffer;
       let Path = BrowserFS.BFSRequire('path');
       if (err != null){
@@ -351,12 +352,14 @@ var JavaExec = {
 
   javac : function(args, cb) {
     JavaExec._whenReady(function(){
-      /*new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
+      /*new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {     
+        console.log("jvm", err, jvmObject); 
         jvmObject.runClass('util.Javac', args, cb);
       })*/
       let a = ['util.Javac'].concat(args);
       console.log(a);
       Doppio.VM.CLI(a, JavaExec.options, function(ecode) {      
+        console.log("ee", ecode)
         cb(ecode);
         //jvmObject.runClass('util.Javac', args, cb);
       })
