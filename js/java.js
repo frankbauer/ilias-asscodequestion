@@ -45,8 +45,8 @@ var JavaExec = {
    */
   initialize : function(cb){
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
-    options.bootstrapClasspath.push("/sys/classes/"); 
-    options.classpath = [".", "/tmp/"]; 
+    //options.bootstrapClasspath.push("/sys/classes/"); 
+    options.classpath = [".", "/sys/classes"]; 
     options.nativeClasspath = ["/sys/natives"];
     console.log("options", options); 
     
@@ -127,10 +127,7 @@ var JavaExec = {
           var remainingSeconds = remainingTime % 60;
           var percent = ((loaded / total) * 100) | 0;
           console.log("<b>Downloading</b> " + Path.basename(what) + " (" + percent + "%)");
-          JavaExec.showMessage("<b>Downloading</b> " + Path.basename(what) + " (" + percent + "%)");          
-          /*progressBarText.text("Downloading doppio_home.zip at " + rate.toFixed(2) + " KB/s [" + (loaded >> 10) + " KB / " + (total >> 10) + " KB] (" + remainingMinutes + "m" + remainingSeconds + "s remaining)");
-          progressBar.attr('aria-valuenow', percent);
-          progressBar.css('width', percent + "%");*/
+          JavaExec.showMessage("<b>Downloading</b> " + Path.basename(what) + " (" + percent + "%)");                    
       });
       xhr.addEventListener('load', function (e) {
           //console.log("Downloaded", what, e, xhr)         
@@ -346,23 +343,23 @@ var JavaExec = {
       new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {
         console.log("here", jvmObject, err);
         jvmObject.runClass(className, args, cb);
-      })
+      })      
     })
   },
 
   javac : function(args, cb) {
     JavaExec._whenReady(function(){
-      /*new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {     
+      new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {     
         console.log("jvm", err, jvmObject); 
         jvmObject.runClass('util.Javac', args, cb);
-      })*/
-      let a = ['util.Javac'].concat(args);
+      })
+      /*let a = ['util.Javac'].concat(args);
       console.log(a);
       Doppio.VM.CLI(a, JavaExec.options, function(ecode) {      
         console.log("ee", ecode)
         cb(ecode);
         //jvmObject.runClass('util.Javac', args, cb);
-      })
+      })*/
     })
   },
 
@@ -399,19 +396,19 @@ var JavaExec = {
         JavaExec.showMessage("<b>Executing</b> " + className);
         if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
           try {
-            JavaExec.runClass(className, [], function(exitCode) {
-              if (exitCode === 0) {
+            //JavaExec.runClass(className, [], function(exitCode) {
+              /*if (exitCode === 0) {
                 console.log("All is good");            
               } else {
                 console.error("Failed to Run " + className)
-              }
+              }*/
               if (JavaExec.outputStream && JavaExec.outputStream!='')
                 console.log(JavaExec.outputStream)
               if (JavaExec.errorStream && JavaExec.errorStream!='')
                 console.error(JavaExec.errorStream)
               console.timeEnd('run')
               iAmDone(JavaExec.outputStream, JavaExec.errorStream)
-            });
+            //});
           } catch (e){
             console.error("Run Failed", e.error)
             iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
