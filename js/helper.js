@@ -126,8 +126,22 @@ function initSolutionBox(useMode, qLanguage, questionID){
     // remember line nr. of last block
     var firstLineNumber = 0;
     var currentLineNumber = 0;
+    var selectTextAres = function(blockid,questionID) {
+        if (blockid.indexOf('question'+questionID+'value1') > -1) {
+            return true; // examination or preview mode for questionID
+        } else if (blockid === 'code_prefix') { 
+            return true; // edit mode
+        } else if (blockid === 'best_solution') {
+            return true; // edit mode
+        } else if (blockid === 'code_postfix') {
+            return true; // edit mode
+        } else {
+            return false; // examination of preview mode for different questionID
+        }
+    }
      $(".assCodeQuestionCodeBox").each(function(i, block) {  
-        if (block.id.indexOf('question'+questionID+'value1') > -1) {
+        //if (block.id.indexOf('question'+questionID+'value1') > -1) {
+        if ( selectTextAres(block.id,questionID) ) {
             // edit part
             if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
                 if ( block.id.indexOf('pre_') !== -1) {
@@ -243,7 +257,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             return CodeMirror.Pass;
         });
         bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 1;
+            bsolFirstLine = prefEditor.lastLine() + 2;
             postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
             postEditor.setOption('firstLineNumber',postFirstLine);
@@ -294,7 +308,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
         postEditor = $('.assCodeQuestionCodeBox#post_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
         bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 1;
+            bsolFirstLine = prefEditor.lastLine() + 2;
             postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
             postEditor.setOption('firstLineNumber',postFirstLine);
