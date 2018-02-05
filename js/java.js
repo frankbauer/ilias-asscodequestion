@@ -392,7 +392,7 @@ var JavaExec = {
       JavaExec.javac([javaFile], function(ecode) {
         console.log('finished with', ecode);
         console.timeEnd('javac');
-      
+       JavaExec.printDirContent('/tmp')
         JavaExec.showMessage("<b>Executing</b> " + className);
         if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
           try {
