@@ -396,19 +396,19 @@ var JavaExec = {
         JavaExec.showMessage("<b>Executing</b> " + className);
         if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
           try {
-            //JavaExec.runClass(className, [], function(exitCode) {
-              /*if (exitCode === 0) {
+            JavaExec.runClass(className, [], function(exitCode) {
+              if (exitCode === 0) {
                 console.log("All is good");            
               } else {
                 console.error("Failed to Run " + className)
-              }*/
+              }
               if (JavaExec.outputStream && JavaExec.outputStream!='')
                 console.log(JavaExec.outputStream)
               if (JavaExec.errorStream && JavaExec.errorStream!='')
                 console.error(JavaExec.errorStream)
               console.timeEnd('run')
               iAmDone(JavaExec.outputStream, JavaExec.errorStream)
-            //});
+            });
           } catch (e){
             console.error("Run Failed", e.error)
             iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
@@ -451,7 +451,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength){
     if (stderr && stderr!='') tex += format_error(stderr) + "\n";
     if (stdout && stdout!='') tex += format_info(stdout);
     log_callback( tex )
-    //console.log("Done", stdout, stderr);
+    console.log("Done", stdout, stderr);
   })
 }
 
