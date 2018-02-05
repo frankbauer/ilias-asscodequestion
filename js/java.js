@@ -292,6 +292,13 @@ var JavaExec = {
     JavaExec.errorStream = '';
   },
   reroutStdStreams : function(){
+    function format_info(text){
+      return '<span style="color:green">'+text+'</span>';
+    }
+    function format_error(text){
+      return '<span style="color:red">'+text+'</span>';
+    }
+
     // Grab BrowserFS's 'process' module, which emulates NodeJS's process.
     var process = BrowserFS.BFSRequire('process');
     // Initialize TTYs; required if needed to be initialized immediately due to
@@ -313,7 +320,7 @@ var JavaExec = {
     var stderrBuffer = '';
     process.stderr.on('data', function(data) {
       stderrBuffer += data.toString();
-      JavaExec.errorStream += data.toString();
+      JavaExec.outputStream += format_error(data.toString());
       var newlineIdx;
       while ((newlineIdx = stderrBuffer.indexOf("\n")) > -1) {
         console.error(stderrBuffer.slice(0, newlineIdx));
@@ -381,7 +388,7 @@ var JavaExec = {
         console.timeEnd('javac');
       
         JavaExec.showMessage("<b>Executing</b> " + className);
-        if (JavaExec.errorStream === undefined) {
+        if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
           try {
             JavaExec.runClass(className, [], function(exitCode) {
               if (exitCode === 0) {
@@ -389,8 +396,10 @@ var JavaExec = {
               } else {
                 console.error("Failed to Run " + className)
               }
-              console.log(JavaExec.outputStream)
-              console.error(JavaExec.errorStream)
+              if (JavaExec.outputStream && JavaExec.outputStream!='')
+                console.log(JavaExec.outputStream)
+              if (JavaExec.errorStream && JavaExec.errorStream!='')
+                console.error(JavaExec.errorStream)
               console.timeEnd('run')
               iAmDone(JavaExec.outputStream, JavaExec.errorStream)
             });
@@ -399,7 +408,7 @@ var JavaExec = {
             iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
           }
         } else {
-          console.error("Compiler Failed")
+          console.error("Compiler Failed", JavaExec.errorStream)
           iAmDone("", JavaExec.errorStream)
         }
       })
