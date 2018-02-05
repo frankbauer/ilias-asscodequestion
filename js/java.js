@@ -319,6 +319,7 @@ var JavaExec = {
     process.stderr.on('data', function(data) {
       stderrBuffer += data.toString();
       JavaExec.outputStream += format_error(data.toString());
+      JavaExec.errorStream += data.toString();
       var newlineIdx;
       while ((newlineIdx = stderrBuffer.indexOf("\n")) > -1) {
         console.error(stderrBuffer.slice(0, newlineIdx));
@@ -396,6 +397,7 @@ var JavaExec = {
         JavaExec.showMessage("<b>Executing</b> " + className);
         if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
           try {
+            console.log("2", JavaExec.errorStream)
             JavaExec.runClass(className, [], function(exitCode) {
               if (exitCode === 0) {
                 console.log("All is good");            
@@ -407,11 +409,11 @@ var JavaExec = {
               if (JavaExec.errorStream && JavaExec.errorStream!='')
                 console.error(JavaExec.errorStream)
               console.timeEnd('run')
-              iAmDone(JavaExec.outputStream, JavaExec.errorStream)
+              iAmDone(JavaExec.outputStream, '')
             });
           } catch (e){
             console.error("Run Failed", e.error)
-            iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
+            iAmDone(JavaExec.outputStream, '' + "\n" + e.error);
           }
         } else {
           console.error("Compiler Failed", JavaExec.errorStream)
