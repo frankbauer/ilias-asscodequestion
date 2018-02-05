@@ -390,6 +390,21 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
     runJavaScriptWorker( prog, log, maxMS, maxLines);
 }
 
+function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+    if(!prog) prog = getTotalSourcecode(questionID);
+    if (mypre===undefined) {
+        mypre = document.getElementById(questionID+"Output");     
+    }  
+    if (mypre){
+        mypre.style.display = '';
+        mypre.innerHTML = ''; 
+    }
+    function log(text){
+        mypre.innerHTML = text; 
+    }       
+    runJavaWorker( prog, log, maxMS, maxLines);
+}
+
 
 function runPythonInTest(questionID){   
     runPython(getTotalSourcecode(questionID), questionID)
@@ -444,6 +459,7 @@ function runInTest(language,questionID){
     switch(language){
         case 'python': runPython(prog, questionID,mypre,maxMS,maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
     }
 }
 
@@ -463,6 +479,7 @@ function runInSolution(language){
         switch(language){
             case 'python': runPython(prog, block.id, node); break;
             case 'javascript':  runJavaScript( block.id, node, prog); break;
+            case 'java':  runJava( block.id, node, prog); break;
         }
     });   
 }
