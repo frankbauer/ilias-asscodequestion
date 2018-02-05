@@ -46,7 +46,7 @@ var JavaExec = {
   initialize : function(cb){
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     options.bootstrapClasspath.push("/sys/vendor/classes/"); 
-    options.classpath.push("/tmp/"); 
+    options.classpath = ["/tmp/"]; 
     console.log("options", options); 
     
     JavaExec.options = options;
@@ -351,8 +351,14 @@ var JavaExec = {
 
   javac : function(args, cb) {
     JavaExec._whenReady(function(){
-      new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
+      /*new Doppio.VM.JVM(JavaExec.options, function(err, jvmObject) {      
         jvmObject.runClass('util.Javac', args, cb);
+      })*/
+      let a = ['util.Javac'].concat(args);
+      console.log(a);
+      Doppio.VM.CLI(a, JavaExec.options, function(ecode) {      
+        cb(ecode);
+        //jvmObject.runClass('util.Javac', args, cb);
       })
     })
   },
