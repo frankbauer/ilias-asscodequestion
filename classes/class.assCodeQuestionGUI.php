@@ -100,9 +100,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
 		} else*/ if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&009');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&009');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&009');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
 		}
 
 
@@ -120,7 +120,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?&auto');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
 		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");');
 		$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 		$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
@@ -235,7 +235,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 			$tpl->setVariable("QUESTION_ID", $this->object->getId());
 			$tpl->setVariable("LANGUAGE", $language);
-			$runCode = $tpl->get();
+			$tpl->setVariable("DISABLED_STATE", $language=='java');
+			$runCode = $tpl->get();			
 		}
 		
 		// fill the question output template
