@@ -46,7 +46,7 @@ var JavaExec = {
   initialize : function(cb){
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     //options.bootstrapClasspath.push("/sys/classes/"); 
-    options.classpath = [".", "/sys/classes"]; 
+    options.classpath = ["/tmp", "/sys/classes"]; 
     options.nativeClasspath = ["/sys/natives"];
     console.log("options", options); 
     
@@ -90,7 +90,7 @@ var JavaExec = {
   showMessage : function(msg) {
     let waitBoxes = document.querySelectorAll("#stateBox"); 
     let infoBoxes = document.querySelectorAll("#stateMessageBox");    
-    console.log(msg, waitBoxes, infoBoxes)    
+    //console.log(msg, waitBoxes, infoBoxes)    
     for (let nr in infoBoxes){
       let box = infoBoxes[nr];     
       if (box.id) {
@@ -445,13 +445,13 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength){
   log_callback('<div class="sk-three-bounce"><div class="sk-child sk-bounce1"></div><div class="sk-child sk-bounce2"></div><div class="sk-child sk-bounce3"></div>');
 
   let className = match[1];
-  console.log(code, className, log_callback, max_ms, max_loglength);
+  //console.log(code, className, log_callback, max_ms, max_loglength);
   JavaExec.compileAndRun(code, className, function(stdout, stderr){
     let tex = '';
     if (stderr && stderr!='') tex += format_error(stderr) + "\n";
     if (stdout && stdout!='') tex += format_info(stdout);
     log_callback( tex )
-    console.log("Done", stdout, stderr);
+    //console.log("Done", stdout, stderr);
   })
 }
 
