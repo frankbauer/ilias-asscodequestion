@@ -461,19 +461,12 @@ var JavaExec = {
         jvmObject.runClass('util.Javac', args, cb);
         
       })
-      /*let a = ['util.Javac'].concat(args);
-      console.log(a);
-      Doppio.VM.CLI(a, JavaExec.options, function(ecode) {      
-        console.log("ee", ecode)
-        cb(ecode);
-        //jvmObject.runClass('util.Javac', args, cb);
-      })*/
     })
   },
 
   
   _compileAndRunClass: null,
-  compileAndRun: function (code, className, whenFinished) {
+  compileAndRun: function (code, className, max_ms, whenFinished) {
     let Path = BrowserFS.BFSRequire('path');
     let iAmDone = function (stdout, stderr) {
       JavaExec.showMessage(null);
@@ -502,11 +495,11 @@ var JavaExec = {
 
       JavaExec._whenReady(function () {
         new Doppio.VM.JVM(JavaExec.options, function (err, jvmObject) {
-          console.log("jvm", err, jvmObject);
+          //console.log("jvm", err, jvmObject);
        
           let _compileAndRunWithClass = function (cls) {
             var cdataStatics =  cls.getConstructor(jvmObject.firstThread);
-            console.log("cdataStatics?", cdataStatics, jvmObject, Doppio)
+            //console.log("cdataStatics?", cdataStatics, jvmObject, Doppio)
             let compile = cdataStatics['compile(Ljava/lang/String;Ljava/lang/String;)I'];
             let run = cdataStatics['run(Ljava/lang/String;)I'];
             if (compile && run) {
@@ -519,7 +512,18 @@ var JavaExec = {
                 
                 if (JavaExec.errorStream === undefined || JavaExec.errorStream == '') {
                   JavaExec.showMessage("<b>Executing</b> " + className);
+
+                  JavaExec.terminate = function(){
+                    console.log("Terminating...")
+                    JavaExec.showMessage("<b>Terminating</b> " + className);
+                    jvmObject.halt(0);
+                  }
+                  setTimeout(function(e){
+                    JavaExec.terminate()
+                  }, max_ms)
+
                   run(jvmObject.firstThread, [p1], function(e, exitCode){
+                    JavaExec.terminate = function(){}
                     if (exitCode === 0) {
                       console.log("All is good");
                     } else {
@@ -556,45 +560,9 @@ var JavaExec = {
           
         })
        
-      })
-
-      /*JavaExec.javac([javaFile], function (ecode) {
-        console.log('finished with', ecode);
-        console.timeEnd('javac');
-        //JavaExec.printDirContent('/tmp')
-        JavaExec.showMessage("<b>Executing</b> " + className);
-        if (JavaExec.errorStream === undefined || JavaExec.errorStream == '') {
-          try {
-            console.log("2", JavaExec.errorStream)
-            JavaExec.runClass(className, [], function (exitCode) {
-              if (exitCode === 0) {
-                console.log("All is good");
-              } else {
-                console.error("Failed to Run " + className)
-              }
-              if (JavaExec.outputStream && JavaExec.outputStream != '')
-                console.log(JavaExec.outputStream)
-              if (JavaExec.errorStream && JavaExec.errorStream != '')
-                console.error(JavaExec.errorStream)
-              console.timeEnd('run')
-              iAmDone(JavaExec.combinedStream, '')
-            });
-          } catch (e) {
-            console.error("Run Failed", e.error)
-            iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
-          }
-        } else {
-          console.error("Compiler Failed", JavaExec.errorStream)
-          iAmDone("", JavaExec.errorStream)
-        }
-      })*/
+      })    
     })
-
-
-
-
   }
-
 };
 function runJavaWorker(code, log_callback, max_ms, max_loglength) {
   function format_info(text) {
@@ -602,12 +570,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
   }
   function format_error(text) {
     return '<span style="color:red">' + text + '</span>';
-  }
-
-
-  setTimeout(function (e) {
-    console.log("NOT DEAD")
-  }, 1000)
+  }  
 
   let exp = new RegExp("public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)");
   let match = exp.exec(code);
@@ -620,7 +583,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
 
   let className = match[1];
   //console.log(code, className, log_callback, max_ms, max_loglength);
-  JavaExec.compileAndRun(code, className, function (stdout, stderr) {
+  JavaExec.compileAndRun(code, className, max_ms, function (stdout, stderr) {
     let tex = '';
     if (stderr && stderr != '') tex += format_error(stderr) + "\n";
     if (stdout && stdout != '') tex += format_info(stdout);
