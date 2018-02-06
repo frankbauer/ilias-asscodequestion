@@ -1,17 +1,13 @@
 
 'use strict';
 
-if ('function' === typeof importScripts) {
-  importScripts('./browserfs/browserfs.min.js&?v=003');
-  importScripts('./doppio/doppio.js&?v=004');
-}
-
 var JavaExec = {
   fs: null,
   options: {},
   persistentFs: null,
   ready: false,
   running: false,
+  terminate: function () { },
 
   constructPersistantFs: function (cb) {
     if (BrowserFS.FileSystem.IndexedDB.isAvailable()) {
@@ -46,7 +42,7 @@ var JavaExec = {
   initialize: function (cb) {
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     //options.bootstrapClasspath.push("/sys/classes/"); 
-    options.classpath = [".", "/tmp", "/sys/classes"];
+    options.classpath = ["/tmp", "/sys/classes"];
     options.nativeClasspath = ["/sys/natives"];
     console.log("options", options);
 
@@ -460,8 +456,10 @@ var JavaExec = {
     JavaExec._whenReady(function () {
       new Doppio.VM.JVM(JavaExec.options, function (err, jvmObject) {
         console.log("jvm", err, jvmObject);
+        let className = '';
         JavaExec.showMessage("<b>Compiling</b> " + className + " (this will take a while...)");
         jvmObject.runClass('util.Javac', args, cb);
+        
       })
       /*let a = ['util.Javac'].concat(args);
       console.log(a);
@@ -473,6 +471,8 @@ var JavaExec = {
     })
   },
 
+  
+  _compileAndRunClass: null,
   compileAndRun: function (code, className, whenFinished) {
     let Path = BrowserFS.BFSRequire('path');
     let iAmDone = function (stdout, stderr) {
@@ -490,6 +490,7 @@ var JavaExec = {
     }
     JavaExec.clearStdStreams();
     JavaExec.running = true;
+    JavaExec.killed = false;
     JavaExec.showMessage("<b>Writing</b> " + className);
     let javaFile = Path.join('/tmp', className + ".java");
 
@@ -497,38 +498,96 @@ var JavaExec = {
     console.time('run');
     JavaExec.fs.writeFile(javaFile, code, function (err) {
       if (err) throw err;
-      JavaExec.showMessage("<b>Compiling</b> " + className + " (this will take a while...)");
+      JavaExec.showMessage("<b>Preparing JVM</b>");
 
-      JavaExec.javac([javaFile], function (ecode) {
+      JavaExec._whenReady(function () {
+        new Doppio.VM.JVM(JavaExec.options, function (err, jvmObject) {
+          console.log("jvm", err, jvmObject);
+       
+          let _compileAndRunWithClass = function (cls) {
+            var cdataStatics =  cls.getConstructor(jvmObject.firstThread);
+            console.log("cdataStatics?", cdataStatics, jvmObject, Doppio)
+            let compile = cdataStatics['compile(Ljava/lang/String;Ljava/lang/String;)I'];
+            let run = cdataStatics['run(Ljava/lang/String;)I'];
+            if (compile && run) {
+              let p1 = Doppio.VM.Util.initString(jvmObject.getBootstrapClassLoader(), className)
+              let p2 = Doppio.VM.Util.initString(jvmObject.getBootstrapClassLoader(), javaFile)              
+             
+              compile(jvmObject.firstThread, [p1, p2], function(e, ecode){
+                console.log('finished with', e, ecode);
+                console.timeEnd('javac');
+                
+                if (JavaExec.errorStream === undefined || JavaExec.errorStream == '') {
+                  JavaExec.showMessage("<b>Executing</b> " + className);
+                  run(jvmObject.firstThread, [p1], function(e, exitCode){
+                    if (exitCode === 0) {
+                      console.log("All is good");
+                    } else {
+                      console.error("Failed to Run " + className)
+                    }
+                    if (JavaExec.outputStream && JavaExec.outputStream != '')
+                      console.log(JavaExec.outputStream)
+                    if (JavaExec.errorStream && JavaExec.errorStream != '')
+                      console.error(JavaExec.errorStream)
+                    console.timeEnd('run')
+                    iAmDone(JavaExec.combinedStream, '')
+                  })
+                } else { //if errorStream
+                  console.error("Compiler Failed", JavaExec.errorStream)
+                  iAmDone(JavaExec.outputStream, JavaExec.errorStream)
+                } //else errorStream
+              });              
+            } else {
+              console.error("INTERNAL ERROR: Did not find compile-method")
+              iAmDone("", "INTERNAL ERROR: Did not find compile-method")
+            }
+          }
+
+          JavaExec.showMessage("<b>Compiling</b> " + className + " (this will take a while...)");    
+          /*if (JavaExec._compileAndRunClass){
+            //we need to unload the compiled class here!
+            _compileAndRunWithClass(JavaExec._compileAndRunClass); 
+          } else*/ {     
+            jvmObject.systemClassLoader.initializeClass(jvmObject.firstThread, 'Lutil/CompileAndRun;', (cls) => {                        
+              JavaExec._compileAndRunClass = cls;
+              _compileAndRunWithClass(cls);            
+            });
+          }
+          
+        })
+       
+      })
+
+      /*JavaExec.javac([javaFile], function (ecode) {
         console.log('finished with', ecode);
         console.timeEnd('javac');
         //JavaExec.printDirContent('/tmp')
         JavaExec.showMessage("<b>Executing</b> " + className);
-        //if (JavaExec.errorStream === undefined || JavaExec.errorStream=='') {
-        try {
-          console.log("2", JavaExec.errorStream)
-          /*JavaExec.runClass(className, [], function(exitCode) {
-            if (exitCode === 0) {
-              console.log("All is good");            
-            } else {
-              console.error("Failed to Run " + className)
-            }*/
-          if (JavaExec.outputStream && JavaExec.outputStream != '')
-            console.log(JavaExec.outputStream)
-          if (JavaExec.errorStream && JavaExec.errorStream != '')
-            console.error(JavaExec.errorStream)
-          console.timeEnd('run')
-          iAmDone(JavaExec.combinedStream, '')
-          //});
-        } catch (e) {
-          console.error("Run Failed", e.error)
-          iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
-        }
-        /*} else {
+        if (JavaExec.errorStream === undefined || JavaExec.errorStream == '') {
+          try {
+            console.log("2", JavaExec.errorStream)
+            JavaExec.runClass(className, [], function (exitCode) {
+              if (exitCode === 0) {
+                console.log("All is good");
+              } else {
+                console.error("Failed to Run " + className)
+              }
+              if (JavaExec.outputStream && JavaExec.outputStream != '')
+                console.log(JavaExec.outputStream)
+              if (JavaExec.errorStream && JavaExec.errorStream != '')
+                console.error(JavaExec.errorStream)
+              console.timeEnd('run')
+              iAmDone(JavaExec.combinedStream, '')
+            });
+          } catch (e) {
+            console.error("Run Failed", e.error)
+            iAmDone(JavaExec.outputStream, JavaExec.errorStream + "\n" + e.error);
+          }
+        } else {
           console.error("Compiler Failed", JavaExec.errorStream)
           iAmDone("", JavaExec.errorStream)
-        }*/
-      })
+        }
+      })*/
     })
 
 
@@ -537,7 +596,6 @@ var JavaExec = {
   }
 
 };
-
 function runJavaWorker(code, log_callback, max_ms, max_loglength) {
   function format_info(text) {
     return '<span style="color:green">' + text + '</span>';
@@ -545,6 +603,11 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
   function format_error(text) {
     return '<span style="color:red">' + text + '</span>';
   }
+
+
+  setTimeout(function (e) {
+    console.log("NOT DEAD")
+  }, 1000)
 
   let exp = new RegExp("public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)");
   let match = exp.exec(code);
