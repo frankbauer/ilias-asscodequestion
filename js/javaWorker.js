@@ -23,14 +23,20 @@ self.addEventListener('message', function (e) {
                 JavaExec.initFileSystems('../', function () {
                     //JavaExec.printDirContent('/');      
 
-                    JavaExec.reroutStdStreams();                    
+                    JavaExec.reroutStdStreams();
                     JavaExec.ready = true;
                     JavaExec.compileAndRun(data.code, data.className, data.max_ms, function (stdout, stderr) {
                         self.postMessage({ event: 'finished', stderr: stderr, stdout: stdout })
+                    }, function () {
+                        self.postMessage({ event: 'startTimer' })
                     })
                 })
             })
-            
+
+            break
+        case 'kill':
+            JavaExec.terminate()
+            self.postMessage({ event: 'finished', stderr: "Terminated Execution after timeout", stdout: JavaExec.combinedStream })
             break
     }
 })

@@ -30,11 +30,24 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
   worker.addEventListener('message', function (e) {
     const data = e.data
     console.log(data)
-    let tex = '';
-    if (data.stderr && data.stderr != '') tex += format_error(data.stderr) + "\n";
-    if (data.stdout && data.stdout != '') tex += format_info(data.stdout);
-    log_callback(tex)
-    console.log("Done", data.stdout, data.stderr);
+    switch (data.event) {
+      case 'finished':
+        let tex = '';
+        if (data.stderr && data.stderr != '') tex += format_error(data.stderr) + "\n";
+        if (data.stdout && data.stdout != '') tex += format_info(data.stdout);
+        log_callback(tex)
+        console.log("Done", data.stdout, data.stderr);
+        break
+
+        case 'startTimer':
+          setTimeout(function(e){
+            console.log("Sending kill command")
+            worker.postMessage({ cmd: 'kill' })
+          }, 5/*max_ms*/)
+        break
+    }
+
+
   }, false);
 
   worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms })

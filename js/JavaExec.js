@@ -467,7 +467,7 @@ var JavaExec = {
 
   
   _compileAndRunClass: null,
-  compileAndRun: function (code, className, max_ms, whenFinished) {
+  compileAndRun: function (code, className, max_ms, whenFinished, beforeExecuting) {
     if (!className || !code) {
         console.error("Nothing to do");
         return
@@ -524,9 +524,10 @@ var JavaExec = {
                     JavaExec.showMessage("<b>Terminating</b> " + className);
                     jvmObject.halt(0);
                   }
-                  setTimeout(function(e){
-                    JavaExec.terminate()
-                  }, max_ms)
+
+                  if (beforeExecuting){
+                    beforeExecuting()
+                  }                  
 
                   run(jvmObject.firstThread, [p1], function(e, exitCode){
                     JavaExec.terminate = function(){}
