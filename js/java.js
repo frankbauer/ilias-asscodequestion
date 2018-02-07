@@ -38,7 +38,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
         if (data.stderr && data.stderr != '') tex += format_error(data.stderr) + "\n";
         if (data.stdout && data.stdout != '') tex += format_info(data.stdout);
         log_callback(tex)
-        console.log("Done", data.stdout, data.stderr);
+        //console.log("Done", data.stdout, data.stderr);
         break
 
       case 'startTimer':

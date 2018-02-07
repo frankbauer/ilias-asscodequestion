@@ -14,7 +14,6 @@ JavaExec.setRunButton = function (enabled) {
     self.postMessage({ event: 'setRunButton', enabled:enabled })
 }
 
-console.log("foo")
 self.addEventListener('message', function (e) {
     const data = e.data;
     switch (data.cmd) {

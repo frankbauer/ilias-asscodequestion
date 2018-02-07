@@ -268,7 +268,7 @@ var JavaExec = {
         //create FileList of loadable files
         process(buffer.listings, '');
         let counter = files.length
-        console.log("Found", counter);
+        //console.log("Found", counter);
 
         for (let fileIdx in files) {
           let file = files[fileIdx];
@@ -342,7 +342,7 @@ var JavaExec = {
           JavaExec.fs.readFile(infoFilename, function (err, infoBuffer) {
             try {
               infoBuffer = JSON.parse(infoBuffer)
-              console.log("Check Date", infoBuffer.date, buffer.date, infoBuffer.date < buffer.date)
+              //console.log("Check Date", infoBuffer.date, buffer.date, infoBuffer.date < buffer.date)
               prepAndStartDownloads(infoBuffer.date < buffer.date);
             } catch (e) {
               console.error(e);
@@ -513,7 +513,7 @@ var JavaExec = {
               let p2 = Doppio.VM.Util.initString(jvmObject.getBootstrapClassLoader(), javaFile)              
              
               compile(jvmObject.firstThread, [p1, p2], function(e, ecode){
-                console.log('finished with', e, ecode);
+                //console.log('finished with', e, ecode);
                 console.timeEnd('javac');
                 
                 if (JavaExec.errorStream === undefined || JavaExec.errorStream == '') {
@@ -532,14 +532,14 @@ var JavaExec = {
                   run(jvmObject.firstThread, [p1], function(e, exitCode){
                     JavaExec.terminate = null
                     if (exitCode === 0) {
-                      console.log("All is good");
+                      //console.log("All is good");
                     } else {
-                      console.error("Failed to Run " + className)
+                      console.error("Failed to Run " + className, exitCode)
                     }
-                    if (JavaExec.outputStream && JavaExec.outputStream != '')
+                    /*if (JavaExec.outputStream && JavaExec.outputStream != '')
                       console.log(JavaExec.outputStream)
                     if (JavaExec.errorStream && JavaExec.errorStream != '')
-                      console.error(JavaExec.errorStream)
+                      console.error(JavaExec.errorStream)*/
                     console.timeEnd('run')
                     iAmDone(JavaExec.combinedStream, '')
                   })
