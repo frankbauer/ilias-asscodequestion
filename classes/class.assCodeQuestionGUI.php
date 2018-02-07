@@ -236,7 +236,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 			$tpl->setVariable("QUESTION_ID", $this->object->getId());
 			$tpl->setVariable("LANGUAGE", $language);
-			$tpl->setVariable("DISABLED_STATE", $language=='java');
+			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
 			$runCode = $tpl->get();			
 		}
 		
