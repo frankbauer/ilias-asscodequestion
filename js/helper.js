@@ -12,7 +12,7 @@ $(document).ready(function(){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 } else {
                     if ($('input#allow_run_button').length) {
@@ -87,7 +87,7 @@ function selectLanguage() {
     postEditor.setOption("mode",edMode);
     // if python or javascript show run button
     var qLanguage = input.options[input.selectedIndex].value;
-    if (qLanguage === 'python' || qLanguage === 'javascript') {
+    if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
         if ($('input#allow_run')[0].checked === true) {
             // checkbox is checked
             if ($('input#allow_run_button').length) {
@@ -126,71 +126,87 @@ function initSolutionBox(useMode, qLanguage, questionID){
     // remember line nr. of last block
     var firstLineNumber = 0;
     var currentLineNumber = 0;
-     $(".assCodeQuestionCodeBox").each(function(i, block) {  
-        // edit part
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
-            if ( block.id.indexOf('pre_') !== -1) {
-                firstLineNumber = 1;
-                var myPrev = document.getElementById(block.id);
-                prog = myPrev ? myPrev.innerHTML : '';
-                currentLineNumber = prog.split('\n').length;
-            } else if (block.id.indexOf('pre_') === -1 && block.id.indexOf('post_') === -1) {
-                firstLineNumber = currentLineNumber + 1;
-                var myPrev = document.getElementById(block.id);
-                prog = myPrev ? myPrev.innerHTML : '';
-                currentLineNumber += prog.split('\n').length;
-            } else if (block.id.indexOf('post_') !== -1) {
-                firstLineNumber = currentLineNumber + 1;
-                var myPrev = document.getElementById(block.id);
-                prog = myPrev ? myPrev.innerHTML : '';
-                currentLineNumber = 0; //prog.split('\n').length;
-            }
+    var selectTextAres = function(blockid,questionID) {
+        if (blockid.indexOf('question'+questionID+'value1') > -1) {
+            return true; // examination or preview mode for questionID
+        } else if (blockid === 'code_prefix') { 
+            return true; // edit mode
+        } else if (blockid === 'best_solution') {
+            return true; // edit mode
+        } else if (blockid === 'code_postfix') {
+            return true; // edit mode
         } else {
-            var prog = '';
-            var myPrev = $('pre#pre_'+block.id).get(0); //document.getElementById("pre_"+block.id);
-            prog = myPrev ? myPrev.innerText : '';
-            firstLineNumber =  prog.trim()=='' ? 1 : prog.split("\n").length+1;
+            return false; // examination of preview mode for different questionID
         }
-        
-        var editor = CodeMirror.fromTextArea(block, {
-            lineNumbers: true, 
-            mode:useMode,
-            theme:"solarized light",
-            tabSize: 2,
-            autoCloseBrackets: true,
-            firstLineNumber: firstLineNumber // prog.trim()=='' ? 1 : prog.split("\n").length+1
-        });   
-        
-        // prevent conflicts with tiny
-        $('.CodeMirror textarea').addClass('noRTEditor');
-
-        var oid = block.id
-        var noChange = false;
-        editor.on('change',function(cMirror){
-            // get value right from instance
-            var yourTextarea = document.getElementById(oid) 
-            yourTextarea.value = cMirror.getValue(); 
-        });   
-        //editor.setOption("extraKeys", {
-        editor.addKeyMap({
-            "Tab": function(cm) {
-                cm.execCommand("insertSoftTab");
-                //var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                //cm.replaceSelection(spaces);
+    }
+     $(".assCodeQuestionCodeBox").each(function(i, block) {  
+        //if (block.id.indexOf('question'+questionID+'value1') > -1) {
+        if ( selectTextAres(block.id,questionID) ) {
+            // edit part
+            if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
+                if ( block.id.indexOf('pre_') !== -1) {
+                    firstLineNumber = 1;
+                    var myPrev = document.getElementById(block.id);
+                    prog = myPrev ? myPrev.innerHTML : '';
+                    currentLineNumber = prog.split('\n').length;
+                } else if (block.id.indexOf('pre_') === -1 && block.id.indexOf('post_') === -1) {
+                    firstLineNumber = currentLineNumber + 1;
+                    var myPrev = document.getElementById(block.id);
+                    prog = myPrev ? myPrev.innerHTML : '';
+                    currentLineNumber += prog.split('\n').length;
+                } else if (block.id.indexOf('post_') !== -1) {
+                    firstLineNumber = currentLineNumber + 1;
+                    var myPrev = document.getElementById(block.id);
+                    prog = myPrev ? myPrev.innerHTML : '';
+                    currentLineNumber = 0; //prog.split('\n').length;
+                }
+            } else {
+                var prog = '';
+                var myPrev = $('pre#pre_'+block.id).get(0); //document.getElementById("pre_"+block.id);
+                prog = myPrev ? myPrev.innerText : '';
+                firstLineNumber =  prog.trim()=='' ? 1 : prog.split("\n").length+1;
             }
-        });
-        // adapt editor's heigh and set readonly if necessary
-        if (block.id.indexOf('pre_') !== -1 || block.id.indexOf('post_') !== -1) {
-            editor.setSize('height','auto');
-            editor.setOption('readOnly',true);
-        }
+            
+            var editor = CodeMirror.fromTextArea(block, {
+                lineNumbers: true, 
+                mode:useMode,
+                theme:"solarized light",
+                tabSize: 2,
+                autoCloseBrackets: true,
+                firstLineNumber: firstLineNumber // prog.trim()=='' ? 1 : prog.split("\n").length+1
+            });   
+            
+            // prevent conflicts with tiny
+            $('.CodeMirror textarea').addClass('noRTEditor');
 
-        lastCodeMirrorInstance[block.id] = editor
-        var inp = editor.display.input;
-    });
+            // var oid = block.id
+            // var noChange = false;
+            // editor.on('change',function(cMirror){
+            //     // get value right from instance
+            //     var yourTextarea = document.getElementById(oid) 
+            //     yourTextarea.value = cMirror.getValue(); 
+            // });   
+            //editor.setOption("extraKeys", {
+            editor.addKeyMap({
+                "Tab": function(cm) {
+                    cm.execCommand("insertSoftTab");
+                    //var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                    //cm.replaceSelection(spaces);
+                }
+            });
+            // adapt editor's height and set readonly if necessary
+            if (block.id.indexOf('pre_') !== -1 || block.id.indexOf('post_') !== -1) {
+                editor.setSize('height','auto');
+                editor.setOption('readOnly',true);
+            }
+
+            lastCodeMirrorInstance[block.id] = editor
+            var inp = editor.display.input;
+        }
+    }); // $().each()
     // if Python or JavaScript display the run button
     if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
+        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
             $('input#allow_run_button').css('display','');
         } else {
             $('input#allow_run_button').css('display','none');
@@ -202,7 +218,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 }
             }
@@ -221,7 +237,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
         postEditor.setOption('firstLineNumber',postFirstLine);
     }
 
-    // add an event handler for the 'enter' key to update line numbers
+    // add an event handlers for the 'enter' key to update line numbers
     var prefEditor = undefined;
     var bsolEditor = undefined;
     var postEditor = undefined;
@@ -233,70 +249,91 @@ function initSolutionBox(useMode, qLanguage, questionID){
         bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
         postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
         // The prefix code area
-        prefEditor.setOption("extraKeys", {
-            "Enter": function(cm) {
-                bsolFirstLine = prefEditor.lastLine() + 2 + 1;
-                postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-                bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                postEditor.setOption('firstLineNumber',postFirstLine);
-                return CodeMirror.Pass;
-            },
-            "Backspace": function(cm) {
-                var pos = prefEditor.getCursor();
-                if (pos.ch === 0) {
-                    bsolFirstLine = prefEditor.lastLine() + 1;
-                    postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-                    bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                    postEditor.setOption('firstLineNumber',postFirstLine);
-                }
-                return CodeMirror.Pass;
-            }
+        prefEditor.on('changes', function(cm) {
+            bsolFirstLine = prefEditor.lastLine() + 2;
+            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
+            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+            postEditor.setOption('firstLineNumber',postFirstLine);
+            return CodeMirror.Pass;
         });
-        bsolEditor.setOption("extraKeys", {
-            "Enter": function(cm) {
-                bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-                postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-                bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                postEditor.setOption('firstLineNumber',postFirstLine);
-                return CodeMirror.Pass;
-            },
-            "Backspace": function(cm) {
-                var pos = bsolEditor.getCursor();
-                if (pos.ch === 0) {
-                    bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-                    postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-                    bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                    postEditor.setOption('firstLineNumber',postFirstLine);
-                }
-                return CodeMirror.Pass;
-            }
+        bsolEditor.on('changes', function(cm) {
+            bsolFirstLine = prefEditor.lastLine() + 2;
+            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
+            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+            postEditor.setOption('firstLineNumber',postFirstLine);
+            return CodeMirror.Pass;
         });
+        // prefEditor.setOption("extraKeys", {
+        //     "Enter": function(cm) {
+        //         bsolFirstLine = prefEditor.lastLine() + 2 + 1;
+        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
+        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //         postEditor.setOption('firstLineNumber',postFirstLine);
+        //         return CodeMirror.Pass;
+        //     },
+        //     "Backspace": function(cm) {
+        //         var pos = prefEditor.getCursor();
+        //         if (pos.ch === 0) {
+        //             bsolFirstLine = prefEditor.lastLine() + 1;
+        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
+        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //             postEditor.setOption('firstLineNumber',postFirstLine);
+        //         }
+        //         return CodeMirror.Pass;
+        //     }
+        // });
+        // bsolEditor.setOption("extraKeys", {
+        //     "Enter": function(cm) {
+        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
+        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
+        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //         postEditor.setOption('firstLineNumber',postFirstLine);
+        //         return CodeMirror.Pass;
+        //     },
+        //     "Backspace": function(cm) {
+        //         var pos = bsolEditor.getCursor();
+        //         if (pos.ch === 0) {
+        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
+        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
+        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //             postEditor.setOption('firstLineNumber',postFirstLine);
+        //         }
+        //         return CodeMirror.Pass;
+        //     }
+        // });
     } else if ($('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').length > 0) {
         // we are in the test or preview mode
         prefEditor = $('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
         bsolEditor = $('.assCodeQuestionCodeBox#question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;; 
         postEditor = $('.assCodeQuestionCodeBox#post_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        // The prefix code area
-        bsolEditor.setOption("extraKeys", {
-            "Enter": function(cm) {
-                bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-                postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-                bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                postEditor.setOption('firstLineNumber',postFirstLine);
-                return CodeMirror.Pass;
-            },
-            "Backspace": function(cm) {
-                var pos = bsolEditor.getCursor();
-                if (pos.ch === 0) {
-                    bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-                    postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-                    bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-                    postEditor.setOption('firstLineNumber',postFirstLine);
-                }
-                return CodeMirror.Pass;
-            }
+        bsolEditor.on('changes', function(cm) {
+            bsolFirstLine = prefEditor.lastLine() + 2;
+            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
+            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+            postEditor.setOption('firstLineNumber',postFirstLine);
+            return CodeMirror.Pass;
         });
+        // The prefix code area
+        // bsolEditor.setOption("extraKeys", {
+        //     "Enter": function(cm) {
+        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
+        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
+        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //         postEditor.setOption('firstLineNumber',postFirstLine);
+        //         return CodeMirror.Pass;
+        //     },
+        //     "Backspace": function(cm) {
+        //         var pos = bsolEditor.getCursor();
+        //         if (pos.ch === 0) {
+        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
+        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
+        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
+        //             postEditor.setOption('firstLineNumber',postFirstLine);
+        //         }
+        //         return CodeMirror.Pass;
+        //     }
+        // });
     }
 }
 
@@ -348,7 +385,7 @@ function getTotalSourcecode(questionID){
  * and define a log function to print the standard output of the program
  * @param {string} questionID 
  * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python or JavaScript program
+ * @param {string} prog  String containing the Python, Java or JavaScript program
  * @param {number} maxMS  Timeout to kill the worker
  * @param {numner} maxLines Maximum number of lines allowd in the standard output
  */
@@ -365,6 +402,21 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
         mypre.innerHTML = text; 
     }       
     runJavaScriptWorker( prog, log, maxMS, maxLines);
+}
+
+function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+    if(!prog) prog = getTotalSourcecode(questionID);
+    if (mypre===undefined) {
+        mypre = document.getElementById(questionID+"Output");     
+    }  
+    if (mypre){
+        mypre.style.display = '';
+        mypre.innerHTML = ''; 
+    }
+    function log(text){
+        mypre.innerHTML = text; 
+    }       
+    runJavaWorker( prog, log, maxMS, maxLines);
 }
 
 
@@ -421,6 +473,7 @@ function runInTest(language,questionID){
     switch(language){
         case 'python': runPython(prog, questionID,mypre,maxMS,maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
     }
 }
 
@@ -440,6 +493,7 @@ function runInSolution(language){
         switch(language){
             case 'python': runPython(prog, block.id, node); break;
             case 'javascript':  runJavaScript( block.id, node, prog); break;
+            case 'java':  runJava( block.id, node, prog); break;
         }
     });   
 }
@@ -596,7 +650,7 @@ function preparePythonSave(nr){
 
 
 function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
-    
+    const maxLineLength = 256;
     function format_info(text){
         return '<span style="color:green">'+text+'</span>';
     }
@@ -614,6 +668,9 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
         //alert(l);
         if(!log_callback) console.log(l);
         else{
+            if (l.length > maxLineLength) {
+                l = l.substring(0,maxLineLength);
+            }
             Log.push(l);
             log_callback( Log.length>max_loglength ?   format_info('...(first '+(Log.length-max_loglength)+' Logs hidden)...\n') + Log.slice(Log.length-max_loglength,Log.length).join('\n')
                                                     :   Log.join('\n')
