@@ -7,13 +7,14 @@ if ('function' === typeof importScripts) {
 }
 
 JavaExec.showMessage = function (msg) {
-
+    self.postMessage({ event: 'showMessage', msg:msg })
 }
 
 JavaExec.setRunButton = function (enabled) {
-
+    self.postMessage({ event: 'setRunButton', enabled:enabled })
 }
 
+console.log("foo")
 self.addEventListener('message', function (e) {
     const data = e.data;
     switch (data.cmd) {
@@ -21,8 +22,6 @@ self.addEventListener('message', function (e) {
             JavaExec.initialize(function () {
                 console.log("Initializing Filesystem", JavaExec.persistentFs);
                 JavaExec.initFileSystems('../', function () {
-                    //JavaExec.printDirContent('/');      
-
                     JavaExec.reroutStdStreams();
                     JavaExec.ready = true;
                     JavaExec.compileAndRun(data.code, data.className, data.max_ms, function (stdout, stderr) {
@@ -35,8 +34,10 @@ self.addEventListener('message', function (e) {
 
             break
         case 'kill':
-            JavaExec.terminate()
-            self.postMessage({ event: 'finished', stderr: "Terminated Execution after timeout", stdout: JavaExec.combinedStream })
+            if (JavaExec.terminate()) {
+                JavaExec.terminate()
+                self.postMessage({ event: 'finished', stderr: "Terminated Execution after timeout", stdout: JavaExec.combinedStream })
+            }
             break
     }
 })

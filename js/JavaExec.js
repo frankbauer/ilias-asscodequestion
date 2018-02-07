@@ -6,7 +6,7 @@ var JavaExec = {
   persistentFs: null,
   ready: false,
   running: false,
-  terminate: function () { },
+  terminate: null,
 
   constructPersistantFs: function (cb) {
     if (BrowserFS.FileSystem.IndexedDB.isAvailable()) {
@@ -530,7 +530,7 @@ var JavaExec = {
                   }                  
 
                   run(jvmObject.firstThread, [p1], function(e, exitCode){
-                    JavaExec.terminate = function(){}
+                    JavaExec.terminate = null
                     if (exitCode === 0) {
                       console.log("All is good");
                     } else {
