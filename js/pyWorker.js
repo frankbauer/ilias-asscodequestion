@@ -37,6 +37,15 @@ var pyProg = '';
  * @type {number} maxLines must be an integer.
  */
 var maxLines = 20;
+
+/**
+ * The maximum number of character allowed in a line of output. This is intended
+ * to avoid creating huge outputs in case of a programming error.
+ * This size will be set here. At the moment is not configurable.
+ * @type {number} maxLineLength must be an integer.
+ */
+var maxLineLength = 256;
+
 /**
  * Maximum time allow for the Python program to run and produce a result.
  * This is necessary to avoid infinite loops or other kind of unexpected bugs.
@@ -109,7 +118,7 @@ self.onmessage = function(e) {
                     pyOut.push(outLine);
                     outLine = '';
                 }
-                if (pyOut.length > (maxLines+1)) {
+                if (pyOut.length > (maxLines)) {
                     pyOut.shift();
                 }
             }
@@ -121,7 +130,14 @@ self.onmessage = function(e) {
             myPromise.then(function(mod) {
                     // construct data message and send it to main thrad
                     //var messageData = {finished: 'success', stdOut: pyOut};
-                    pyOut.unshift('last ' + maxLines + ' lines of standard output\n');
+                    if (pyOut.length >= maxLines) { 
+                        pyOut.unshift('last ' + maxLines + ' lines of standard output\n');
+                    }
+                    pyOut.forEach( function(s,index) {
+                        if (s.length > maxLineLength) {
+                            pyOut[index] = s.substring(0,maxLineLength) + '\n';
+                        }
+                    });
                     var messageData = {finished: 'success', stdOut: pyOut.join('')};
                     postMessage(['finished',messageData]);
                 },
