@@ -12,7 +12,7 @@ $(document).ready(function(){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 } else {
                     if ($('input#allow_run_button').length) {
@@ -87,7 +87,7 @@ function selectLanguage() {
     postEditor.setOption("mode",edMode);
     // if python or javascript show run button
     var qLanguage = input.options[input.selectedIndex].value;
-    if (qLanguage === 'python' || qLanguage === 'javascript') {
+    if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
         if ($('input#allow_run')[0].checked === true) {
             // checkbox is checked
             if ($('input#allow_run_button').length) {
@@ -143,7 +143,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
         //if (block.id.indexOf('question'+questionID+'value1') > -1) {
         if ( selectTextAres(block.id,questionID) ) {
             // edit part
-            if (qLanguage === 'python' || qLanguage === 'javascript') {
+            if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
                 if ( block.id.indexOf('pre_') !== -1) {
                     firstLineNumber = 1;
                     var myPrev = document.getElementById(block.id);
@@ -179,13 +179,13 @@ function initSolutionBox(useMode, qLanguage, questionID){
             // prevent conflicts with tiny
             $('.CodeMirror textarea').addClass('noRTEditor');
 
-            // var oid = block.id
-            // var noChange = false;
-            // editor.on('change',function(cMirror){
-            //     // get value right from instance
-            //     var yourTextarea = document.getElementById(oid) 
-            //     yourTextarea.value = cMirror.getValue(); 
-            // });   
+            var oid = block.id
+            var noChange = false;
+            editor.on('change',function(cMirror){
+                // get value right from instance
+                var yourTextarea = document.getElementById(oid) 
+                yourTextarea.value = cMirror.getValue(); 
+            });   
             //editor.setOption("extraKeys", {
             editor.addKeyMap({
                 "Tab": function(cm) {
@@ -206,7 +206,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
     }); // $().each()
     // if Python or JavaScript display the run button
     if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript') {
+        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
             $('input#allow_run_button').css('display','');
         } else {
             $('input#allow_run_button').css('display','none');
@@ -218,7 +218,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             if ($(this).is(':checked')) {
                 var input = $('select#source_lang')['0'];
                 var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript') {
+                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
                     $(this).prop('checked',false);
                 }
             }
@@ -385,7 +385,7 @@ function getTotalSourcecode(questionID){
  * and define a log function to print the standard output of the program
  * @param {string} questionID 
  * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python or JavaScript program
+ * @param {string} prog  String containing the Python, Java or JavaScript program
  * @param {number} maxMS  Timeout to kill the worker
  * @param {numner} maxLines Maximum number of lines allowd in the standard output
  */
@@ -402,6 +402,21 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
         mypre.innerHTML = text; 
     }       
     runJavaScriptWorker( prog, log, maxMS, maxLines);
+}
+
+function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+    if(!prog) prog = getTotalSourcecode(questionID);
+    if (mypre===undefined) {
+        mypre = document.getElementById(questionID+"Output");     
+    }  
+    if (mypre){
+        mypre.style.display = '';
+        mypre.innerHTML = ''; 
+    }
+    function log(text){
+        mypre.innerHTML = text; 
+    }       
+    runJavaWorker( prog, log, maxMS, maxLines);
 }
 
 
@@ -458,6 +473,7 @@ function runInTest(language,questionID){
     switch(language){
         case 'python': runPython(prog, questionID,mypre,maxMS,maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
     }
 }
 
@@ -477,6 +493,7 @@ function runInSolution(language){
         switch(language){
             case 'python': runPython(prog, block.id, node); break;
             case 'javascript':  runJavaScript( block.id, node, prog); break;
+            case 'java':  runJava( block.id, node, prog); break;
         }
     });   
 }
@@ -760,3 +777,5 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
 
     setTimeout( testTimeout, max_ms );
 }
+
+//@ sourceURL=helper.js

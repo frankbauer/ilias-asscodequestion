@@ -45,7 +45,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function fixLoadedCode($str){
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+		if($str !== '') {
+			return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+		} else {
+			return ' -- Nada --';
+		}
 	}
 
 	function fixSentCode($str){
@@ -540,7 +544,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					"value1"      => array("clob", $solution["value1"]),
 					"value2"      => array("clob", $solution["value2"]),
 			));
-		}/*});*/
+		};
 
 		// unlock
 		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
@@ -631,8 +635,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @access public
 	 * @see assQuestion::setExportDetailsXLS()
-	 */
 	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
 		global $lng;
 
@@ -648,6 +652,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 
+		$format_title = '';
+		$format_bold = '';
 		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
 		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
 		$i = 1;

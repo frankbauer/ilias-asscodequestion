@@ -25,7 +25,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @const	string 	URL suffix to prevent caching of css files (increase with every change)
 	 * 					Note: this does not yet work with $tpl->addJavascript()
 	 */
-	const URL_SUFFIX = "?css_version=1.5.4";
+	const URL_SUFFIX = "?css_version=1.5.5";
 
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
@@ -64,7 +64,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	var $didPrepare = false;
 	private function getLanguageData(){
 		$language = $this->getLanguage();
-		
+		$inLanguage = $language;
 		// prepare language for hilight.js
 		$hljslanguage = $language;
 		$mode = $language;
@@ -86,7 +86,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return array(
 			'cmLanguage'=>$language,
 			'cmMode'=>$mode,
-			'hljsLanguage'=>$hljslanguage
+			'hljsLanguage'=>$hljslanguage,
+			'org'=>$inLanguage
 			);
 	}
 	private function prepareTemplate($force=false) {
@@ -95,10 +96,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 		$lngData = $this->getLanguageData();
 		//$this->tpl->addJavascript(self::URL_PATH.'/js/javapoly/javapoly.js');
-		//if ($lngData['cmLanguage'] == "python" && $this->object->getAllowRun()) {
-		//	$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
-		//	$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
-		//}
+		/*if ($lngData['cmLanguage'] == "python" && $this->object->getAllowRun()) {
+			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
+		} else*/ if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
+			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+		}
 
 
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
@@ -111,11 +117,19 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
 		
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
 		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");');
 		$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 		$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
@@ -230,7 +244,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 			$tpl->setVariable("QUESTION_ID", $this->object->getId());
 			$tpl->setVariable("LANGUAGE", $language);
-			$runCode = $tpl->get();
+			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
+			$runCode = $tpl->get();			
 		}
 		
 		// fill the question output template
@@ -271,7 +286,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}*/
 
 		//opening code
-		if ($this->getLanguage() == 'python' || $this->getLanguage() == 'javascript') {
+		if ($this->getLanguage() == 'python' || $this->getLanguage() == 'javascript' || $this->getLanguage() == 'java') {
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
 			$id = $id = "pre_question".$this->object->getId()."value1";
 			$tpl->setVariable("NAME", $id);
@@ -509,11 +524,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutionoutput = $solutiontemplate->get();
 
 		/*if ($this->isRenderPurposePrintPdf()) {
+
 			$solutionoutput = str_replace("<pre", "\n<code",$solutionoutput);
 			$solutionoutput = str_replace("</pre", "</code",$solutionoutput);
 			$solutionoutput = str_replace("\t", "  ",$solutionoutput);
 			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
-			$solutionoutput = str_replace("\n", "<br />", $solutionoutput);
 		}*/		
 
 		//include everything we need to execute python code when we just want to display a brief answer
@@ -533,8 +548,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/java/java.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript">runPythonInSolution();hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
 		}
@@ -668,30 +691,32 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// Add Source Code Type Selection
 		// first complete scripts for codemirror
 		$language = $this->getLanguage();
-		if ($language != 'c' || $language != 'c++' || $language != 'c#' || $language != 'java' || $language != 'objectivec') {
+		//this is just to debug variable content
+	/*	if ($language == 'c' || $language == 'c++' || $language == 'c#' || $language == 'objectivec') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
 		}
-		if ($language != 'fortran') {
+		if ($language == 'fortran') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
 		}
-		if ($language != 'java') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
+		if ($language == 'java') {
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js??'.$language.'-'.($language == 'java'));
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
 		}
-		if ($language != 'javascript') {
+		if ($language == 'javascript') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
 		}
-		if ($language != 'perl') {
+		if ($language == 'perl') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
 		}
-		if ($language != 'python') {
+		if ($language == 'python') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
 		}
-		if ($language != 'r') {
+		if ($language == 'r') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
 		}
-		if ($language != 'ruby') {
+		if ($language == 'ruby') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		}
+		}*/
 
 		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
         $select->setOptions(array(
@@ -715,7 +740,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
 		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
 		$allowRun->setChecked( $this->object->getAllowRun() );
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python') {
+		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java') {
 			$allowRun->setValue('true');
 		} else {
 			$allowRun->setValue('false');
