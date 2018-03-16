@@ -117,6 +117,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
 		
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
+		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
@@ -540,8 +548,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/java/java.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
+			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript">runPythonInSolution();hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
 		}
@@ -676,14 +692,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// first complete scripts for codemirror
 		$language = $this->getLanguage();
 		//this is just to debug variable content
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js??'.$language.'-'.($language == 'java'));
-		if ($language == 'c' || $language == 'c++' || $language == 'c#' || $language == 'objectivec') {
+	/*	if ($language == 'c' || $language == 'c++' || $language == 'c#' || $language == 'objectivec') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
 		}
 		if ($language == 'fortran') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
 		}
 		if ($language == 'java') {
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js??'.$language.'-'.($language == 'java'));
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
 		}
 		if ($language == 'javascript') {
@@ -700,7 +716,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 		if ($language == 'ruby') {
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		}
+		}*/
 
 		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
         $select->setOptions(array(

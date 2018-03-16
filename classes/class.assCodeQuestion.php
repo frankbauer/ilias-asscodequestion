@@ -45,7 +45,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function fixLoadedCode($str){
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+		if($str !== '') {
+			return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+		} else {
+			return ' -- Nada --';
+		}
 	}
 
 	function fixSentCode($str){
