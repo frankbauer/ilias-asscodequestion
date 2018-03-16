@@ -179,13 +179,13 @@ function initSolutionBox(useMode, qLanguage, questionID){
             // prevent conflicts with tiny
             $('.CodeMirror textarea').addClass('noRTEditor');
 
-            // var oid = block.id
-            // var noChange = false;
-            // editor.on('change',function(cMirror){
-            //     // get value right from instance
-            //     var yourTextarea = document.getElementById(oid) 
-            //     yourTextarea.value = cMirror.getValue(); 
-            // });   
+            var oid = block.id
+            var noChange = false;
+            editor.on('change',function(cMirror){
+                // get value right from instance
+                var yourTextarea = document.getElementById(oid) 
+                yourTextarea.value = cMirror.getValue(); 
+            });   
             //editor.setOption("extraKeys", {
             editor.addKeyMap({
                 "Tab": function(cm) {
@@ -777,3 +777,5 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
 
     setTimeout( testTimeout, max_ms );
 }
+
+//@ sourceURL=helper.js

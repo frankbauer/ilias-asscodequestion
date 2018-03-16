@@ -539,11 +539,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					// in our example we allow to enter these values directly
 					"value1"      => array("clob", $solution["value1"]),
 					"value2"      => array("clob", $solution["value2"]),
-			));
 		}});
-
-		// unlock
+		};
 		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		// unlock
+		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
 
 		// Check if the user has entered something
 		// Then set entered_values accordingly
@@ -628,11 +628,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	/**
 	 * Creates an Excel worksheet for the detailed cumulated results of this question
-	 *
-	 * @access public
-	 * @see assQuestion::setExportDetailsXLS()
 	 */
 	//public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	 * @access public
+	 * @see assQuestion::setExportDetailsXLS()
+	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
 	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
 		global $lng;
