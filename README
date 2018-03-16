@@ -11,7 +11,7 @@ ILIAS Example Question Plugin
 =============================
 
 Author:   Frank Bauer <frank.bauer@fau.de>
-Version:  1.0.7 
+Version:  1.0.8 
 Supports: ILIAS 5.2 - 5.2
 
 Installation
@@ -40,6 +40,10 @@ It adds no extra table to the database.
 ===============
 Version History
 ===============
+
+Version 1.0.8
+-------------
+* Added support for Client-Side Java-Execution using dopio.js
 
 Version 1.0.3
 -------------
