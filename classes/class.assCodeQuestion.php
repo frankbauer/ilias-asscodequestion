@@ -1,5 +1,6 @@
 <?php
 
+require_once './Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
 require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
@@ -539,11 +540,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					// in our example we allow to enter these values directly
 					"value1"      => array("clob", $solution["value1"]),
 					"value2"      => array("clob", $solution["value2"]),
-		}});
-		};
+				)
+			);
+		}
+	  });
 		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
 		// unlock
-		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
 
 		// Check if the user has entered something
 		// Then set entered_values accordingly
@@ -630,14 +633,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * Creates an Excel worksheet for the detailed cumulated results of this question
 	 */
 	//public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
-	 * @access public
-	 * @see assQuestion::setExportDetailsXLS()
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
 	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		global $lng;
-
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		global $lng;		
+		//include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
 		$solutions = $this->getSolutionValues($active_id, $pass);
 
 		if (is_array($solutions))
@@ -651,21 +650,29 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		$format_title = '';
 		$format_bold = '';
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+		/*$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
+		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);*/
+		$worksheet->setCell($startrow, 0, $this->plugin->txt($this->getQuestionType()));
+		$worksheet->setCell($startrow, 1, $this->getTitle());
 		$i = 1;
 
 		// now provide a result string and write it to excel
 		// it is also possible to write multiple rows
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
+		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
+		//$worksheet->write($startrow + $i, 1, $value1);
+		$worksheet->setCell($startrow + $i, 1, $value1);
 		$i++;
 
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
+		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
+		//$worksheet->write($startrow + $i, 1, $value2);
+		$worksheet->setCell($startrow + $i, 1, $value2);
 		
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));
+		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_points"));
+		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
+		//$worksheet->write($startrow + $i, 1, $points);
+		$worksheet->setCell($startrow + $i, 1, $points);
 		$i++;
 
 		return $startrow + $i + 1;
