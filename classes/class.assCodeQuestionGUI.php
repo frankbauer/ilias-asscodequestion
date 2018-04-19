@@ -267,7 +267,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}	
 
 		$value1 = empty($value1) ? "" : ilUtil::prepareFormOutput($value1);
-
 		$value2 = empty($value2) ? "" : ilUtil::prepareFormOutput($value2);
 		if ($htmlResults) {
 			$value2 = str_replace('[err]', '<span style="color:red">', $value2);
@@ -285,66 +284,44 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$value2 = str_replace("\n", "<br />", $value2);
 		}*/
 
-		//opening code
-		if ($this->getLanguage() == 'python' || $this->getLanguage() == 'javascript' || $this->getLanguage() == 'java') {
+		$html = '';
+		//Add Code Blocks
+		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+			$questionID = $this->object->getId();
+			$code = $this->object->getContentForBlock($i);
+			$id = 'block['.$questionID.']['.$i.']';
+			$type = $this->object->getTypeForBlock($i);
+
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
-			$id = $id = "pre_question".$this->object->getId()."value1";
 			$tpl->setVariable("NAME", $id);
-			$code = $this->object->getPrefixCode();
-			if (trim($code)!='') {
-				//$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($this->object->getPrefixCode()));
+			$tpl->setVariable("BLOCK_ID", $i);
+			$tpl->setVariable("BLOCK_TYPE", $type);
+			$tpl->setVariable("QUESTION_ID", $questionID);
+
+		
+			if (trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) {
+				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';				
+			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
 				$tpl->setVariable("CONTENT", $code);
-				$template->setVariable("OPENING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
-			$id = $id = "post_question".$this->object->getId()."value1";
-			$tpl->setVariable("NAME", $id);
-			$code = $this->object->getPostfixCode();
-			if (trim($code)!='') {
-				//$this->createCodeEditorFormInput($form, 'code_postfix', $this->object->getPostfixCode());
+				$html .= $tpl->get();
+			} else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
 				$tpl->setVariable("CONTENT", $code);
-				$template->setVariable("CLOSING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("CLOSING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-		} else {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
-			$tpl->setVariable("LANGUAGE", $language);
-			$id = "pre_question".$this->object->getId()."value1";
-			$tpl->setVariable("ID", $id);
-			$code = $this->object->getPrefixCode();
-			if (trim($code)!='') {
-				$tpl->setVariable("CODE", $code);
-				$template->setVariable("OPENING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-			
-			//closing code
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
-			$tpl->setVariable("LANGUAGE", $language);
-			$id = "post_question".$this->object->getId()."value1";
-			$tpl->setVariable("ID", $id);
-			$code = $this->object->getPostfixCode();
-			if (trim($code)!='') {
-				$tpl->setVariable("CODE", $code);
-				$template->setVariable("CLOSING_CODE_BOX", $tpl->get());		
-			} else {
-				$template->setVariable("CLOSING_CODE_BOX", '<span id="'.$id.'"></span>');
+				$html .= $tpl->get();
+			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
+				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
+			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
+				//TODO: Add Canvas Code here
 			}
 		}
-
+		$template->setVariable("BLOCK_HTML", $html);		
+		
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
 		$template->setVariable("QUESTION_ID", $this->object->getId());
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		//$template->setVariable("OPENING_CODE", $this->object->getPrefixCode());
 		$template->setVariable("VALUE1", $value1);
-		//$template->setVariable("CLOSING_CODE", $this->object->getPostfixCode());
 		$template->setVariable("RESULT1", $value2);		
 		$template->setVariable("MAX_LINES_VAL",$this->object->getMaxLines());
 		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
@@ -664,6 +641,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("NAME", $name);
 		$tpl->setVariable("BLOCK_ID", $blockID);
 		$tpl->setVariable("BLOCK_TYPE", $blockType);
+		$tpl->setVariable("QUESTION_ID", $this->object->getId());
 		$item->setHTML($tpl->get());
 		$form->addItem($item);
 	}
