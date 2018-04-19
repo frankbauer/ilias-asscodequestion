@@ -101,6 +101,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
+	function clearBlocks(){
+		$this->additional_data['blocks'] = array();
+	}
+
 	function getTypeForBlock($nr) {
 		if (is_array($this->additional_data['blocks'])){
 			return $this->additional_data['blocks'][$nr]['type'];
@@ -111,6 +115,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 			return assCodeQuestionBlockTypes::HiddenCode;
 		}
+	}
+
+	function setTypeForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['type'] = $value;
 	}
 
 	function getContentForBlock($nr) {
@@ -125,7 +136,15 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
+	function setContentForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['content'] = $value;
+	}
+
 	function getPrefixCode() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['prefixCode']);
 	}
 
@@ -134,6 +153,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function getPostfixCode() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['postfixCode']);
 	}
 
@@ -142,6 +162,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function getBestSolution() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['bestSolution']);
 	}
 
