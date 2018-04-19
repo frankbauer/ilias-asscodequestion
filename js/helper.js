@@ -119,6 +119,39 @@ function selectType(select, elementID, blockNr){
     console.log(select, elementID, el, blockNr, select.value)
 }
 
+
+/**
+ * Counts the number of displayed lines within a Textarea fo
+ * @param {*} block The Element to count the lines in
+ */
+function numberOfLinesIn(block){
+   let prog = ''
+   if (block && block.value) {
+    prog = block.value
+   } else if (block && block.innerHTML) {
+    prog = block.innerHTML
+   }
+   return prog.split('\n').length
+}
+
+/**
+ * Counts the number of displayed lines within a Textarea fo
+ * @param {*} questionID 
+ */
+function updateLineNumbers(questionID){
+    var firstLineNumber = 1
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+    //$("textarea[data-question="+questionID+"]").each(function(i, block) {
+        const editor = editors[block.id]
+        if (editor) {
+            editor.setOption('firstLineNumber',firstLineNumber);
+        } 
+        firstLineNumber += numberOfLinesIn(block)      
+    });
+}
+
+//maintains a list of active code boxes on the website
+const editors = {}
 /**
  * @function initSolutionBox
  * This function initialize the editors and set some event handlers
@@ -133,90 +166,44 @@ function selectType(select, elementID, blockNr){
  * @param {*} qLanguage The langua being used, quite redundant
  * @param {*} questionID The id of the question in the test
  */
-function initSolutionBox(useMode, qLanguage, questionID){
-    // remember line nr. of last block
-    var firstLineNumber = 0;
-    var currentLineNumber = 0;
-    var selectTextAres = function(blockid,questionID, hasBlockNR) {
-        if (blockid.indexOf('question'+questionID+'value1') > -1) {
-            return true; // examination or preview mode for questionID
-        } else if (blockid === 'code_prefix') { 
-            return true; // edit mode
-        } else if (blockid === 'best_solution') {
-            return true; // edit mode
-        } else if (blockid === 'code_postfix') {
-            return true; // edit mode
-        } else if (hasBlockNR) {
-            return true; // edit mode
-        } else {
-            return false; // examination of preview mode for different questionID
-        }
-    }
-     $(".assCodeQuestionCodeBox").each(function(i, block) {  
-        //if (block.id.indexOf('question'+questionID+'value1') > -1) {
-        if ( selectTextAres(block.id,questionID, block.getAttribute && block.getAttribute('data-blocknr')) ) {
-            // edit part
-            if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-                if ( block.id.indexOf('pre_') !== -1) {
-                    firstLineNumber = 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber = prog.split('\n').length;
-                } else if (block.id.indexOf('pre_') === -1 && block.id.indexOf('post_') === -1) {
-                    firstLineNumber = currentLineNumber + 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber += prog.split('\n').length;
-                } else if (block.id.indexOf('post_') !== -1) {
-                    firstLineNumber = currentLineNumber + 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber = 0; //prog.split('\n').length;
-                }
-            } else {
-                var prog = '';
-                var myPrev = $('pre#pre_'+block.id).get(0); //document.getElementById("pre_"+block.id);
-                prog = myPrev ? myPrev.innerText : '';
-                firstLineNumber =  prog.trim()=='' ? 1 : prog.split("\n").length+1;
-            }
-            
-            var editor = CodeMirror.fromTextArea(block, {
-                lineNumbers: true, 
-                mode:useMode,
-                theme:"solarized light",
-                tabSize: 2,
-                autoCloseBrackets: true,
-                firstLineNumber: firstLineNumber // prog.trim()=='' ? 1 : prog.split("\n").length+1
-            });   
-            
-            // prevent conflicts with tiny
-            $('.CodeMirror textarea').addClass('noRTEditor');
+function initSolutionBox(useMode, qLanguage, questionID){    
+    $("textarea[data-question="+questionID+"]").each(function(i, block) {        
+        var editor = CodeMirror.fromTextArea(block, {
+            lineNumbers: true, 
+            mode:useMode,
+            theme:"solarized light",
+            tabSize: 2,
+            autoCloseBrackets: true,
+            firstLineNumber: 1 
+        });  
 
-            var oid = block.id
-            var noChange = false;
-            editor.on('change',function(cMirror){
-                // get value right from instance
-                var yourTextarea = document.getElementById(oid) 
-                yourTextarea.value = cMirror.getValue(); 
-            });   
-            //editor.setOption("extraKeys", {
-            editor.addKeyMap({
-                "Tab": function(cm) {
-                    cm.execCommand("insertSoftTab");
-                    //var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                    //cm.replaceSelection(spaces);
-                }
-            });
-            // adapt editor's height and set readonly if necessary
-            if (block.id.indexOf('pre_') !== -1 || block.id.indexOf('post_') !== -1) {
-                editor.setSize('height','auto');
-                editor.setOption('readOnly',true);
-            }
+        //make static code blocks uneditable
+        if (block.getAttribute('data-blocktype')==1) {
+            editor.setSize('height','auto')
+            editor.setOption('readOnly',true)  
+            editor.display.wrapper.style.opacity = 0.8       
+            editor.display.wrapper.style.filter = "grayscale(80%)"
+        } 
 
-            lastCodeMirrorInstance[block.id] = editor
-            var inp = editor.display.input;
-        }
-    }); // $().each()
+        editor.on('change',function(cMirror){
+            block.value = cMirror.getValue(); 
+        });           
+        editor.addKeyMap({
+            "Tab": function(cMirror) {
+                cMirror.execCommand("insertSoftTab");              
+            }
+        });
+        editor.on('changes', function(cm) {
+            updateLineNumbers(questionID)
+            return CodeMirror.Pass;
+        });
+
+        editors[block.id] = editor
+        //console.log(block, editor, editors)
+    })
+
+    updateLineNumbers(questionID);
+
     // if Python or JavaScript display the run button
     if ($('input#allow_run_button').length) {
         if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
@@ -237,119 +224,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             }
         });
     }
-    // set line numbers for the edit part. Each codemirror block appears only once
-    if ($('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').length > 0) {
-        var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-        var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-        var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-        var prefFirstLine = 1;
-        var bsolFirstLine = prefEditor.lastLine() + 2;
-        var postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        prefEditor.setOption('firstLineNumnber',prefFirstLine);
-        bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        postEditor.setOption('firstLineNumber',postFirstLine);
-    }
-
-    // add an event handlers for the 'enter' key to update line numbers
-    var prefEditor = undefined;
-    var bsolEditor = undefined;
-    var postEditor = undefined;
-    var bsolFirstLine = 1;
-    var postFirstLine = 1;
-    if ($('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').length > 0) {
-        // we are in the edit mode
-        prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-        bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-        postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-        // The prefix code area
-        prefEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        // prefEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 2 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = prefEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
-        // bsolEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = bsolEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
-    } else if ($('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').length > 0) {
-        // we are in the test or preview mode
-        prefEditor = $('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
-        bsolEditor = $('.assCodeQuestionCodeBox#question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;; 
-        postEditor = $('.assCodeQuestionCodeBox#post_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
-        bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        // The prefix code area
-        // bsolEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = bsolEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
-    }
 }
-
 
 /**
  * @function getTotalSourcecode
@@ -357,39 +232,18 @@ function initSolutionBox(useMode, qLanguage, questionID){
  * the prefix_code, the best_solution or test and the postfix_code
  * @param {string} questionID The id of the question in the test required to collect the students input
  */
-function getTotalSourcecode(questionID){   
-    var prog = "";
-    var el = document.getElementById("pre_"+questionID);
-    // if in test mode
-    if (el) {
-        var code = el.innerText
-        if (code && code.trim()!='') {
-            prog = prog + code + "\n"
+function getTotalSourcecode(questionID){
+    var code = ''
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        const editor = editors[block.id]        
+        if (editor) {
+            code += block.value + "\n"      
+        } else {
+            code += block.innerHTML+ "\n"   
         }
-    }else{ // edit mode
-        prog = lastCodeMirrorInstance["code_prefix"].getDoc().getValue() + '\n';
-    }
-
-    // if in test mode, otherwise collect input from edit mode
-    el = lastCodeMirrorInstance[questionID];
-    if(!el) el = lastCodeMirrorInstance["best_solution"];  
-
-    if(el){
-        prog += el.getDoc().getValue()  + '\n';
-    }
-    el = document.getElementById("post_"+questionID);
-    if (el) {
-        var code = el.innerText
-        if (code && code.trim()!='') {
-            prog = prog + "\n" + code
-        }
-    }else{
-        prog += lastCodeMirrorInstance["code_postfix"].getDoc().getValue();
-    }
-    return prog;
+    });
+    return code
 }
-
-
 
 
 /**
@@ -436,25 +290,6 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
 function runPythonInTest(questionID){   
     runPython(getTotalSourcecode(questionID), questionID)
 }
-
-/*function runJava(prog){
-    JavaPoly.type('com.javapoly.demo.HomepageDemo').then(
-        function(HomepageDemo){
-            HomepageDemo.compileAndRun(document.getElementById('usercode').value);
-        }
-    );
-}*/
-
-
-
-/*function runPythonInSolution() { 
-    $("[name=resultingCode]").each(function(i, block) { 
-        block.setAttribute("name", "resultingCodeDone") //mark as processed
-        var node = document.getElementById(block.id+"Output")
-        var prog = block.innerText;  
-        runPython(prog, block.id, node);
-    });   
-}*/
 
 /**
  * @function runInTest
