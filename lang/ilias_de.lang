@@ -23,3 +23,10 @@ max_line_infos#:#Maximale Anzahl von Zeilen, die im Ausgabebereich zulässig sin
 cm_theme#:#Farbschema für den Texteditor
 cm_theme_info#:#Wähle ein Farbschema für den Texteditor
 empty_text#:# 
+cq_blocks#:#Frageblöcke
+cq_blocks_info#:#Die Frage wird aus den folgenden Blöcken zusammengestellt
+plain_text#:#Freitext
+static_code#:#Code (Angabe)
+solution_code#:#Lösung
+hidden_code#:#Code (Versteckt)
+canvas#:#Visualisierungsbereich

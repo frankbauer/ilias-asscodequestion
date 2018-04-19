@@ -109,6 +109,17 @@ function selectLanguage() {
 }
 
 /**
+ * @function selectType
+ * @param {*} elementID - The ID of the associated text area
+ * Called when the type of a Block-Element should change
+ */
+function selectType(select, elementID, blockNr){
+    const el = $('[data-blocknr='+blockNr+']')
+    el.attr('data-blocktype', select.value)
+    console.log(select, elementID, el, blockNr, select.value)
+}
+
+/**
  * @function initSolutionBox
  * This function initialize the editors and set some event handlers
  * to correctly manage the line number in the editors. The problem
@@ -126,7 +137,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
     // remember line nr. of last block
     var firstLineNumber = 0;
     var currentLineNumber = 0;
-    var selectTextAres = function(blockid,questionID) {
+    var selectTextAres = function(blockid,questionID, hasBlockNR) {
         if (blockid.indexOf('question'+questionID+'value1') > -1) {
             return true; // examination or preview mode for questionID
         } else if (blockid === 'code_prefix') { 
@@ -135,13 +146,15 @@ function initSolutionBox(useMode, qLanguage, questionID){
             return true; // edit mode
         } else if (blockid === 'code_postfix') {
             return true; // edit mode
+        } else if (hasBlockNR) {
+            return true; // edit mode
         } else {
             return false; // examination of preview mode for different questionID
         }
     }
      $(".assCodeQuestionCodeBox").each(function(i, block) {  
         //if (block.id.indexOf('question'+questionID+'value1') > -1) {
-        if ( selectTextAres(block.id,questionID) ) {
+        if ( selectTextAres(block.id,questionID, block.getAttribute && block.getAttribute('data-blocknr')) ) {
             // edit part
             if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
                 if ( block.id.indexOf('pre_') !== -1) {

@@ -6,6 +6,15 @@ require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 
+abstract class assCodeQuestionBlockTypes
+{
+    const Text = 0;
+    const StaticCode = 1;
+	const SolutionCode = 2;
+	const HiddenCode = 3;
+	const Canvas = 4;
+}
+
 /**
  * Example class for question type plugins
  *
@@ -14,7 +23,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoring
  * @ingroup ModulesTestQuestionPool
  */
 class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable
-{
+{	
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
@@ -83,6 +92,38 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	
 	function setMaxLines($newValue) {
 		$this->additional_data['maxLines'] = (int)$newValue;
+	}
+
+	function getNumberOfBlocks() {
+		if (is_array($this->additional_data['blocks'])){
+			return count($this->additional_data['blocks']);
+		} else {
+			return 3;
+		}
+	}
+
+	function getTypeForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->additional_data['blocks'][$nr]['type'];
+		} else {
+			if ($nr==0) return assCodeQuestionBlockTypes::StaticCode;
+			if ($nr==1) return assCodeQuestionBlockTypes::SolutionCode;
+			if ($nr==2) return assCodeQuestionBlockTypes::StaticCode;
+
+			return assCodeQuestionBlockTypes::HiddenCode;
+		}
+	}
+
+	function getContentForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->fixLoadedCode($this->additional_data['blocks'][$nr]['content']);
+		} else {
+			if ($nr==0) return $this->fixLoadedCode($this->additional_data['prefixCode']);
+			if ($nr==1) return $this->fixLoadedCode($this->additional_data['bestSolution']);
+			if ($nr==2) return $this->fixLoadedCode($this->additional_data['postfixCode']);
+
+			return '';
+		}
 	}
 
 	function getPrefixCode() {
