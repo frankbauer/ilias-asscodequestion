@@ -656,22 +656,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addBackTab($ilTabs);
 	}
 
-	public function createCodeEditorFormInput(\ilPropertyFormGUI $form, $name, $value){
-		/*$txt1 = new ilTextAreaInputGUI($this->plugin->txt($name), $name);	
-		$txt1->usePurifier(false);				
-		$txt1->setUseRte(TRUE);		
-        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt1->setValue($value);
-		$form->addItem($txt1);*/
-		$item = new ilCustomInputGUI($this->plugin->txt($name));
-		$item->setInfo($this->plugin->txt($name.'_info'));
+	public function createCodeEditorFormInput(\ilPropertyFormGUI $form, $name, $value, $blockID=-1, $blockType=1){
+		$item = new ilCustomInputGUI('');
+		//$item->setInfo($this->plugin->txt($name.'_info'));
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
 		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
 		$tpl->setVariable("NAME", $name);
+		$tpl->setVariable("BLOCK_ID", $blockID);
+		$tpl->setVariable("BLOCK_TYPE", $blockType);
 		$item->setHTML($tpl->get());
 		$form->addItem($item);
-		/*$this->tpl->addOnLoadCode('$("[name='.$name.']").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');*/
-
 	}
 
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
@@ -782,12 +776,25 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
 		$form->addItem($selectTheme);
 
-		$this->createCodeEditorFormInput($form, 'code_prefix', $this->object->getPrefixCode());
-		$this->createCodeEditorFormInput($form, 'best_solution', $this->object->getBestSolution());
-		$this->createCodeEditorFormInput($form, 'code_postfix', $this->object->getPostfixCode());
-
-
-
+		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
+		$item->setInfo($this->plugin->txt('cq_blocks_info'));
+		$form->addItem($item);
+		
+		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+			$elname = 'block['.$i.']';
+			$selectType = new ilSelectInputGUI('', 'block_type_'.$i);
+			$selectType->setOptions(array(
+				assCodeQuestionBlockTypes::Text => $this->plugin->txt('plain_text'),
+				assCodeQuestionBlockTypes::StaticCode => $this->plugin->txt('static_code'),
+				assCodeQuestionBlockTypes::SolutionCode => $this->plugin->txt('solution_code'),
+				assCodeQuestionBlockTypes::HiddenCode => $this->plugin->txt('hidden_code'),
+				assCodeQuestionBlockTypes::Canvas => $this->plugin->txt('canvas')
+			));
+			$selectType->addCustomAttribute('onchange="selectType(this, \''.$elname.'\', '.$i.')"');
+			$selectType->setValue($this->object->getTypeForBlock($i));
+			$form->addItem($selectType);
+			$this->createCodeEditorFormInput($form, $elname, $this->object->getContentForBlock($i), $i, $this->object->getTypeForBlock($i));
+		}
 
 		//$this->prepareTemplate();
 		$language = $this->getLanguage();	
