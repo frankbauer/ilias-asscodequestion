@@ -779,7 +779,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
 		$item->setInfo($this->plugin->txt('cq_blocks_info'));
 		$form->addItem($item);
-		
+
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$elname = 'block['.$i.']';
 			$selectType = new ilSelectInputGUI('', 'block_type_'.$i);
@@ -818,6 +818,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 	}
 
+	/**
+	 * Store the information from "Edit Question" in the Database
+	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
 	{
 		// Here you can write the question type specific values
@@ -825,10 +828,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->setLanguage((string) $_POST["source_lang"]);
 		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
 		$this->object->setMaxLines((int) $_POST["max_lines-question".$this->object->getId().'value1']);
-		$this->object->setPrefixCode((string) $_POST["code_prefix"]);
-		$this->object->setPostfixCode((string) $_POST["code_postfix"]);
-		$this->object->setBestSolution((string) $_POST["best_solution"]);
+
 		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
+		$this->object->clearBlocks();
+		$i = 0;
+		foreach($_POST["block"] as $k=>$c){
+			$t = $_POST['block_type_'.$k];
+			$this->object->setTypeForBlock($i, $t);
+			$this->object->setContentForBlock($i, $c);
+			$i = $i + 1;
+		}
 	}
 
 	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)
