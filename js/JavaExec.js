@@ -82,8 +82,7 @@ var JavaExec = {
 
   setRunButton: function(enabled, info=undefined){
     $('#allow_run_button').each(function(i, runButton){
-      if (enabled && info){
-        console.log(enabled, info)
+      if (enabled){
         if (runButton.getAttribute('data-info') != info)
           return
       }

@@ -54,7 +54,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID) {
         break
 
       case 'setRunButton':
-        console.log("setRunButton", data)
+        //console.log("setRunButton", data)
         JavaExec.setRunButton(data.enabled, data.info)
         break
     }
