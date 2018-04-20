@@ -434,10 +434,17 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit()
-	{
+	{		
+		$data = $_POST['block'][$this->getId()];
+		$result = array();
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			if ($this->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+				$result[$i] = $data[$i];
+			}
+		}
 		return array(
-			'value1' => ilUtil::stripSlashes($_POST["question".$this->getId()."value1"]),
-			'value2' => ilUtil::stripSlashes($_POST["question".$this->getId()."result1"])
+			'value1' => json_encode($result),
+			'value2' => ''
 		);
 	}
 
