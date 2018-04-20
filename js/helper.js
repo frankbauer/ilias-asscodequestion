@@ -109,9 +109,10 @@ function blockIsCanvas(block){
 }
 
 function blockIsReadOnly(block){
-    const type = block.getAttribute('data-blocktype');
-    if (type!=2) return true;
-    return false;
+    const type = block.getAttribute('data-blocktype')
+    if (block.getAttribute('data-readonly')) return true
+    if (type!=2) return true
+    return false
 }
 
 /**
@@ -180,10 +181,14 @@ function initSolutionBox(useMode, qLanguage, questionID){
         if (block.getAttribute('data-ignore')) return    
         var editor = initEditor(block, questionID, useMode)
 
-        //make static code blocks uneditable
-        if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {
+        //make blocks read-only
+        if (blockIsReadOnly(block) && !inQuestionEditMode){
             editor.setSize('height','auto')
-            editor.setOption('readOnly',true)  
+            editor.setOption('readOnly',true) 
+        }
+
+        //chnage look of static code blocks
+        if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {             
             editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
@@ -303,14 +308,14 @@ function runPythonInTest(questionID){
 }
 
 /**
- * @function runInTest
+ * @function runInExam
  * This function is called by the input button 'Run' during the test. 
  * According to the implement programming languages will call the worker 
  * for a Python or a JavaScript program
  * @param {string} language 
  * @param {string} questionID 
  */
-function runInTest(language,questionID){   
+function runInExam(language,questionID){   
     var prog = getTotalSourcecode(questionID);
     var maxLines = parseInt($('#max_lines-'+questionID).val());
     var maxMS = parseInt($('#timeout_ms-'+questionID).val());

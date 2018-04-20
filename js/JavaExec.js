@@ -82,7 +82,7 @@ var JavaExec = {
 
   setRunButton: function(enabled){
     let runButton = document.getElementById('allow_run_button');
-    runButton.disabled = !enabled;
+    if (runButton) runButton.disabled = !enabled;
   },
 
   showMessage: function (msg) {

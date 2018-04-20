@@ -90,52 +90,60 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'org'=>$inLanguage
 			);
 	}
+
 	private function prepareTemplate($force=false) {
-		if ($this->didPrepare && !$force) return;
+		if (($this->didPrepare) && !$force) return;
 		$this->didPrepare = true;
 		
+		
 		$lngData = $this->getLanguageData();
-		//$this->tpl->addJavascript(self::URL_PATH.'/js/javapoly/javapoly.js');
-		/*if ($lngData['cmLanguage'] == "python" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
-		} else*/ if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
+			if (!$this->tpl->hasJava){
+				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
+				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
+				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
+				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+				$this->tpl->hasJava = true;
+			}
 		}
+		if (!$this->tpl->didPrepare) {
+			$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			
+			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
-		$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-		
-		
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
 
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
+
+			$this->tpl->didPrepare = true;
+		}
+	
 		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");');
 		$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 		$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+
+		
 	}
 
 	/**
@@ -209,6 +217,26 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return 1;
 	}
 
+	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
+		if (empty($value)) return '';
+
+		$json = json_decode($value);				
+		if (!empty($json)) $value = $json->$blockID;
+
+		$value = ilUtil::prepareFormOutput($value);
+
+		if ($toHTMLOutput){
+			$value = str_replace('[err]', '<span style="color:red">', $value);
+			$value = str_replace('[/err]', '</span>', $value);	
+		}
+
+		if ($forPrint) {
+			$value = str_replace("\t", "  ",$value);
+			$value = str_replace(" ", "&nbsp;",$value);
+			$value = str_replace("\n", "<br />", $value);
+		}
+		return $value;
+	}
 	
 	/**
 	 * Show the question in Test mode
@@ -235,10 +263,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false)
-	{
+	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false)
+	{		
 		$this->prepareTemplate();
 		$language = $this->getLanguage();		
+
 		$runCode = "";
 		if ($this->object->getAllowRun()) {
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
@@ -266,23 +295,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template->setVariable("QUESTIONTEXT", "");
 		}	
 
-		$value1 = empty($value1) ? "" : ilUtil::prepareFormOutput($value1);
-		$value2 = empty($value2) ? "" : ilUtil::prepareFormOutput($value2);
-		if ($htmlResults) {
-			$value2 = str_replace('[err]', '<span style="color:red">', $value2);
-			$value2 = str_replace('[/err]', '</span>', $value2);	
-		}
-
-		//This should work, however it seems to be ignored 
-		/*if ($this->isRenderPurposePrintPdf()) {
-			$value1 = str_replace("\t", "  ",$value1);
-			$value1 = str_replace(" ", "&nbsp;",$value1);
-			$value1 = str_replace("\n", "<br />", $value1);
-
-			$value2 = str_replace("\t", "  ",$value2);
-			$value2 = str_replace(" ", "&nbsp;",$value2);
-			$value2 = str_replace("\n", "<br />", $value2);
-		}*/
 
 		$html = '';
 		$script = '';
@@ -298,15 +310,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
 			$tpl->setVariable("QUESTION_ID", $questionID);
+			$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
 
 		
 			if (trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) {
-				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';				
+				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';
 			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
 				$tpl->setVariable("CONTENT", $code);
 				$html .= $tpl->get();
 			} else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
-				$tpl->setVariable("CONTENT", $code);
+				$tpl->setVariable("CONTENT", $this->prepareSolutionCode($value1, $i));
 				$html .= $tpl->get();
 			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
 				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
@@ -316,15 +329,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}
 		$template->setVariable("BLOCK_HTML", $html);		
-		$template->setVariable("{CANVAS_SCRIPT}", $script);	 
+		$template->setVariable("CANVAS_SCRIPT", $script);	 
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
 		$template->setVariable("QUESTION_ID", $this->object->getId());
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		$template->setVariable("VALUE1", $value1);
-		$template->setVariable("RESULT1", $value2);		
 		$template->setVariable("MAX_LINES_VAL",$this->object->getMaxLines());
 		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
 
@@ -429,12 +440,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 		else
 		{
+			$bestSolution = array();
+			for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+				if ($this->object->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+					$bestSolution[$i] = $this->object->getContentForBlock($i);
+				}
+			}
 			// show the correct solution
 			$solutions = array(array(
-				"value1" => $this->object->getBestSolution(),
+				"value1" => json_encode($bestSolution),
 				"value2" => "..."
 			));
-			$template->setVariable("NAME_MODIFIER", "_SOL");
+			$template->setVariable("NAME_MODIFIER", "_SOL");			
 		}
 
 		// loop through the saved values if more records exist
@@ -446,11 +463,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
 		}		
 		
-		/*if ($this->getLanguage() == "python" && $this->object->getAllowRun()) {			
-			$this->tpl->addOnLoadCode('runPythonInSolution();');
-		}*/
 		if ( $this->object->getAllowRun() ) {			
-			$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
+			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
 		}
 			
 		if (($active_id > 0) && (!$show_correct_solution))
@@ -458,37 +472,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			if ($graphicalOutput)
 			{
 				// copied from assNumericGUI, yet not really understood
-				if($this->object->getStep() === NULL)
-				{
-					$reached_points = $this->object->getReachedPoints($active_id, $pass);
-				}
-				else
-				{
-					$reached_points = $this->object->calculateReachedPoints($active_id, $pass);
-				}
-				
-				// output of ok/not ok icons for user entered solutions
-				// in this example we have ony one relevant input field (points)
-				// so we just need to tet the icon beneath this field
-				// question types with partial answers may have a more complex output
-				/*if ($this->object->getReachedPoints($active_id, $pass) == $this->object->getMaximumPoints())
-				{
-					$template->setCurrentBlock("icon_ok");
-					$template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-					$template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-					$template->parseCurrentBlock();
-				}
-				else
-				{
-					$template->setCurrentBlock("icon_ok");
-					$template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-					$template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-					$template->parseCurrentBlock();
-				}*/
+				if($this->object->getStep() === NULL) 
+					$reached_points = $this->object->getReachedPoints($active_id, $pass);				
+				else 
+					$reached_points = $this->object->calculateReachedPoints($active_id, $pass);	
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -498,48 +489,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$solutionoutput = $solutiontemplate->get();
 
-		/*if ($this->isRenderPurposePrintPdf()) {
-
-			$solutionoutput = str_replace("<pre", "\n<code",$solutionoutput);
-			$solutionoutput = str_replace("</pre", "</code",$solutionoutput);
-			$solutionoutput = str_replace("\t", "  ",$solutionoutput);
-			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
-		}*/		
-
-		//include everything we need to execute python code when we just want to display a brief answer
-		if ($_GET['cmd'] == 'getAnswerDetail' ) {
-			$lngData = $this->getLanguageData();
-			$solutionoutput .= '
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/css/custom.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-dark.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-light.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
-			
-			<script type="text/javascript" src="./Services/jQuery/js/2_2_4/jquery-min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="./Services/jQuery/js/ui_1_12_0/jquery-ui-min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/java/java.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript">runPythonInSolution();hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
-		}
+		
 		if(!$show_question_only)
 		{
 			// get page object output
