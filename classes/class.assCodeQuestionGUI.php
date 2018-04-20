@@ -111,10 +111,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
+		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
+		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+		
 		
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
 		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
@@ -285,6 +288,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}*/
 
 		$html = '';
+		$script = 'function displayResult';
 		//Add Code Blocks
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$questionID = $this->object->getId();
@@ -310,11 +314,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
 				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
 			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
-				//TODO: Add Canvas Code here
+				$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" class="assCodeQuestionCanvas"></canvas>';	
+				$script .= 'if (questionID==='.$questionID.' && blockID==='.$i.') {\n'.$code.'\n}';
 			}
 		}
 		$template->setVariable("BLOCK_HTML", $html);		
-		
+		$template->setVariable("{CANVAS_SCRIPT}", $script);	 
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
@@ -516,10 +521,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
+			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-dark.css" media="screen" />
+			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-light.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
+			
 			<script type="text/javascript" src="./Services/jQuery/js/2_2_4/jquery-min.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="./Services/jQuery/js/ui_1_12_0/jquery-ui-min.js'.self::URL_SUFFIX.'"></script>
 			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
@@ -744,6 +752,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'default' => 'default',
 			'base16-dark' => 'base16-dark',
 			'base16-light' => 'base16-light',
+			'xq-light' => 'xq-light',
+			'xq-dark' => 'xq-dark',
 			'blackborard' => 'blackboard',
 			'midnight' => 'midnight',
 			'neo' => 'neo',
@@ -764,8 +774,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$selectType->setOptions(array(
 				assCodeQuestionBlockTypes::Text => $this->plugin->txt('plain_text'),
 				assCodeQuestionBlockTypes::StaticCode => $this->plugin->txt('static_code'),
-				assCodeQuestionBlockTypes::SolutionCode => $this->plugin->txt('solution_code'),
 				assCodeQuestionBlockTypes::HiddenCode => $this->plugin->txt('hidden_code'),
+				assCodeQuestionBlockTypes::SolutionCode => $this->plugin->txt('solution_code'),
 				assCodeQuestionBlockTypes::Canvas => $this->plugin->txt('canvas')
 			));
 			$selectType->addCustomAttribute('onchange="selectType(this, \''.$elname.'\', '.$i.')"');

@@ -166,7 +166,10 @@ const editors = {}
  * @param {*} qLanguage The langua being used, quite redundant
  * @param {*} questionID The id of the question in the test
  */
-function initSolutionBox(useMode, qLanguage, questionID){    
+function initSolutionBox(useMode, qLanguage, questionID){  
+    
+    const inEditor = $('input#allow_run').length!==0
+    console.log($('input#allow_run').length, inEditor)
     $("textarea[data-question="+questionID+"]").each(function(i, block) {        
         var editor = CodeMirror.fromTextArea(block, {
             lineNumbers: true, 
@@ -178,11 +181,12 @@ function initSolutionBox(useMode, qLanguage, questionID){
         });  
 
         //make static code blocks uneditable
-        if (block.getAttribute('data-blocktype')==1) {
+        if (block.getAttribute('data-blocktype')==1 && !inEditor) {
             editor.setSize('height','auto')
             editor.setOption('readOnly',true)  
+            editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
-            editor.display.wrapper.style.filter = "grayscale(80%)"
+            editor.display.wrapper.style.filter = "grayscale(20%)"
         } 
 
         editor.on('change',function(cMirror){
