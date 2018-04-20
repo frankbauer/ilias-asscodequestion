@@ -10,8 +10,8 @@ JavaExec.showMessage = function (msg) {
     self.postMessage({ event: 'showMessage', msg:msg })
 }
 
-JavaExec.setRunButton = function (enabled) {
-    self.postMessage({ event: 'setRunButton', enabled:enabled })
+JavaExec.setRunButton = function (enabled, info=undefined) {    
+    self.postMessage({ event: 'setRunButton', enabled:enabled, info:info })
 }
 
 self.addEventListener('message', function (e) {

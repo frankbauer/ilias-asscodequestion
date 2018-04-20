@@ -299,12 +299,7 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaWorker( prog, log, maxMS, maxLines);
-}
-
-
-function runPythonInTest(questionID){   
-    runPython(getTotalSourcecode(questionID), questionID)
+    runJavaWorker( prog, log, maxMS, maxLines, questionID);
 }
 
 /**
@@ -315,7 +310,7 @@ function runPythonInTest(questionID){
  * @param {string} language 
  * @param {string} questionID 
  */
-function runInExam(language,questionID){   
+function runInExam(language, questionID){   
     var prog = getTotalSourcecode(questionID);
     var maxLines = parseInt($('#max_lines-'+questionID).val());
     var maxMS = parseInt($('#timeout_ms-'+questionID).val());
@@ -331,11 +326,10 @@ function runInExam(language,questionID){
     // codeqst_edit_mode is a dummy language set by the PHP-script to avoid
     // collisions with the test and solution mode
     if (language === 'codeqst_edit_mode') {
-        var input = $('select#source_lang')['0'];
-        language = input.options[input.selectedIndex].value;
+        language = $('select#source_lang').val();
     }
     switch(language){
-        case 'python': runPython(prog, questionID,mypre,maxMS,maxLines); break;
+        case 'python': runPython(prog, questionID, mypre, maxMS, maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
         case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
     }
@@ -348,18 +342,8 @@ function runInExam(language,questionID){
  * for a Python or a JavaScript program.
  * @param {string} language 
  */
-function runInSolution(language){
-    $("[name=resultingCode]").each(function(i, block) { 
-        block.setAttribute("name", "resultingCodeDone") //mark as processed
-        var node = document.getElementById(block.id+"Output")
-        var prog = block.innerText;  
-
-        switch(language){
-            case 'python': runPython(prog, block.id, node); break;
-            case 'javascript':  runJavaScript( block.id, node, prog); break;
-            case 'java':  runJava( block.id, node, prog); break;
-        }
-    });   
+function runInSolution(language, questionID){
+    runInExam(language, questionID) 
 }
 
 

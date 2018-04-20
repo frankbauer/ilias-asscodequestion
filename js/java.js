@@ -4,7 +4,7 @@
  * @type {int} javaRunOverhead execution overhead in ms
  */
 var javaRunOverhead = 4000;
-function runJavaWorker(code, log_callback, max_ms, max_loglength) {
+function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID) {
   function format_info(text) {
     return '<span style="color:green">' + text + '</span>';
   }
@@ -54,15 +54,15 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength) {
         break
 
       case 'setRunButton':
-        //console.log("setRunButton", data)
-        JavaExec.setRunButton(data.enabled)
+        console.log("setRunButton", data)
+        JavaExec.setRunButton(data.enabled, data.info)
         break
     }
 
 
   }, false);
 
-  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms })
+  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms, questionID:questionID })
 }
 
 (function () {
