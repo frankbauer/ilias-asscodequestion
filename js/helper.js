@@ -144,6 +144,7 @@ function initEditor(block, questionID, useMode){
         autoCloseBrackets: true,
         firstLineNumber: 1 
     }); 
+    block.setAttribute('data-has-editor', true)
     
     editor.on('change',function(cMirror){
         block.value = cMirror.getValue(); 
@@ -174,12 +175,14 @@ const editors = {}
  * @param {*} questionID The id of the question in the test
  */
 function initSolutionBox(useMode, qLanguage, questionID){  
-    
+    console.log(useMode, qLanguage, questionID)
     const inQuestionEditMode = $('input#allow_run').length!==0
     
     $("textarea[data-question="+questionID+"]").each(function(i, block) {    
-        if (block.getAttribute('data-ignore')) return    
+        if (block.getAttribute('data-ignore')) return          
+        if (block.getAttribute('data-has-editor')) return;  
         var editor = initEditor(block, questionID, useMode)
+        //console.log(block.id, editors[block.id], editors, $(block).data('CodeMirrorInstance'))
 
         //make blocks read-only
         if (blockIsReadOnly(block) && !inQuestionEditMode){
@@ -192,7 +195,9 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
-        }         
+        }  
+        
+        editor.focus();
     })
 
     updateLineNumbers(questionID)
