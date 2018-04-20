@@ -874,12 +874,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getAggregatedAnswersView($relevant_answers)
 	{
-		return '';
+		return ''; //print_r($relevant_answers,true);
 	}
-
+	
 	public function isRenderPurposePrintPdf() {
 		return isset($_GET['pdf']) && $_GET['pdf'];
 	}
-
 }
 ?>
