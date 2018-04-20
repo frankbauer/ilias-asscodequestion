@@ -30,3 +30,4 @@ static_code#:#Code (static)
 solution_code#:#Answer
 hidden_code#:#Code (hidden)
 canvas#:#Canvas Area
+remove#:#REMOVE

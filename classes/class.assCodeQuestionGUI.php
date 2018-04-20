@@ -106,7 +106,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
 		}
 
-
+		$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
 		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
@@ -510,6 +510,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($_GET['cmd'] == 'getAnswerDetail' ) {
 			$lngData = $this->getLanguageData();
 			$solutionoutput .= '
+			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/css/custom.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
 			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
@@ -634,17 +635,39 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addBackTab($ilTabs);
 	}
 
-	public function createCodeEditorFormInput(\ilPropertyFormGUI $form, $name, $value, $blockID=-1, $blockType=1){
-		$item = new ilCustomInputGUI('');
-		//$item->setInfo($this->plugin->txt($name.'_info'));
+	public function createBlockTypeOption($value, $nameRef, $currentValue=-1){
+		return '<option value="'.$value.'" '.($currentValue==$value?'selected':'').'>'.$this->plugin->txt($nameRef).'</option>';
+	}
+
+	public function createCodeBlockInput($i, $elname){
+		$type = $this->object->getTypeForBlock($i);
+		$options_html  = $this->createBlockTypeOption(assCodeQuestionBlockTypes::Text, 'plain_text', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::StaticCode, 'static_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::HiddenCode, 'hidden_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::SolutionCode, 'solution_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::Canvas, 'canvas', $type);			
+
+		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_block_ui.html');
+		$tpl->setVariable("BLOCK_ID", $i);
+		$tpl->setVariable("REMOVE_TXT", $this->plugin->txt('remove'));
+		$tpl->setVariable("BLOCK_TYPE_OPTIONS", $options_html);
+		$tpl->setVariable("CODE_EDITOR_ID", $elname);
+		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
+		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $this->object->getTypeForBlock($i)));
+
+		return $tpl->get();		
+	}
+
+	public function createCodeEditorInput($name, $value, $blockID=-1, $blockType=1, $selectType=undefined){
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
 		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
 		$tpl->setVariable("NAME", $name);
 		$tpl->setVariable("BLOCK_ID", $blockID);
 		$tpl->setVariable("BLOCK_TYPE", $blockType);
-		$tpl->setVariable("QUESTION_ID", $this->object->getId());
-		$item->setHTML($tpl->get());
-		$form->addItem($item);
+		$tpl->setVariable("QUESTION_ID", $this->object->getId());		
+		$item = new ilCustomInputGUI('');
+		
+		return $tpl->get();		
 	}
 
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
@@ -734,21 +757,17 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$item->setInfo($this->plugin->txt('cq_blocks_info'));
 		$form->addItem($item);
 
+		
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$elname = 'block['.$i.']';
-			$selectType = new ilSelectInputGUI('', 'block_type_'.$i);
-			$selectType->setOptions(array(
-				assCodeQuestionBlockTypes::Text => $this->plugin->txt('plain_text'),
-				assCodeQuestionBlockTypes::StaticCode => $this->plugin->txt('static_code'),
-				assCodeQuestionBlockTypes::HiddenCode => $this->plugin->txt('hidden_code'),
-				assCodeQuestionBlockTypes::SolutionCode => $this->plugin->txt('solution_code'),
-				assCodeQuestionBlockTypes::Canvas => $this->plugin->txt('canvas')
-			));
-			$selectType->addCustomAttribute('onchange="selectType(this, \''.$elname.'\', '.$i.')"');
-			$selectType->setValue($this->object->getTypeForBlock($i));
-			$form->addItem($selectType);
-			$this->createCodeEditorFormInput($form, $elname, $this->object->getContentForBlock($i), $i, $this->object->getTypeForBlock($i));
+			$item = new ilCustomInputGUI('');		
+			$item->setHTML($this->createCodeBlockInput($i, $elname));
+			$form->addItem($item);			
 		}
+
+		$rect = new ilCustomInputGUI('');
+		$rect->setHTML('<input type="button" class="addBlockButton" value="+">');
+		$form->addItem($rect);
 
 		//$this->prepareTemplate();
 		$language = $this->getLanguage();	
