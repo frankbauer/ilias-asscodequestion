@@ -6,26 +6,7 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 $(document).ready(function(){
-    var $checkBox = $('input#allow_run');
-    if ($checkBox.length > 0) {
-        $checkBox.click(function () {
-            if ($(this).is(':checked')) {
-                var input = $('select#source_lang')['0'];
-                var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
-                    $(this).prop('checked',false);
-                } else {
-                    if ($('input#allow_run_button').length) {
-                        $('input#allow_run_button').css('display','');
-                    }
-                }
-            } else {
-                if ($('input#allow_run_button').length) {
-                    $('input#allow_run_button').css('display','none');
-                }
-            }
-        });
-    }
+    
 });
 
 /**
@@ -37,8 +18,11 @@ function selectTheme() {
     const themeSelect = $('select#cm_theme');
     const edTheme = themeSelect.val();
 
+    if (edTheme===undefined) return;
     $("textarea[data-question]").each(function(i, block) {  
         const ed = editors[block.id];   
+        if (!ed || ed===undefined) return;
+
         if ( blockIsReadOnly(block) ){
             ed.setOption('theme', 'xq-light') 
         } else {        
@@ -80,35 +64,22 @@ var cmMode = {
  * 'run' button.
  */
 function selectLanguage() {
-    var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-    var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-    var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-    var input = $('select#source_lang')['0'];
-    var edMode = cmMode[input.options[input.selectedIndex].value];
-    prefEditor.setOption("mode",edMode);
-    bsolEditor.setOption("mode",edMode);
-    postEditor.setOption("mode",edMode);
-    // if python or javascript show run button
-    var qLanguage = input.options[input.selectedIndex].value;
-    if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-        if ($('input#allow_run')[0].checked === true) {
-            // checkbox is checked
-            if ($('input#allow_run_button').length) {
-                $('input#allow_run_button').css('display','');
-            }
-        } else {
-            // check box is not checked
-            if ($('input#allow_run_button').length) {
-                $('input#allow_run_button').css('display','none');
-            }
-        }
-    } else {
-        $('input#allow_run')[0].checked = false;
-        if ($('input#allow_run_button').length) {
-            $('input#allow_run_button').css('display','none');
-        }
-    }
+    const qLanguage = $('select#source_lang').val()
+    if (qLanguage===undefined) return;
+    const edMode = cmMode[qLanguage]
 
+    $("textarea[data-question]").each(function(i, block) {  
+        const ed = editors[block.id];   
+        if (!ed) return;
+        
+        if ( !blockIsCanvas(block) ){
+            ed.setOption('mode', edMode)
+        } else {        
+            ed.setOption('mode', 'text/javascript')
+        }
+    })   
+
+    updateCodeEditorUI()
 }
 
 /**
@@ -129,6 +100,12 @@ function blockHasProgramCode(block){
     const type = block.getAttribute('data-blocktype');
     if (type==0 || type==4 ) return false;
     return true;
+}
+
+function blockIsCanvas(block){
+    const type = block.getAttribute('data-blocktype');
+    if (type==4) return true;
+    return false;
 }
 
 function blockIsReadOnly(block){
@@ -181,6 +158,7 @@ function initEditor(block, questionID, useMode){
     });
 
     editors[block.id] = editor
+    return editor
 }
 
 //maintains a list of active code boxes on the website
@@ -214,26 +192,46 @@ function initSolutionBox(useMode, qLanguage, questionID){
 
     updateLineNumbers(questionID)
     selectTheme()
+    selectLanguage()
 
-    // if Python or JavaScript display the run button
-    if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-            $('input#allow_run_button').css('display','');
-        } else {
-            $('input#allow_run_button').css('display','none');
-        }
-    }
-    var $checkBox = $('input#allow_run');
+    updateCodeEditorUI()
+}
+
+function isRunnableLanguage(qLanguage){
+    return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java';
+}
+
+/**
+ * Make sure the Edit Question UI has all inputs (like Run Checkbox) in the correct state
+ */
+function updateCodeEditorUI(){
+    const qLanguage = $('select#source_lang').val()
+    const runnableLanguage = isRunnableLanguage(qLanguage)
+    
+    //disable the run checkbox for unsupported languages
+    const $checkBox = $('input#allow_run');
     if ($checkBox.length > 0) {
         $checkBox.click(function () {
             if ($(this).is(':checked')) {
-                var input = $('select#source_lang')['0'];
-                var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
+                const qLanguage = $('select#source_lang').val();
+                if (!isRunnableLanguage(qLanguage)) {
                     $(this).prop('checked',false);
                 }
             }
-        });
+        })
+
+        if (!runnableLanguage) {
+            $checkBox.prop('checked',false);
+        }
+    }
+
+    // if Python or JavaScript display the run button
+    if ($('input#allow_run_button').length && $('input#allow_run').length) {
+        if ($('input#allow_run')[0].checked === true && runnableLanguage) {
+            $('input#allow_run_button').css('display','');
+        } else {
+            $('input#allow_run_button').css('display','none');        
+        }
     }
 }
 
@@ -247,6 +245,7 @@ function getTotalSourcecode(questionID){
     var code = ''
     $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
         if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
         const editor = editors[block.id]        
         if (editor) {
             code += block.value + "\n"      
