@@ -307,7 +307,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$script = '';
 		//Add Code Blocks
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-			$questionID = $this->object->getId();
+			$questionID = $this->object->getId()*$qidf ;
 			$code = $this->object->getContentForBlock($i);
 			$id = 'block['.$questionID.']['.$i.']';
 			$type = $this->object->getTypeForBlock($i);
@@ -316,7 +316,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("NAME", $id);
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
-			$tpl->setVariable("QUESTION_ID", $questionID*$qidf);
+			$tpl->setVariable("QUESTION_ID", $questionID);
 			if ($readOnly)
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
 			else
