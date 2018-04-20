@@ -6,6 +6,7 @@ var JavaExec = {
   persistentFs: null,
   ready: false,
   running: false,
+  initializing: false,
   terminate: null,
 
   constructPersistantFs: function (cb) {
@@ -39,6 +40,8 @@ var JavaExec = {
    * Initialize the System
    */
   initialize: function (cb) {
+    if (JavaExec.initializing) return;
+    JavaExec.initializing = true;
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     //options.bootstrapClasspath.push("/sys/classes/"); 
     options.classpath = ["/tmp", "/sys/classes"];
@@ -52,6 +55,7 @@ var JavaExec = {
       JavaExec.persistentFs = _fs;
       BrowserFS.initialize(_fs);
       cb();
+      JavaExec.initializing = false;
     });
   },
 
@@ -81,7 +85,7 @@ var JavaExec = {
   },
 
   setRunButton: function(enabled, info=undefined){
-    $('#allow_run_button').each(function(i, runButton){
+    $('[type=button][data-question]').each(function(i, runButton){
       if (enabled){
         if (runButton.getAttribute('data-info') != info)
           return
