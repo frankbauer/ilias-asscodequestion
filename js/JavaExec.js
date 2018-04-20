@@ -7,6 +7,7 @@ var JavaExec = {
   ready: false,
   running: false,
   initializing: false,
+  initialized: false,
   terminate: null,
 
   constructPersistantFs: function (cb) {
@@ -41,6 +42,11 @@ var JavaExec = {
    */
   initialize: function (cb) {
     if (JavaExec.initializing) return;
+    if (JavaExec.initialized) {
+      console.log("No Initialization needed!")
+      cb();
+      return;
+    }
     JavaExec.initializing = true;
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     //options.bootstrapClasspath.push("/sys/classes/"); 
@@ -55,7 +61,8 @@ var JavaExec = {
       JavaExec.persistentFs = _fs;
       BrowserFS.initialize(_fs);
       cb();
-      JavaExec.initializing = false;
+      JavaExec.initialized = true;
+      JavaExec.initializing = false;      
     });
   },
 
