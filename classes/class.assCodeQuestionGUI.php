@@ -91,9 +91,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			);
 	}
 
-	private function prepareTemplate($force=false) {
-		if (($this->didPrepare) && !$force) return;
-		$this->didPrepare = true;
+	private function prepareTemplate($force=false, $negativeQuestionID=false)
+	{		
+		$qidf = $negativeQuestionID?-1:1;
+		//if (($this->didPrepare) && !$force) return;
 		
 		
 		$lngData = $this->getLanguageData();
@@ -139,11 +140,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->didPrepare = true;
 		}
 	
-		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");');
-		$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-		$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
 
+		if (!$this->didPrepare) {
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+		}
 		
+		$this->didPrepare = true;
 	}
 
 	/**
@@ -256,6 +260,19 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->setVariable("FORMACTION", $formaction);
 	}*/
 
+	private function createRunHTMLCode($language, $questionID){
+		$runCode = "";
+		if ($this->object->getAllowRun()) {
+			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
+			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
+			$tpl->setVariable("QUESTION_ID", $questionID);
+			$tpl->setVariable("LANGUAGE", $language);
+			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
+			$runCode = $tpl->get();			
+		}
+		return $runCode;
+	}
+
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -263,23 +280,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false)
+	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false)
 	{		
-		$this->prepareTemplate();
+		$qidf = $negativeQuestionID?-1:1;
+		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();		
 
-		$runCode = "";
-		if ($this->object->getAllowRun()) {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-			$tpl->setVariable("QUESTION_ID", $this->object->getId());
-			$tpl->setVariable("LANGUAGE", $language);
-			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
-			$runCode = $tpl->get();			
-		}
-		
-		// fill the question output template
-		// in out example we have 1:1 relation for the database field
+		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
 		
 		if ($template == nil) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
@@ -309,8 +316,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("NAME", $id);
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
-			$tpl->setVariable("QUESTION_ID", $questionID);
-			$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
+			$tpl->setVariable("QUESTION_ID", $questionID*$qidf);
+			if ($readOnly)
+				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
+			else
+				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
 
 		
 			if (trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) {
@@ -333,7 +343,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
-		$template->setVariable("QUESTION_ID", $this->object->getId());
+		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
 		$template->setVariable("MAX_LINES_VAL",$this->object->getMaxLines());
@@ -426,12 +436,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
+		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
 
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
-		if (($active_id > 0) && (!$show_correct_solution))
+		if ($showStudentResults)
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
@@ -467,7 +478,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
 		}
 			
-		if (($active_id > 0) && (!$show_correct_solution))
+		if ($showStudentResults)
 		{
 			if ($graphicalOutput)
 			{
@@ -479,7 +490,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);

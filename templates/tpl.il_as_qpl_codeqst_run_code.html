@@ -135,12 +135,12 @@
 </style>
 <div></div>
 <input class="btn btn-default" type="button" value="{RUN_LABEL}" onclick="runInExam('{LANGUAGE}','{QUESTION_ID}')"
-    id='allow_run_button' {DISABLED_STATE} style="display:inline">
-<div id="stateBox" style="display:none;margin-left:20px;">
-    <div class="sk-chasing-dots" style="display:inline-block">
-        <div class="sk-child sk-dot1"></div>
-        <div class="sk-child sk-dot2"></div>
+    id='allow_run_button' {DISABLED_STATE} style="display:inline" data-question="{QUESTION_ID}">
+<div id="stateBox" style="display:none;margin-left:20px;" data-question="{QUESTION_ID}">
+    <div class="sk-chasing-dots" style="display:inline-block" data-question="{QUESTION_ID}">
+        <div class="sk-child sk-dot1" data-question="{QUESTION_ID}"></div>
+        <div class="sk-child sk-dot2" data-question="{QUESTION_ID}"></div>
     </div>
-    <div id="stateMessageBox" style="color:gray;display:inline-block;padding-left:4px;padding-right:4px;">...</div>
+    <div id="stateMessageBox" style="color:gray;display:inline-block;padding-left:4px;padding-right:4px;" data-question="{QUESTION_ID}">...</div>
 </div>
 <pre id="{QUESTION_ID}Output" style="display:none">...</pre>

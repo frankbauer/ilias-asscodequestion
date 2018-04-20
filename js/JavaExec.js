@@ -80,9 +80,18 @@ var JavaExec = {
     // mfs.mount('/sys', new BrowserFS.FileSystem.XmlHttpRequest('listings.json', baseFolder+'/js/doppio'));    
   },
 
-  setRunButton: function(enabled){
-    let runButton = document.getElementById('allow_run_button');
-    if (runButton) runButton.disabled = !enabled;
+  setRunButton: function(enabled, info=undefined){
+    $('#allow_run_button').each(function(i, runButton){
+      if (enabled && info){
+        console.log(enabled, info)
+        if (runButton.getAttribute('data-info') != info)
+          return
+      }
+      runButton.disabled = !enabled;
+      if (info)
+        if (enabled) runButton.removeAttribute('data-info')
+        else runButton.setAttribute('data-info', info);
+    })    
   },
 
   showMessage: function (msg) {
@@ -248,7 +257,7 @@ var JavaExec = {
       }
     }
 
-    let iAmDone = function () {
+    let iAmDone = function (info=undefined) {
       JavaExec.showMessage(null);
       callWhenFinished();
       JavaExec.setRunButton(true)      
@@ -476,11 +485,11 @@ var JavaExec = {
     let iAmDone = function (stdout, stderr) {
       JavaExec.showMessage(null);
       whenFinished(stdout, stderr);
-      JavaExec.setRunButton(true)
+      JavaExec.setRunButton(true, 'run')
       JavaExec.running = false;
     }
 
-    JavaExec.setRunButton(false)  
+    JavaExec.setRunButton(false, 'run')  
     
     if (JavaExec.running) {
       alert("Please wait for the last Java-Process to finish...");
