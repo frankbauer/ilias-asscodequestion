@@ -164,7 +164,7 @@ const editors = {}
 function initSolutionBox(useMode, qLanguage, questionID){  
     
     const inQuestionEditMode = $('input#allow_run').length!==0
-    console.log($('input#allow_run').length, inEditor)
+    
     $("textarea[data-question="+questionID+"]").each(function(i, block) {        
         var editor = CodeMirror.fromTextArea(block, {
             lineNumbers: true, 
