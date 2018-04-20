@@ -155,20 +155,15 @@ const editors = {}
 /**
  * @function initSolutionBox
  * This function initialize the editors and set some event handlers
- * to correctly manage the line number in the editors. The problem
- * arises, because we have three editors, one with e preamble, called 
- * prefix_code, one with the input of the lecturer in edit mode or the input
- * of the student in test mode, and finaly an editor for the epilog, closing
- * part of the code for test purposes called post_fix. 
- * The pre_fix and post_fix codes can not be changed by the students, they
- * must be readOnly.
- * @param {string} useMode The langued being used, as a string for CodeMirror
- * @param {*} qLanguage The langua being used, quite redundant
+ * to correctly manage the line number in the editors.
+ * 
+ * @param {string} useMode The langued being used, as a string for CodeMirror (ie "text/x-c++src")
+ * @param {*} qLanguage The langua being used (ie "clike")
  * @param {*} questionID The id of the question in the test
  */
 function initSolutionBox(useMode, qLanguage, questionID){  
     
-    const inEditor = $('input#allow_run').length!==0
+    const inQuestionEditMode = $('input#allow_run').length!==0
     console.log($('input#allow_run').length, inEditor)
     $("textarea[data-question="+questionID+"]").each(function(i, block) {        
         var editor = CodeMirror.fromTextArea(block, {
@@ -181,7 +176,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
         });  
 
         //make static code blocks uneditable
-        if (block.getAttribute('data-blocktype')==1 && !inEditor) {
+        if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {
             editor.setSize('height','auto')
             editor.setOption('readOnly',true)  
             editor.setOption('theme', 'xq-light')  
