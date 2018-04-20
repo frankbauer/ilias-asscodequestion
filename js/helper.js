@@ -625,4 +625,16 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
     setTimeout( testTimeout, max_ms );
 }
 
+function removeBlock(container, elName){
+    const ed = editors[elName]
+    if (ed) {
+        editors[elName] = undefined
+        ed.toTextArea()
+    }
+    
+    if (container){
+        container.remove()
+    }
+}
+
 //@ sourceURL=helper.js

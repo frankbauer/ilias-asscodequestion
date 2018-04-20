@@ -1,0 +1,39 @@
+.remBlockButton, .addBlockButton {    
+    border-radius: 3px;
+    font-weight: bold;
+    text-align:center;
+    font-size:120%;
+    padding:4px;
+    width:100%;
+    display:block;
+}
+
+.remBlockButton {
+    margin-top:2px!important;
+    border:1px dashed rgb(128, 48, 48);
+    color:rgb(128, 48, 48);
+    background-color:rgb(240, 220, 220);  
+}
+
+.remBlockButton:hover {
+    background-color:rgb(241, 48, 48);
+    color:white;
+}
+
+.addBlockButton {
+    border:1px dashed gray;
+    color:black;
+    background-color:rgb(235, 235, 235);    
+}
+
+.addBlockButton:hover{
+    background-color:rgb(245, 245, 245);
+}
+
+.hideBlockButton{
+    display:none!important;
+}
+
+.BlockContainer{
+    margin-bottom:20px;
+}
