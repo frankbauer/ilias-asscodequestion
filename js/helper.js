@@ -6,7 +6,12 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 $(document).ready(function(){
-    
+    //we need this for the manual scoring view, otherwise the boxes have to get clicked
+    setTimeout(function() {
+        $.each(editors, function(i, e){            
+            e.refresh();
+        })
+    }, 500);    
 });
 
 /**
@@ -175,7 +180,7 @@ const editors = {}
  * @param {*} questionID The id of the question in the test
  */
 function initSolutionBox(useMode, qLanguage, questionID){  
-    console.log(useMode, qLanguage, questionID)
+    //console.log(useMode, qLanguage, questionID)
     const inQuestionEditMode = $('input#allow_run').length!==0
     
     $("textarea[data-question="+questionID+"]").each(function(i, block) {    
@@ -196,8 +201,6 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
         }  
-        
-        editor.focus();
     })
 
     updateLineNumbers(questionID)
