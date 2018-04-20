@@ -221,6 +221,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return 1;
 	}
 
+	private function printableString($value){
+		$value = str_replace("\t", "  ",$value);
+		$value = str_replace(" ", "&nbsp;",$value);
+		$value = str_replace("\n", "<br />", $value);
+
+		return $value;
+	}
+
 	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
 		if (empty($value)) return '';
 
@@ -235,9 +243,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 
 		if ($forPrint) {
-			$value = str_replace("\t", "  ",$value);
-			$value = str_replace(" ", "&nbsp;",$value);
-			$value = str_replace("\n", "<br />", $value);
+			$value = $this->printableString($value);
 		}
 		return $value;
 	}
@@ -280,7 +286,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=null)
+	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=null, $print=false)
 	{		
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
@@ -288,7 +294,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
 		//we can not run when we have multiple instances of the same question on screen
-		if ($active_id!=null) $runCode='';
+		if ($active_id!=null || $print) $runCode='';
 
 		if ($template == nil) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
@@ -311,13 +317,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$questionID = $this->object->getId()*$qidf ;
 			$code = $this->object->getContentForBlock($i);
+			if ($print) $code = $this->printableString($code);
 			$id = 'block['.$questionID.']['.$i.']';
 			if ($active_id!=null){
 				$id .= '['.$active_id.']';
 			}
 			$type = $this->object->getTypeForBlock($i);
 
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
+			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
 			$tpl->setVariable("NAME", $id);
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
@@ -441,6 +448,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
+		
+		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
@@ -495,7 +504,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :null);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :null, $print);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -550,6 +559,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			// get page object output
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
+		
 		return $solutionoutput;
 	}
 
