@@ -648,23 +648,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::Canvas, 'canvas', $type);			
 
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_block_ui.html');
-		$tpl->setVariable("BLOCK_ID", $i);
+		$tpl->setVariable("BLOCK_ID", $i==-1?'[ID]':$i);
 		$tpl->setVariable("REMOVE_TXT", $this->plugin->txt('remove'));
 		$tpl->setVariable("BLOCK_TYPE_OPTIONS", $options_html);
 		$tpl->setVariable("CODE_EDITOR_ID", $elname);
 		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
-		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $this->object->getTypeForBlock($i)));
+		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $type));
 
 		return $tpl->get();		
 	}
 
-	public function createCodeEditorInput($name, $value, $blockID=-1, $blockType=1, $selectType=undefined){
+	public function createCodeEditorInput($name, $value, $blockID=-1, $blockType=1){
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
 		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
 		$tpl->setVariable("NAME", $name);
-		$tpl->setVariable("BLOCK_ID", $blockID);
+		$tpl->setVariable("BLOCK_ID", $blockID==-1?'[ID]':$blockID);
 		$tpl->setVariable("BLOCK_TYPE", $blockType);
-		$tpl->setVariable("QUESTION_ID", $this->object->getId());		
+		$tpl->setVariable("QUESTION_ID", $this->object->getId());	
+		$tpl->setVariable("ADDITIONAL_ATTRIBUTES", ' '.($blockID==-1?'data-ignore=true':'').' ');	
 		$item = new ilCustomInputGUI('');
 		
 		return $tpl->get();		
@@ -686,7 +687,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		// Add Source Code Type Selection
 		// first complete scripts for codemirror
-		$language = $this->getLanguage();		
+		$language = $this->getLanguage();
+		$lngData = $this->getLanguageData();
 		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
         $select->setOptions(array(
 			'c'=>'C', 
@@ -765,8 +767,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$form->addItem($item);			
 		}
 
+		//Add Button and Template UI
 		$rect = new ilCustomInputGUI('');
-		$rect->setHTML('<input type="button" class="addBlockButton" value="+">');
+		$rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
 		$form->addItem($rect);
 
 		//$this->prepareTemplate();
@@ -795,7 +798,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * Store the information from "Edit Question" in the Database
 	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
-	{
+	{		
 		// Here you can write the question type specific values
 		$this->object->setPoints((int) $_POST["points"]);
 		$this->object->setLanguage((string) $_POST["source_lang"]);
