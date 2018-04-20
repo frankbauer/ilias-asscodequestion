@@ -34,14 +34,17 @@ $(document).ready(function(){
  * This function is only called in edit mode. This is not available for the test mode.
  */
 function selectTheme() {
-    var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-    var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-    var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-    var input = $('select#cm_theme')['0'];
-    var edTheme = input.options[input.selectedIndex].textContent;
-    prefEditor.setOption("theme",edTheme);
-    bsolEditor.setOption("theme",edTheme);
-    postEditor.setOption("theme",edTheme);
+    const themeSelect = $('select#cm_theme');
+    const edTheme = themeSelect.val();
+
+    $("textarea[data-question]").each(function(i, block) {  
+        const ed = editors[block.id];   
+        if ( blockIsReadOnly(block) ){
+            ed.setOption('theme', 'xq-light') 
+        } else {        
+            ed.setOption('theme', edTheme)
+        }
+    })   
 }
 
 /**
@@ -209,7 +212,8 @@ function initSolutionBox(useMode, qLanguage, questionID){
         }         
     })
 
-    updateLineNumbers(questionID);
+    updateLineNumbers(questionID)
+    selectTheme()
 
     // if Python or JavaScript display the run button
     if ($('input#allow_run_button').length) {
@@ -659,6 +663,7 @@ function addBlock(button, useMode, questionID){
     block.removeAttribute('data-ignore')
     initEditor(block, questionID, useMode)    
     updateLineNumbers()
+    selectTheme()
 }
 
 function removeBlock(container, elName){
