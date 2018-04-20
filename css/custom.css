@@ -37,3 +37,7 @@
 .BlockContainer{
     margin-bottom:20px;
 }
+
+#blockTemplate{
+    display:none;
+}

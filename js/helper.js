@@ -109,18 +109,6 @@ function selectLanguage() {
 }
 
 /**
- * @function selectType
- * @param {*} elementID - The ID of the associated text area
- * Called when the type of a Block-Element should change
- */
-function selectType(select, elementID, blockNr){
-    const el = $('[data-blocknr='+blockNr+']')
-    el.attr('data-blocktype', select.value)
-    console.log(select, elementID, el, blockNr, select.value)
-}
-
-
-/**
  * Counts the number of displayed lines within a Textarea fo
  * @param {*} block The Element to count the lines in
  */
@@ -134,6 +122,18 @@ function numberOfLinesIn(block){
    return prog.split('\n').length
 }
 
+function blockHasProgramCode(block){
+    const type = block.getAttribute('data-blocktype');
+    if (type==0 || type==4 ) return false;
+    return true;
+}
+
+function blockIsReadOnly(block){
+    const type = block.getAttribute('data-blocktype');
+    if (type!=2) return true;
+    return false;
+}
+
 /**
  * Counts the number of displayed lines within a Textarea fo
  * @param {*} questionID 
@@ -142,12 +142,42 @@ function updateLineNumbers(questionID){
     var firstLineNumber = 1
     $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
     //$("textarea[data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
+
         const editor = editors[block.id]
         if (editor) {
             editor.setOption('firstLineNumber',firstLineNumber);
         } 
         firstLineNumber += numberOfLinesIn(block)      
     });
+}
+
+function initEditor(block, questionID, useMode){
+    const type = block.getAttribute('data-blocktype');
+    var editor = CodeMirror.fromTextArea(block, {
+        lineNumbers: blockHasProgramCode(block), 
+        mode:useMode,
+        theme:"solarized light",
+        tabSize: 2,
+        autoCloseBrackets: true,
+        firstLineNumber: 1 
+    }); 
+    
+    editor.on('change',function(cMirror){
+        block.value = cMirror.getValue(); 
+    });           
+    editor.addKeyMap({
+        "Tab": function(cMirror) {
+            cMirror.execCommand("insertSoftTab");              
+        }
+    });
+    editor.on('changes', function(cm) {
+        updateLineNumbers(questionID)
+        return CodeMirror.Pass;
+    });
+
+    editors[block.id] = editor
 }
 
 //maintains a list of active code boxes on the website
@@ -165,15 +195,9 @@ function initSolutionBox(useMode, qLanguage, questionID){
     
     const inQuestionEditMode = $('input#allow_run').length!==0
     
-    $("textarea[data-question="+questionID+"]").each(function(i, block) {        
-        var editor = CodeMirror.fromTextArea(block, {
-            lineNumbers: true, 
-            mode:useMode,
-            theme:"solarized light",
-            tabSize: 2,
-            autoCloseBrackets: true,
-            firstLineNumber: 1 
-        });  
+    $("textarea[data-question="+questionID+"]").each(function(i, block) {    
+        if (block.getAttribute('data-ignore')) return    
+        var editor = initEditor(block, questionID, useMode)
 
         //make static code blocks uneditable
         if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {
@@ -182,23 +206,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
-        } 
-
-        editor.on('change',function(cMirror){
-            block.value = cMirror.getValue(); 
-        });           
-        editor.addKeyMap({
-            "Tab": function(cMirror) {
-                cMirror.execCommand("insertSoftTab");              
-            }
-        });
-        editor.on('changes', function(cm) {
-            updateLineNumbers(questionID)
-            return CodeMirror.Pass;
-        });
-
-        editors[block.id] = editor
-        //console.log(block, editor, editors)
+        }         
     })
 
     updateLineNumbers(questionID);
@@ -234,6 +242,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
 function getTotalSourcecode(questionID){
     var code = ''
     $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
         const editor = editors[block.id]        
         if (editor) {
             code += block.value + "\n"      
@@ -625,6 +634,33 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
     setTimeout( testTimeout, max_ms );
 }
 
+/**
+ * Create a new Edit Block in the Question Edit View
+ * @param {*} button 
+ * @param {*} useMode 
+ * @param {*} questionID 
+ */
+function addBlock(button, useMode, questionID){
+    button = $(button)
+    
+    let maxNr = 0
+    $("textarea[data-question]").each(function(i, block) {    
+        if (block.getAttribute('data-ignore')) return
+        maxNr = Math.max(maxNr, block.getAttribute('data-blocknr'))
+    })
+
+    const tpl = $('#blockTemplate')
+    let html = tpl.html()    
+    html = html.replace(/\[ID\]/g, (maxNr+1))
+    html = html.replace(/block_template/g, 'block['+(maxNr+1)+']')
+    $(html).insertBefore(button)
+
+    const block = $('#block\\['+(maxNr+1)+'\\]').get()[0]
+    block.removeAttribute('data-ignore')
+    initEditor(block, questionID, useMode)    
+    updateLineNumbers()
+}
+
 function removeBlock(container, elName){
     const ed = editors[elName]
     if (ed) {
@@ -635,6 +671,29 @@ function removeBlock(container, elName){
     if (container){
         container.remove()
     }
+}
+
+/**
+ * @function selectType
+ * @param {*} elementID - The ID of the associated text area
+ * Called when the type of a Block-Element should change
+ */
+function selectType(select, elementID, blockNr){
+    const el = $('[data-blocknr='+blockNr+']')
+    const block = el.get()[0];
+    const ed = editors[el.attr('id')]
+    el.attr('data-blocktype', select.value)
+    ed.setOption('lineNumbers', blockHasProgramCode(block));
+    if ( blockIsReadOnly(block) ){
+        ed.setOption('theme', 'xq-light') 
+    } else {
+        const themeSelect = $('select#cm_theme');
+        const edTheme = themeSelect.val();
+        console.log(edTheme)
+        ed.setOption('theme', edTheme)
+    }
+    ed.setOption('lineNumbers', blockHasProgramCode(el.get()[0]));
+    console.log(select, elementID, el, blockNr, select.value, ed)
 }
 
 //@ sourceURL=helper.js
