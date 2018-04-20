@@ -203,8 +203,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
 			$this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
 
-			
-
 			$this->saveTaxonomyAssignments();
 			return 0;
 		}
@@ -258,8 +256,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
-		if ($show_question_text==true)
-		{
+		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
 			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
@@ -288,7 +285,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}*/
 
 		$html = '';
-		$script = 'function displayResult';
+		$script = '';
 		//Add Code Blocks
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$questionID = $this->object->getId();
@@ -366,11 +363,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2);
-		/*if ($this->getLanguage() == "python") {
-			$this->tpl->addOnLoadCode("preparePythonSave(".$this->object->getId().");");
-		}
-		*/
+		$questionoutput = $this->getQuestionOutput($value1, $value2);		
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
@@ -670,34 +663,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		// Add Source Code Type Selection
 		// first complete scripts for codemirror
-		$language = $this->getLanguage();
-		//this is just to debug variable content
-	/*	if ($language == 'c' || $language == 'c++' || $language == 'c#' || $language == 'objectivec') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
-		}
-		if ($language == 'fortran') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
-		}
-		if ($language == 'java') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js??'.$language.'-'.($language == 'java'));
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
-		}
-		if ($language == 'javascript') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
-		}
-		if ($language == 'perl') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
-		}
-		if ($language == 'python') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
-		}
-		if ($language == 'r') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
-		}
-		if ($language == 'ruby') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		}*/
-
+		$language = $this->getLanguage();		
 		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
         $select->setOptions(array(
 			'c'=>'C', 
