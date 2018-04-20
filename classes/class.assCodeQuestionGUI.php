@@ -287,7 +287,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$language = $this->getLanguage();		
 
 		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
-		
+		//we can not run when we have multiple instances of the same question on screen
+		if ($active_id!=null) $runCode='';
+
 		if ($template == nil) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
