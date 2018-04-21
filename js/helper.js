@@ -142,7 +142,7 @@ function updateLineNumbers(questionID){
 function initEditor(block, questionID, useMode){
     const type = block.getAttribute('data-blocktype');
     var editor = CodeMirror.fromTextArea(block, {
-        lineNumbers: blockHasProgramCode(block), 
+        lineNumbers: blockHasProgramCode(block) || blockIsCanvas(block), 
         mode:useMode,
         theme:"solarized light",
         tabSize: 2,
@@ -183,6 +183,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
     //console.log(useMode, qLanguage, questionID)
     const inQuestionEditMode = $('input#allow_run').length!==0
     
+    
     $("textarea[data-question="+questionID+"]").each(function(i, block) {    
         if (block.getAttribute('data-ignore')) return          
         if (block.getAttribute('data-has-editor')) return;  
@@ -202,6 +203,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.display.wrapper.style.filter = "grayscale(20%)"
         }  
     })
+    finishedExecutionWithOutput(undefined, questionID)
 
     updateLineNumbers(questionID)
     selectTheme()
@@ -292,7 +294,7 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaScriptWorker( prog, log, maxMS, maxLines);
+    runJavaScriptWorker( prog, log, maxMS, maxLines, questionID);
 }
 
 function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
@@ -307,7 +309,7 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaWorker( prog, log, maxMS, maxLines, questionID);
+    runJavaWorker( prog, log, maxMS, maxLines, questionID, finishedExecutionWithOutput);
 }
 
 /**
@@ -352,6 +354,22 @@ function runInExam(language, questionID){
  */
 function runInSolution(language, questionID){
     runInExam(language, questionID) 
+}
+
+/**
+ * Call when the program finished executing and pass the output string. We will send the output to all embeded canvas elements
+ * @param {*} output 
+ */
+function finishedExecutionWithOutput(output, questionID){
+    if (typeof displayResults !== "function"){
+        console.log('displayResults is not available here' );
+        return output;
+    }
+    $("canvas[data-question="+questionID+"]").each(function(i, block) {    
+        output = displayResults(output, $(block), questionID, block.getAttribute('data-blocknr'))        
+    })
+    
+    return output;
 }
 
 
@@ -443,7 +461,9 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
             //only accept messages, when worker not terminated (workers do not immetiately terminate)
             if (testTimeout() === true) { return; }
             if( e.data[0] == 'finished' ){
-                output(''+ e.data[1].stdOut);
+                const result = finishedExecutionWithOutput(e.data[1].stdOut, questionID)
+                output(''+ result);
+                
                 worker.end(format_info("Info: Execution finished in : " + (Date.now() - start) + " ms"));
             }else if (e.data[0] ==='err'){
                 worker.end(format_error("ERROR: " + e.data[1]));
@@ -457,55 +477,7 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
     }
 } 
 
-
-
-function runPythonForSave(form, target, questionID){
-    try {
-        var prog = getTotalSourcecode(questionID);
-        prog = prog.replaceAll("\t", "  ")
-    
-        target.value = '';
-        Sk.configure({output:function(text) {
-            try {
-                target.value += text;
-            } catch (err) {
-                console.log(err);
-            }
-            //alert("result: " + text + " " + questionID+", "+target)
-        }, read:builtinRead, execLimit:1000}); 
-        try {
-            eval(Sk.importMainWithBody("<stdin>", false, prog));
-        }
-        catch(err) {
-          target.value += '[err]'+err+'[/err]';
-        }    
-        //Sk.importMainWithBody("<stdin>", false, prog, false);     
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-function preparePythonSave(nr){
-    try {
-        var form = $('#taForm');    
-        var target = document.getElementById('question'+nr+'result1');    
-
-        form.submit(function() {
-            console.log("Python Save");
-            //runPythonForSave(form, target, nr);
-            return true;
-        });
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-
-
-
-
-
-function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
+function runJavaScriptWorker( code, log_callback, max_ms, max_loglength, questionID){
     const maxLineLength = 256;
     function format_info(text){
         return '<span style="color:green">'+text+'</span>';
@@ -596,12 +568,15 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
         }
     }
     
+    var outputBuffer = ''
     worker.onmessage = function(e){
         if(executionFinished) return;
         //only accept messages, when worker not terminated (workers do not immetiately terminate)
 
         testTimeout();
         if( e.data[0] == 'finished' ){
+            outputBuffer = finishedExecutionWithOutput(outputBuffer, questionID)
+            output(''+ outputBuffer );   
             worker.end(format_info("Info: Execution finished in " + (Date.now() - start) + " ms"));
 
             //TODO:: perform additional calls to check for hidden testcases
@@ -618,7 +593,8 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
 */
 
         }else if(e.data[0]=='log'){
-            output(''+ e.data[1] );              
+            outputBuffer += e.data[1];
+                       
         }else{
             worker.end(format_error("HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test."));
         }
@@ -684,7 +660,7 @@ function selectType(select, elementID, blockNr){
     const block = el.get()[0];
     const ed = editors[el.attr('id')]
     el.attr('data-blocktype', select.value)
-    ed.setOption('lineNumbers', blockHasProgramCode(block));
+    ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
     if ( blockIsReadOnly(block) ){
         ed.setOption('theme', 'xq-light') 
     } else {
@@ -693,7 +669,7 @@ function selectType(select, elementID, blockNr){
         console.log(edTheme)
         ed.setOption('theme', edTheme)
     }
-    ed.setOption('lineNumbers', blockHasProgramCode(el.get()[0]));
+    selectLanguage()
     console.log(select, elementID, el, blockNr, select.value, ed)
 }
 

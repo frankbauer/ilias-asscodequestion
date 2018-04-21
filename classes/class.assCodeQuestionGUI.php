@@ -346,8 +346,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
 				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
 			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
-				$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" class="assCodeQuestionCanvas"></canvas>';	
-				$script .= 'if (questionID==='.$questionID.' && blockID==='.$i.') {\n'.$code.'\n}';
+				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
+				$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></canvas>';	
+				$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
 			}
 		}
 		$template->setVariable("BLOCK_HTML", $html);		
@@ -876,7 +877,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		return ''; //print_r($relevant_answers,true);
 	}
-	
+
 	public function isRenderPurposePrintPdf() {
 		return isset($_GET['pdf']) && $_GET['pdf'];
 	}
