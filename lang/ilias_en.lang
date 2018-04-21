@@ -31,3 +31,7 @@ solution_code#:#Answer
 hidden_code#:#Code (hidden)
 canvas#:#Canvas Area
 remove#:#REMOVE
+havethreejs#:#Include Three.JS
+havethreejs_info#:#Three.JS (https://threejs.org) is a WebGL-SceneGraph for Canvas Elements
+havedthree#:#Include D3
+havedthree_info#:#D3 (https://d3js.org) is a library for visualizing data using web standards.

@@ -365,8 +365,8 @@ function finishedExecutionWithOutput(output, questionID){
         console.log('displayResults is not available here' );
         return output;
     }
-    $("canvas[data-question="+questionID+"]").each(function(i, block) {    
-        output = displayResults(output, $(block), questionID, block.getAttribute('data-blocknr'))        
+    $("area[data-question="+questionID+"]").each(function(i, block) {  
+        output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
     })
     
     return output;
@@ -671,6 +671,14 @@ function selectType(select, elementID, blockNr){
     }
     selectLanguage()
     console.log(select, elementID, el, blockNr, select.value, ed)
+}
+
+function initThreeJS(){
+    console.log('initThreeJS')
+}
+
+function initD3(){    
+    console.log('initD3')
 }
 
 //@ sourceURL=helper.js

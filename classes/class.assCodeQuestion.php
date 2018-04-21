@@ -94,6 +94,22 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['maxLines'] = (int)$newValue;
 	}
 
+	function getIncludeThreeJS() {
+		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
+	}
+	
+	function setIncludeThreeJS($newValue) {
+		$this->additional_data['includeThreeJS'] = (bool)$newValue;
+	}
+
+	function getIncludeD3() {
+		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
+	}
+	
+	function setIncludeD3($newValue) {
+		$this->additional_data['includeD3'] = (bool)$newValue;
+	}
+
 	function getNumberOfBlocks() {
 		if (is_array($this->additional_data['blocks'])){
 			return count($this->additional_data['blocks']);
