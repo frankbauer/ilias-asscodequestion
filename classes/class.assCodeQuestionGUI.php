@@ -138,13 +138,25 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
 
 			$this->tpl->didPrepare = true;
-		}
+		}		
 	
 		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
 
 		if (!$this->didPrepare) {
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+		}
+
+		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
+			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
+			$this->tpl->addOnLoadCode('initThreeJS();');
+			$this->tpl->didIncludeThreeJS = true;			
+		}
+
+		if ($this->object->getIncludeD3() && !$this->tpl->didIncludeD3){
+			$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
+			$this->tpl->addOnLoadCode('initD3();');
+			$this->tpl->didIncludeD3 = true;			
 		}
 		
 		$this->didPrepare = true;
@@ -347,7 +359,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
 			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
 				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
-				$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></canvas>';	
+				$html .= '<area id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></area>';	
 				$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
 			}
 		}
@@ -726,13 +738,28 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
 		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		$allowRun->setChecked( $this->object->getAllowRun() );
+		$allowRun->setChecked( $this->object->getAllowRun() );		
+		$form->addItem($allowRun);
+
+		$haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
+		$haved3->setInfo($this->plugin->txt('havedthree_info'));	
+		$haved3->setChecked( $this->object->getIncludeD3() );
+		$form->addItem($haved3);
+
+		$have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
+		$have3js->setInfo($this->plugin->txt('havethreejs_info'));	
+		$have3js->setChecked( $this->object->getIncludeThreeJS() );
+		$form->addItem($have3js);
+
 		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java') {
 			$allowRun->setValue('true');
+			$haved3->setValue('true');
+			$have3js->setValue('true');
 		} else {
 			$allowRun->setValue('false');
+			$haved3->setValue('false');
+			$have3js->setValue('false');
 		}
-		$form->addItem($allowRun);
 
 		$id = 'timeout_ms-question'.$this->object->getId().'value1';
 		$runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
@@ -820,8 +847,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->setLanguage((string) $_POST["source_lang"]);
 		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
 		$this->object->setMaxLines((int) $_POST["max_lines-question".$this->object->getId().'value1']);
-
 		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
+		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
+		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');
 		$this->object->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){

@@ -13,7 +13,7 @@
 <script type="text/javascript">
 function displayResults(outputString, canvasElement, questionID, blockID){
     if (!canvasElement || canvasElement.length==0) return;
-    canvasElement.removeClass('hiddenBlock')    
+    $(canvasElement).removeClass('hiddenBlock')    
     {CANVAS_SCRIPT}  
     return outputString
 }
