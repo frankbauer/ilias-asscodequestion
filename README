@@ -7,11 +7,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 =============================
-ILIAS Example Question Plugin
+ILIAS Code Question Plugin
 =============================
 
 Author:   Frank Bauer <frank.bauer@fau.de>
-Version:  1.1.0 
+Version:  1.1.1
+Company:  Computer Graphics Group Erlangen
 Supports: ILIAS 5.2 - 5.2
 
 Installation
@@ -40,9 +41,13 @@ It adds no extra table to the database.
 ===============
 Version History
 ===============
+Version 1.1.1
+-------------
+* Added full support for canvas element drawing using data for the result output as datasource
+
 Version 1.1.0
 -------------
-* New, flexible version to add Question Fragments
+* New, flexible block-system to add Question Fragments
 
 Version 1.0.8
 -------------
