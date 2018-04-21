@@ -4,7 +4,7 @@
  * @type {int} javaRunOverhead execution overhead in ms
  */
 var javaRunOverhead = 4000;
-function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID) {
+function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID, finishedExecutionWithOutputCb) {
   function format_info(text) {
     return '<span style="color:green">' + text + '</span>';
   }
@@ -34,9 +34,11 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID) {
           clearTimeout(timer)
           timer = null
         }
+
+        const outputBuffer = finishedExecutionWithOutputCb(data.stdout, questionID);
         let tex = '';
         if (data.stderr && data.stderr != '') tex += format_error(data.stderr) + "\n";
-        if (data.stdout && data.stdout != '') tex += format_info(data.stdout);
+        if (data.stdout && data.stdout != '') tex += format_info(outputBuffer);
         log_callback(tex)
         //console.log("Done", data.stdout, data.stderr);
         break
