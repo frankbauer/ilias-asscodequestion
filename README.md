@@ -40,6 +40,8 @@ graphical output.
 ### D3
 If you use an executable Language, and include the D3 Library, you can add a **Canvas Area**-Block to your Question.
 Add the following Code, to get a very basic D3 Sample when the code is executed:
+
+
     if (outputString===undefined){
         //create the canvas once
         var base = d3.select(canvasElement);
@@ -69,6 +71,8 @@ Add the following Code, to get a very basic D3 Sample when the code is executed:
 ### ThreeJS
 If you use an executable Language, and include the ThreeJS Library, you can add a **Canvas Area**-Block to your Question.
 Add the following Code, to get a very basic ThreeJS Sample when the code is executed:
+
+
     if (outputString===undefined){
         // Create an empty scene
         var scene = new THREE.Scene();
