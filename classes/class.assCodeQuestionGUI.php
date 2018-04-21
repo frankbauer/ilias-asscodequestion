@@ -335,7 +335,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
 
 		
-			if (trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) {
+			if ((trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) && $type!=assCodeQuestionBlockTypes::SolutionCode) {
 				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';
 			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
 				$tpl->setVariable("CONTENT", $code);
