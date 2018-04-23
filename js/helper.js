@@ -810,9 +810,9 @@ function setupD3Scene(outputObject, canvasElement, createSceneCallback, type='sv
     canvasElement = $(canvasElement)
     const w = canvasElement.width()
     const h = canvasElement.height()
-    console.log("tts", type)
+    
     //create the canvas once
-    var base = d3.select(domEl);
+    var base = d3.select(canvasElement.get(0));
     var canvas = base.append(type)
         .attr("width", w)
         .attr("height", h);
