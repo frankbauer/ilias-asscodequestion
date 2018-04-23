@@ -88,7 +88,8 @@ function selectLanguage() {
         if (blocknr==0){
             if (qLanguage=='glsl'){
                 $('#block_type_0').prop('disabled', 'disabled')
-                $('#block_type_0').prop('value', 4)
+                $('#block_type_0').val(4)
+                document.getElementById("block_type_0").selectedIndex = 4;
                 selectType(block, block.id, blocknr, false)
             } else {
                 $('#block_type_0').prop('disabled', false)

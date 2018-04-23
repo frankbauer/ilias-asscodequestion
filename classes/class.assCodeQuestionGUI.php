@@ -860,6 +860,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
 			$t = $_POST['block_type_'.$k];
+			if ($_POST["source_lang"]=='glsl' && $k==0){
+				$t = 4;
+				$this->object->setIncludeThreeJS(true);
+			}
 			$this->object->setTypeForBlock($i, $t);
 			$this->object->setContentForBlock($i, $c);
 			$i = $i + 1;
