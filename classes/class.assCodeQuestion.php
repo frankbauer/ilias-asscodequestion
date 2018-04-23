@@ -781,6 +781,85 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	{
 		return true;
 	}
+
+
+	/*-----------------*/
+	/* EST Integration */
+	/*-----------------*/
+
+	function getExportExtension() {
+		$language = $this->getLanguage();
+		if ($language=='c') return 'c';
+		if ($language=='c++') return 'cpp';		
+		if ($language=='c#') return 'cs';
+		if ($language=='fortran') return 'f';
+		if ($language=='glsl') return 'glsl';
+		if ($language=='java') return 'java';
+		if ($language=='javascript') return 'js';
+		if ($language=='objectivec') return 'm';
+		if ($language=='perl') return 'pl';
+		if ($language=='python') return 'py';
+		if ($language=='r') return 'r';
+		if ($language=='ruby') return 'rb';
+
+		return 'txt';
+	}
+
+	function getExportFilename() {
+		if (is_string($this->additional_data['export_filename'])) {
+			return $this->additional_data['export_filename'];
+		} else if ($this->getLanguage()=='java'){
+			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
+			$className = trim($matches[1][0]);
+			if ($className=='') $className="Unbekannt";
+			return $className.'.java';
+		} else {
+			return sprintf('Question_%09d.%s', $this->getId(), $this->getExportExtension());
+		}
+	}
+
+	public function getBestSolution(){
+		$res = '';
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			$t = $this->getTypeForBlock($i);
+			if ($t == assCodeQuestionBlockTypes::SolutionCode || $t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode){
+				$res .= $this->getContentForBlock($i)."\n";
+			}
+		}
+		return $res;
+	}
+
+	public function getExportSolution($active_id=NULL, $pass=NULL){
+		if(is_null($pass)){
+			$pass = $this->getSolutionMaxPass($active_id);
+		}
+
+		$solutions = $this->getSolutionValues($active_id, $pass);
+		if (count($solutions)>0) return $solutions[count($solutions)-1];
+
+		return NULL;
+	}
+
+	public function getCompleteSource($solution){	
+		if(is_null($solution)){
+			$solution = array('value1'=>array());
+		}
+
+		$studentCode = json_decode($solution['value1']);
+	
+		$res = '';
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			$t = $this->getTypeForBlock($i);
+			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+				if (!empty($studentCode)){
+					$res .= $studentCode->$i."\n";
+				}
+			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
+				$res .= $this->getContentForBlock($i)."\n";
+			}
+		}
+		return $res;
+	}
 }
 
 ?>
