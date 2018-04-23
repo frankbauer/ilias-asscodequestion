@@ -11,7 +11,7 @@ best_solution#:#Best Solution
 code_prefix_info#:#This Code is displayd as static source code just before the input field for the solution. It is also prepended to the students solution when the code is executed.
 code_postfix_info#:#This Code is displayd as static source code after the input field for the solution. It is also appended to the students solution when the code is executed.
 best_solution_info#:#The suggested best solution for this Question
-allow_run_info#:#If you use <b>Python</b>, <b>JavaScript</b> or <b>Java</b> code, this will allow the Students to run the code and display it during the exam.
+allow_run_info#:#If you use <b>Python</b>, <b>JavaScript</b>, <b>Java</b> or <b>GLSL</b> code, this will allow the Students to run the code and display it during the exam.
 source_lang_info#:#The Language we use for Sytax-Highlighting and when executing Code.
 question_edit_info#:#This is a basic SourceCode Question. It supports Syntax-Highlighting and (for select languages) Code Execution .<br>You may use <b>[code][/code]</b> in your Question-Text to insert a syntax-highlighted code-box.
 run_code#:#Run

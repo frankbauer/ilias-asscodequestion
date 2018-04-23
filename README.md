@@ -37,6 +37,12 @@ highlighting for various languages (based on Highlight.js and CodeMirror).
 Certain languages (at the moment *Java*, *Python* and *JavaScript*) can be compiled and 
 executed during an Test/Assesment session. Executable Code can also be used to generate
 graphical output.
+
+### GLSL
+Selecting GLSL enables you to write shader code you may process using three.js. 
+When selecting this type, the first block is a "Canvas Area". All Answer-Blocks contain shader code, 
+that is passed to the `outputObject`-variable of the canvas Area.
+
 ### D3
 If you use an executable Language, and include the D3 Library, you can add a **Canvas Area**-Block to your Question.
 Add the following Code, to get a very basic D3 Sample. Your code must return a css-formated color-string 
@@ -145,6 +151,7 @@ which is used to change the color of a spinning cube.
 
 ### Version 1.1.1
 * Added full support for canvas element drawing using data for the result output as datasource
+* GLSL Code Execution (the first block is a forced Canvas Area), Answer blocks are considered fragment shaders that are passed to the Canvas Area for processing
 
 ### Version 1.1.0
 * New, flexible block-system to add Question Fragments
