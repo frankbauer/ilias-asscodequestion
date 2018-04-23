@@ -43,6 +43,37 @@ Selecting GLSL enables you to write shader code you may process using three.js.
 When selecting this type, the first block is a "Canvas Area". All Answer-Blocks contain shader code, 
 that is passed to the `outputObject`-variable of the canvas Area.
 
+If you define a GLSL-Question (enable threeJS) where the first answer box represents the Vertex, and the second the fragment 
+shader, the following canvas-area-code will allow you to use that shader on the scene:
+
+    if (outputObject===undefined){
+        setupThreeJSScene(
+            outputObject, 
+            canvasElement, 
+            function(scene, camera, renderer){ //delegate that creates the actual scene. 
+                var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+                var material = new THREE.MeshBasicMaterial( { color: "#FF00FF" } );
+                var cube = new THREE.Mesh( geometry, material );
+                scene.add(cube);
+            
+                return {cube:cube, geometry:geometry}
+            },
+            function(scene, camera, renderer, userData){ //called in the render loop
+                userData.cube.rotation.x += 0.01;
+                userData.cube.rotation.y += 0.01;
+            }
+        )
+    } else {
+        var threeJS = $(canvasElement).data('threejs')        
+        threeJS.userData.cube.material = new THREE.ShaderMaterial(
+          {
+            vertexShader:outputObject[0], 
+            fragmentShader:outputObject[1]
+          }
+        )
+
+    }
+
 ### D3
 If you use an executable Language, and include the D3 Library, you can add a **Canvas Area**-Block to your Question.
 Add the following Code, to get a very basic D3 Sample. Your code must return a css-formated color-string 
@@ -176,9 +207,9 @@ which is used to change the color of a spinning cube.
 Alternativley you may use the built-in setup function to prepare a default ThreeJS rendering context:
 
 
-    if (outputString===undefined){
+    if (outputObject===undefined){
         setupThreeJSScene(
-            outputString, 
+            outputObject, 
             canvasElement, 
             function(scene, camera, renderer){ //delegate that creates the actual scene. 
                 var geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -195,7 +226,7 @@ Alternativley you may use the built-in setup function to prepare a default Three
         )
     } else {
         var threeJS = $(canvasElement).data('threejs')
-        threeJS.userData.material.color.set(outputString.trim())
+        threeJS.userData.material.color.set(outputObject.trim())
     }
 
 ## Included Software
