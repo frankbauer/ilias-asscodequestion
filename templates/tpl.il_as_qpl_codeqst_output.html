@@ -11,10 +11,10 @@
     <input id="timeout_ms-question{QUESTION_ID}value1" style="display:none" input="number" value={TIMEOUT_VAL}>
 </p>
 <script type="text/javascript">
-function displayResults(outputString, canvasElement, questionID, blockID){
+function displayResults(outputObject, canvasElement, questionID, blockID){
     if (!canvasElement || canvasElement.length==0) return;
     $(canvasElement).removeClass('hiddenBlock')    
     {CANVAS_SCRIPT}  
-    return outputString
+    return outputObject
 }
 </script>
