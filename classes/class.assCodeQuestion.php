@@ -160,33 +160,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['blocks'][$nr]['content'] = $value;
 	}
 
-	function getPrefixCode() {
-		return "WRONG!!!!";
-		return $this->fixLoadedCode($this->additional_data['prefixCode']);
-	}
-
-	function setPrefixCode($newCode) {
-		$this->additional_data['prefixCode'] = $this->fixSentCode($newCode);
-	}
-
-	function getPostfixCode() {
-		return "WRONG!!!!";
-		return $this->fixLoadedCode($this->additional_data['postfixCode']);
-	}
-
-	function setPostfixCode($newCode) {
-		$this->additional_data['postfixCode'] = $this->fixSentCode($newCode);
-	}
-
-	function getBestSolution() {
-		return "WRONG!!!!";
-		return $this->fixLoadedCode($this->additional_data['bestSolution']);
-	}
-
-	function setBestSolution($newCode) {
-		$this->additional_data['bestSolution'] = $this->fixSentCode($newCode);
-	}
-
 	function setJSONEncodedAdditionalData($data) {
 		$this->additional_data = json_decode($data, true);
 	}
