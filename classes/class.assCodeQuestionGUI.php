@@ -104,10 +104,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$lngData = $this->getLanguageData();
 		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
 			if (!$this->tpl->hasJava){
-				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
 				$this->tpl->hasJava = true;
 			}
 		}
