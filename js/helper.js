@@ -379,6 +379,7 @@ function finishedExecutionWithOutput(output, questionID){
         return output;
     }
     $("area[data-question="+questionID+"]").each(function(i, block) {  
+        console.log('display', output)
         output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
     })
     
@@ -711,10 +712,109 @@ function selectType(select, elementID, blockNr, languageSelect=true){
 function initThreeJS(){
     //currently we need no genereal purpose code to set up ThreeJS
 }
+
+/**
+ * Call this Object from a "Canvas Area" to create an WebGL rendering context. The 'threejs' data-block of the canvasElement will contain an object that provides references to the created scene, renderer and camera.
+ * @param {*} outputObject The value passed from the program to the canvas area
+ * @param {*} canvasElement The dom-element that should contain the canvas
+ * @param {function(scene, camera, renderer):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is sent to the renderLoopCallback in the userData-parameter
+ * @param {function(scene, camera, renderer, userData):void} renderLoopCallback  When defined, a render loop is set up that wil periodically call this function. Otherwise the scene is rendered exactly once. userData contains the value returned by createSceneCallback
+ */
+function setupThreeJSScene(outputObject, canvasElement, createSceneCallback, renderLoopCallback=undefined){
+    canvasElement = $(canvasElement)
+
+    //cleanup?
+    const tjs = canvasElement.data('threejs')
+    if (tjs){
+        tjs.renderer.dispose()
+        tjs.scene.dispose()
+        tjs.camera.dispose()
+        canvasElement.data('threejs') = undefined
+    }
+
+    //get dimension of the container
+    const w = canvasElement.width()
+    const h = canvasElement.height()
+
+    // Create an empty scene
+    var scene = new THREE.Scene();        
+
+    // Create a basic perspective camera
+    var camera = new THREE.PerspectiveCamera( 75, w/h, 0.1, 1000 );
+    camera.position.z = 4;
+
+    // Create a renderer with Antialiasing
+    var renderer = new THREE.WebGLRenderer({antialias:true});
+
+    // Configure renderer clear color
+    renderer.setClearColor("#000000");
+
+    // Configure renderer size
+    renderer.setSize( w, h );
+
+    // Append Renderer to DOM
+    canvasElement.append( renderer.domElement );
+
+    // Create a Cube Mesh with basic material
+    const userData = createSceneCallback(scene, camera, renderer)
+
+    //Store the Material
+    canvasElement.data('threejs', {
+        scene:scene,
+        renderer:renderer,
+        camera:camera,
+        userData:userData
+    })
+    console.log("setup", canvasElement.data('threejs'))
+    
+
+    if (renderLoopCallback!==undefined){
+        // Render Loop
+        var render = function () {
+            requestAnimationFrame( render );
+
+            renderLoopCallback(scene, camera, renderer, userData)
+
+            // Render the scene
+            renderer.render(scene, camera);
+        }   
+        render();     
+    } else {
+        renderer.render(scene, camera);
+    }
 }
 
 function initD3(){    
-    console.log('initD3')
+    //currently we need no genereal purpose code to set up D3
+}
+
+/**
+ * Call this Object from a "Canvas Area" to create an D3 context. The 'd3' data-block of the canvasElement will contain an object that provides references to the created context
+ * @param {*} outputObject The value passed from the program to the canvas area
+ * @param {*} canvasElement The dom-element that should contain the canvas
+ * @param {function(canvas):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is stored as userData in the elements data-block
+ * @param {*} type svg or canvas
+ */
+function setupD3Scene(outputObject, canvasElement, createSceneCallback, type='svg'){
+    const domEl = canvasElement
+    canvasElement = $(canvasElement)
+    const w = canvasElement.width()
+    const h = canvasElement.height()
+    console.log("tts", type)
+    //create the canvas once
+    var base = d3.select(domEl);
+    var canvas = base.append(type)
+        .attr("width", w)
+        .attr("height", h);
+
+    // Create stuff
+    const userData = createSceneCallback(canvas)
+
+    //Store the Material
+    canvasElement.data('d3', {
+        canvas:canvas,        
+        userData:userData
+    })
 }
 
 //@ sourceURL=helper.js
