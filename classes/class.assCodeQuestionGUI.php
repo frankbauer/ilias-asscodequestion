@@ -139,7 +139,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
 
-			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
 
 			$this->tpl->didPrepare = true;
 		}		
