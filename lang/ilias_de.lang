@@ -11,7 +11,7 @@ best_solution#:#Musterlösung
 code_prefix_info#:#Dieser Quellcode wird als unveränderbarer Text unmittelbar vor dem Eingabefeld für den Studenten angezeigt. Er wird auch vor dem Lösungstext des Studenten eingefügt wenn der Code ausgeführt werden soll.
 code_postfix_info#:#Dieser Quellcode wird als unveränderbarer Text unmittelbar nach dem Eingabefeld für den Studenten angezeigt. Er wird auch nach dem Lösungstext des Studenten eingefügt wenn der Code ausgeführt werden soll.
 best_solution_info#:#Die vorgeschlagene Musterlösung.
-allow_run_info#:#Wenn <b>Python</b>-, <b>JavaScript</b>- oder <b>Java</b>-code programmiert wird, kann der Student während der Prüfung seinen eigenen Quellcode ausführen und das Ergebnis anzeigen lassen.
+allow_run_info#:#Wenn <b>Python</b>-, <b>JavaScript</b>-, <b>Java</b>- oder <b>GLSL</b>-code programmiert wird, kann der Student während der Prüfung seinen eigenen Quellcode ausführen und das Ergebnis anzeigen lassen.
 source_lang_info#:#Die Programmiersprache die wir zur Einfärbung und Code-Ausführung verwenden.
 question_edit_info#:#Eine einfache Quellcode-Frage. Eingaben können mit Syntax-Highlighting versehen werden und (bei ausgewählten Sprachen) zur Laufzeit des Tests ausgeführt werden.<br>Innerhalb der Frage kann<b>[code][/code]</b> verwendet werden um Quellcode auszuzeichnen.
 run_code#:#Ausführen

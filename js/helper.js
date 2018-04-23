@@ -47,6 +47,7 @@ var cmMode = {
     'c#': 'text/x-csharp', // (C#),
     'css': 'text/css', // (CSS)
     'fortran': 'text/x-fortran', // (Fortran)
+    'glsl': 'text/x-glsl', // (GLSL)
     'html': 'text/html', // (HTML)
     'java': 'text/x-java', // (Java),
     'javascript': 'text/javascript', // (JavaScript)
@@ -81,6 +82,17 @@ function selectLanguage() {
             ed.setOption('mode', edMode)
         } else {        
             ed.setOption('mode', 'text/javascript')
+        }
+
+        const blocknr = block.getAttribute('data-blocknr')
+        if (blocknr==0){
+            if (qLanguage=='glsl'){
+                $('#block_type_0').prop('disabled', 'disabled')
+                $('#block_type_0').prop('value', 4)
+                selectType(block, block.id, blocknr, false)
+            } else {
+                $('#block_type_0').prop('disabled', false)
+            }
         }
     })   
 
@@ -176,7 +188,7 @@ const editors = {}
  * to correctly manage the line number in the editors.
  * 
  * @param {string} useMode The langued being used, as a string for CodeMirror (ie "text/x-c++src")
- * @param {*} qLanguage The langua being used (ie "clike")
+ * @param {*} qLanguage The langua being used (ie "python")
  * @param {*} questionID The id of the question in the test
  */
 function initSolutionBox(useMode, qLanguage, questionID){  
@@ -213,7 +225,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
 }
 
 function isRunnableLanguage(qLanguage){
-    return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java';
+    return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java'|| qLanguage === 'glsl';
 }
 
 /**
@@ -342,6 +354,7 @@ function runInExam(language, questionID){
         case 'python': runPython(prog, questionID, mypre, maxMS, maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
         case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'glsl':  runGLSL( questionID, undefined, prog, maxMS, maxLines); break;
     }
 }
 
@@ -370,6 +383,28 @@ function finishedExecutionWithOutput(output, questionID){
     })
     
     return output;
+}
+
+/**This function will send the code provided by the student directly to the available canvas areas
+ * @param {string} questionID 
+ * @param {HTML-element} mypre The HTML element to write the standard output of the program
+ * @param {string} prog  String containing the Python, Java or JavaScript program
+ * @param {number} maxMS  Timeout to kill the worker
+ * @param {numner} maxLines Maximum number of lines allowd in the standard output
+ */
+function runGLSL(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+    var outputData = []
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
+        const editor = editors[block.id]        
+        if (editor) {
+            outputData.push(block.value)
+        } else {
+            outputData.push(block.innerHTML)
+        }
+    });
+    finishedExecutionWithOutput(outputData, questionID)
 }
 
 
@@ -655,7 +690,7 @@ function removeBlock(container, elName){
  * @param {*} elementID - The ID of the associated text area
  * Called when the type of a Block-Element should change
  */
-function selectType(select, elementID, blockNr){
+function selectType(select, elementID, blockNr, languageSelect=true){
     const el = $('[data-blocknr='+blockNr+']')
     const block = el.get()[0];
     const ed = editors[el.attr('id')]
@@ -669,12 +704,13 @@ function selectType(select, elementID, blockNr){
         console.log(edTheme)
         ed.setOption('theme', edTheme)
     }
-    selectLanguage()
+    if (languageSelect) selectLanguage()
     console.log(select, elementID, el, blockNr, select.value, ed)
 }
 
 function initThreeJS(){
-    console.log('initThreeJS')
+    //currently we need no genereal purpose code to set up ThreeJS
+}
 }
 
 function initD3(){    

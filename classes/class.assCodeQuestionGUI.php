@@ -82,6 +82,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		} else if ($language=="objectivec") {
 			$language = "clike";
 			$mode = "text/x-objectivec";
+		} else if ($language=="glsl") {
+			$language = "clike";
+			$mode = "text/x-glsl";
 		} 
 
 		return array(
@@ -130,6 +133,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
 
@@ -556,6 +560,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>';
@@ -723,6 +728,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'c++'=>'C++',
 			'c#' => 'C#', 
 			'fortran'=>'Fortran', 
+			'glsl'=>'GLSL', 
 			'java'=>'Java',
 			'javascript'=>'JavaScript',
 			'objectivec'=>'Objective-C',
@@ -751,7 +757,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$have3js->setChecked( $this->object->getIncludeThreeJS() );
 		$form->addItem($have3js);
 
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java') {
+		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'glsl') {
 			$allowRun->setValue('true');
 			$haved3->setValue('true');
 			$have3js->setValue('true');
