@@ -6,26 +6,12 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 $(document).ready(function(){
-    var $checkBox = $('input#allow_run');
-    if ($checkBox.length > 0) {
-        $checkBox.click(function () {
-            if ($(this).is(':checked')) {
-                var input = $('select#source_lang')['0'];
-                var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
-                    $(this).prop('checked',false);
-                } else {
-                    if ($('input#allow_run_button').length) {
-                        $('input#allow_run_button').css('display','');
-                    }
-                }
-            } else {
-                if ($('input#allow_run_button').length) {
-                    $('input#allow_run_button').css('display','none');
-                }
-            }
-        });
-    }
+    //we need this for the manual scoring view, otherwise the boxes have to get clicked
+    setTimeout(function() {
+        $.each(editors, function(i, e){            
+            e.refresh();
+        })
+    }, 500);    
 });
 
 /**
@@ -34,14 +20,20 @@ $(document).ready(function(){
  * This function is only called in edit mode. This is not available for the test mode.
  */
 function selectTheme() {
-    var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-    var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-    var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-    var input = $('select#cm_theme')['0'];
-    var edTheme = input.options[input.selectedIndex].textContent;
-    prefEditor.setOption("theme",edTheme);
-    bsolEditor.setOption("theme",edTheme);
-    postEditor.setOption("theme",edTheme);
+    const themeSelect = $('select#cm_theme');
+    const edTheme = themeSelect.val();
+
+    if (edTheme===undefined) return;
+    $("textarea[data-question]").each(function(i, block) {  
+        const ed = editors[block.id];   
+        if (!ed || ed===undefined) return;
+
+        if ( blockIsReadOnly(block) ){
+            ed.setOption('theme', 'xq-light') 
+        } else {        
+            ed.setOption('theme', edTheme)
+        }
+    })   
 }
 
 /**
@@ -55,6 +47,7 @@ var cmMode = {
     'c#': 'text/x-csharp', // (C#),
     'css': 'text/css', // (CSS)
     'fortran': 'text/x-fortran', // (Fortran)
+    'glsl': 'text/x-glsl', // (GLSL)
     'html': 'text/html', // (HTML)
     'java': 'text/x-java', // (Java),
     'javascript': 'text/javascript', // (JavaScript)
@@ -77,266 +70,198 @@ var cmMode = {
  * 'run' button.
  */
 function selectLanguage() {
-    var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-    var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-    var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-    var input = $('select#source_lang')['0'];
-    var edMode = cmMode[input.options[input.selectedIndex].value];
-    prefEditor.setOption("mode",edMode);
-    bsolEditor.setOption("mode",edMode);
-    postEditor.setOption("mode",edMode);
-    // if python or javascript show run button
-    var qLanguage = input.options[input.selectedIndex].value;
-    if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-        if ($('input#allow_run')[0].checked === true) {
-            // checkbox is checked
-            if ($('input#allow_run_button').length) {
-                $('input#allow_run_button').css('display','');
-            }
-        } else {
-            // check box is not checked
-            if ($('input#allow_run_button').length) {
-                $('input#allow_run_button').css('display','none');
-            }
-        }
-    } else {
-        $('input#allow_run')[0].checked = false;
-        if ($('input#allow_run_button').length) {
-            $('input#allow_run_button').css('display','none');
-        }
-    }
+    const qLanguage = $('select#source_lang').val()
+    if (qLanguage===undefined) return;
+    const edMode = cmMode[qLanguage]
 
+    $("textarea[data-question]").each(function(i, block) {  
+        const ed = editors[block.id];   
+        if (!ed) return;
+        
+        if ( !blockIsCanvas(block) ){
+            ed.setOption('mode', edMode)
+        } else {        
+            ed.setOption('mode', 'text/javascript')
+        }
+
+        const blocknr = block.getAttribute('data-blocknr')
+        if (blocknr==0){
+            if (qLanguage=='glsl'){
+                $('#block_type_0').prop('disabled', 'disabled')
+                $('#block_type_0').val(4)
+                document.getElementById("block_type_0").selectedIndex = 4;
+                selectType(block, block.id, blocknr, false)
+            } else {
+                $('#block_type_0').prop('disabled', false)
+            }
+        }
+    })   
+
+    updateCodeEditorUI()
 }
 
 /**
+ * Counts the number of displayed lines within a Textarea fo
+ * @param {*} block The Element to count the lines in
+ */
+function numberOfLinesIn(block){
+   let prog = ''
+   if (block && block.value) {
+    prog = block.value
+   } else if (block && block.innerHTML) {
+    prog = block.innerHTML
+   }
+   return prog.split('\n').length
+}
+
+function blockHasProgramCode(block){
+    const type = block.getAttribute('data-blocktype');
+    if (type==0 || type==4 ) return false;
+    return true;
+}
+
+function blockIsCanvas(block){
+    const type = block.getAttribute('data-blocktype');
+    if (type==4) return true;
+    return false;
+}
+
+function blockIsReadOnly(block){
+    const type = block.getAttribute('data-blocktype')
+    if (block.getAttribute('data-readonly')) return true
+    if (type!=2) return true
+    return false
+}
+
+/**
+ * Counts the number of displayed lines within a Textarea fo
+ * @param {*} questionID 
+ */
+function updateLineNumbers(questionID){
+    var firstLineNumber = 1
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+    //$("textarea[data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
+
+        const editor = editors[block.id]
+        if (editor) {
+            editor.setOption('firstLineNumber',firstLineNumber);
+        } 
+        firstLineNumber += numberOfLinesIn(block)      
+    });
+}
+
+function initEditor(block, questionID, useMode){
+    const type = block.getAttribute('data-blocktype');
+    var editor = CodeMirror.fromTextArea(block, {
+        lineNumbers: blockHasProgramCode(block) || blockIsCanvas(block), 
+        mode:useMode,
+        theme:"solarized light",
+        tabSize: 2,
+        autoCloseBrackets: true,
+        firstLineNumber: 1 
+    }); 
+    block.setAttribute('data-has-editor', true)
+    
+    editor.on('change',function(cMirror){
+        block.value = cMirror.getValue(); 
+    });           
+    editor.addKeyMap({
+        "Tab": function(cMirror) {
+            cMirror.execCommand("insertSoftTab");              
+        }
+    });
+    editor.on('changes', function(cm) {
+        updateLineNumbers(questionID)
+        return CodeMirror.Pass;
+    });
+
+    editors[block.id] = editor
+    return editor
+}
+
+//maintains a list of active code boxes on the website
+const editors = {}
+/**
  * @function initSolutionBox
  * This function initialize the editors and set some event handlers
- * to correctly manage the line number in the editors. The problem
- * arises, because we have three editors, one with e preamble, called 
- * prefix_code, one with the input of the lecturer in edit mode or the input
- * of the student in test mode, and finaly an editor for the epilog, closing
- * part of the code for test purposes called post_fix. 
- * The pre_fix and post_fix codes can not be changed by the students, they
- * must be readOnly.
- * @param {string} useMode The langued being used, as a string for CodeMirror
- * @param {*} qLanguage The langua being used, quite redundant
+ * to correctly manage the line number in the editors.
+ * 
+ * @param {string} useMode The langued being used, as a string for CodeMirror (ie "text/x-c++src")
+ * @param {*} qLanguage The langua being used (ie "python")
  * @param {*} questionID The id of the question in the test
  */
-function initSolutionBox(useMode, qLanguage, questionID){
-    // remember line nr. of last block
-    var firstLineNumber = 0;
-    var currentLineNumber = 0;
-    var selectTextAres = function(blockid,questionID) {
-        if (blockid.indexOf('question'+questionID+'value1') > -1) {
-            return true; // examination or preview mode for questionID
-        } else if (blockid === 'code_prefix') { 
-            return true; // edit mode
-        } else if (blockid === 'best_solution') {
-            return true; // edit mode
-        } else if (blockid === 'code_postfix') {
-            return true; // edit mode
-        } else {
-            return false; // examination of preview mode for different questionID
-        }
-    }
-     $(".assCodeQuestionCodeBox").each(function(i, block) {  
-        //if (block.id.indexOf('question'+questionID+'value1') > -1) {
-        if ( selectTextAres(block.id,questionID) ) {
-            // edit part
-            if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-                if ( block.id.indexOf('pre_') !== -1) {
-                    firstLineNumber = 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber = prog.split('\n').length;
-                } else if (block.id.indexOf('pre_') === -1 && block.id.indexOf('post_') === -1) {
-                    firstLineNumber = currentLineNumber + 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber += prog.split('\n').length;
-                } else if (block.id.indexOf('post_') !== -1) {
-                    firstLineNumber = currentLineNumber + 1;
-                    var myPrev = document.getElementById(block.id);
-                    prog = myPrev ? myPrev.innerHTML : '';
-                    currentLineNumber = 0; //prog.split('\n').length;
-                }
-            } else {
-                var prog = '';
-                var myPrev = $('pre#pre_'+block.id).get(0); //document.getElementById("pre_"+block.id);
-                prog = myPrev ? myPrev.innerText : '';
-                firstLineNumber =  prog.trim()=='' ? 1 : prog.split("\n").length+1;
-            }
-            
-            var editor = CodeMirror.fromTextArea(block, {
-                lineNumbers: true, 
-                mode:useMode,
-                theme:"solarized light",
-                tabSize: 2,
-                autoCloseBrackets: true,
-                firstLineNumber: firstLineNumber // prog.trim()=='' ? 1 : prog.split("\n").length+1
-            });   
-            
-            // prevent conflicts with tiny
-            $('.CodeMirror textarea').addClass('noRTEditor');
+function initSolutionBox(useMode, qLanguage, questionID){  
+    //console.log(useMode, qLanguage, questionID)
+    const inQuestionEditMode = $('input#allow_run').length!==0
+    
+    
+    $("textarea[data-question="+questionID+"]").each(function(i, block) {    
+        if (block.getAttribute('data-ignore')) return          
+        if (block.getAttribute('data-has-editor')) return;  
+        var editor = initEditor(block, questionID, useMode)
+        //console.log(block.id, editors[block.id], editors, $(block).data('CodeMirrorInstance'))
 
-            var oid = block.id
-            var noChange = false;
-            editor.on('change',function(cMirror){
-                // get value right from instance
-                var yourTextarea = document.getElementById(oid) 
-                yourTextarea.value = cMirror.getValue(); 
-            });   
-            //editor.setOption("extraKeys", {
-            editor.addKeyMap({
-                "Tab": function(cm) {
-                    cm.execCommand("insertSoftTab");
-                    //var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                    //cm.replaceSelection(spaces);
-                }
-            });
-            // adapt editor's height and set readonly if necessary
-            if (block.id.indexOf('pre_') !== -1 || block.id.indexOf('post_') !== -1) {
-                editor.setSize('height','auto');
-                editor.setOption('readOnly',true);
-            }
+        //make blocks read-only
+        if (blockIsReadOnly(block) && !inQuestionEditMode){
+            editor.setSize('height','auto')
+            editor.setOption('readOnly',true) 
+        }
 
-            lastCodeMirrorInstance[block.id] = editor
-            var inp = editor.display.input;
-        }
-    }); // $().each()
-    // if Python or JavaScript display the run button
-    if ($('input#allow_run_button').length) {
-        if (qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java') {
-            $('input#allow_run_button').css('display','');
-        } else {
-            $('input#allow_run_button').css('display','none');
-        }
-    }
-    var $checkBox = $('input#allow_run');
+        //chnage look of static code blocks
+        if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {             
+            editor.setOption('theme', 'xq-light')  
+            editor.display.wrapper.style.opacity = 0.8       
+            editor.display.wrapper.style.filter = "grayscale(20%)"
+        }  
+    })
+    finishedExecutionWithOutput(undefined, questionID)
+
+    updateLineNumbers(questionID)
+    selectTheme()
+    selectLanguage()
+
+    updateCodeEditorUI()
+}
+
+function isRunnableLanguage(qLanguage){
+    return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java'|| qLanguage === 'glsl';
+}
+
+/**
+ * Make sure the Edit Question UI has all inputs (like Run Checkbox) in the correct state
+ */
+function updateCodeEditorUI(){
+    const qLanguage = $('select#source_lang').val()
+    const runnableLanguage = isRunnableLanguage(qLanguage)
+    
+    //disable the run checkbox for unsupported languages
+    const $checkBox = $('input#allow_run');
     if ($checkBox.length > 0) {
         $checkBox.click(function () {
             if ($(this).is(':checked')) {
-                var input = $('select#source_lang')['0'];
-                var qLanguage = input.options[input.selectedIndex].value;
-                if (qLanguage !== 'python' && qLanguage !== 'javascript' && qLanguage !== 'java') {
+                const qLanguage = $('select#source_lang').val();
+                if (!isRunnableLanguage(qLanguage)) {
                     $(this).prop('checked',false);
                 }
             }
-        });
-    }
-    // set line numbers for the edit part. Each codemirror block appears only once
-    if ($('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').length > 0) {
-        var prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-        var bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-        var postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-        var prefFirstLine = 1;
-        var bsolFirstLine = prefEditor.lastLine() + 2;
-        var postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        prefEditor.setOption('firstLineNumnber',prefFirstLine);
-        bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        postEditor.setOption('firstLineNumber',postFirstLine);
+        })
+
+        if (!runnableLanguage) {
+            $checkBox.prop('checked',false);
+        }
     }
 
-    // add an event handlers for the 'enter' key to update line numbers
-    var prefEditor = undefined;
-    var bsolEditor = undefined;
-    var postEditor = undefined;
-    var bsolFirstLine = 1;
-    var postFirstLine = 1;
-    if ($('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').length > 0) {
-        // we are in the edit mode
-        prefEditor = $('.assCodeQuestionCodeBox#code_prefix + .CodeMirror').get(0).CodeMirror;
-        bsolEditor = $('.assCodeQuestionCodeBox#best_solution + .CodeMirror').get(0).CodeMirror;
-        postEditor = $('.assCodeQuestionCodeBox#code_postfix + .CodeMirror').get(0).CodeMirror;
-        // The prefix code area
-        prefEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        // prefEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 2 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = prefEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
-        // bsolEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = bsolEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
-    } else if ($('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').length > 0) {
-        // we are in the test or preview mode
-        prefEditor = $('.assCodeQuestionCodeBox#pre_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
-        bsolEditor = $('.assCodeQuestionCodeBox#question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;; 
-        postEditor = $('.assCodeQuestionCodeBox#post_question'+questionID+'value1 + .CodeMirror').get(0).CodeMirror;
-        bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        bsolEditor.on('changes', function(cm) {
-            bsolFirstLine = prefEditor.lastLine() + 2;
-            postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1;
-            bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-            postEditor.setOption('firstLineNumber',postFirstLine);
-            return CodeMirror.Pass;
-        });
-        // The prefix code area
-        // bsolEditor.setOption("extraKeys", {
-        //     "Enter": function(cm) {
-        //         bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //         postFirstLine = bsolFirstLine + bsolEditor.lastLine() + 1 + 1;
-        //         bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //         postEditor.setOption('firstLineNumber',postFirstLine);
-        //         return CodeMirror.Pass;
-        //     },
-        //     "Backspace": function(cm) {
-        //         var pos = bsolEditor.getCursor();
-        //         if (pos.ch === 0) {
-        //             bsolFirstLine = prefEditor.lastLine() + 1 + 1;
-        //             postFirstLine = bsolFirstLine + bsolEditor.lastLine();
-        //             bsolEditor.setOption('firstLineNumber',bsolFirstLine);
-        //             postEditor.setOption('firstLineNumber',postFirstLine);
-        //         }
-        //         return CodeMirror.Pass;
-        //     }
-        // });
+    // if Python or JavaScript display the run button
+    if ($('input#allow_run_button').length && $('input#allow_run').length) {
+        if ($('input#allow_run')[0].checked === true && runnableLanguage) {
+            $('input#allow_run_button').css('display','');
+        } else {
+            $('input#allow_run_button').css('display','none');        
+        }
     }
 }
-
 
 /**
  * @function getTotalSourcecode
@@ -344,39 +269,20 @@ function initSolutionBox(useMode, qLanguage, questionID){
  * the prefix_code, the best_solution or test and the postfix_code
  * @param {string} questionID The id of the question in the test required to collect the students input
  */
-function getTotalSourcecode(questionID){   
-    var prog = "";
-    var el = document.getElementById("pre_"+questionID);
-    // if in test mode
-    if (el) {
-        var code = el.innerText
-        if (code && code.trim()!='') {
-            prog = prog + code + "\n"
+function getTotalSourcecode(questionID){
+    var code = ''
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
+        const editor = editors[block.id]        
+        if (editor) {
+            code += block.value + "\n"      
+        } else {
+            code += block.innerHTML+ "\n"   
         }
-    }else{ // edit mode
-        prog = lastCodeMirrorInstance["code_prefix"].getDoc().getValue() + '\n';
-    }
-
-    // if in test mode, otherwise collect input from edit mode
-    el = lastCodeMirrorInstance[questionID];
-    if(!el) el = lastCodeMirrorInstance["best_solution"];  
-
-    if(el){
-        prog += el.getDoc().getValue()  + '\n';
-    }
-    el = document.getElementById("post_"+questionID);
-    if (el) {
-        var code = el.innerText
-        if (code && code.trim()!='') {
-            prog = prog + "\n" + code
-        }
-    }else{
-        prog += lastCodeMirrorInstance["code_postfix"].getDoc().getValue();
-    }
-    return prog;
+    });
+    return code
 }
-
-
 
 
 /**
@@ -401,7 +307,7 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaScriptWorker( prog, log, maxMS, maxLines);
+    runJavaScriptWorker( prog, log, maxMS, maxLines, questionID);
 }
 
 function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
@@ -416,42 +322,18 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaWorker( prog, log, maxMS, maxLines);
+    runJavaWorker( prog, log, maxMS, maxLines, questionID, finishedExecutionWithOutput);
 }
-
-
-function runPythonInTest(questionID){   
-    runPython(getTotalSourcecode(questionID), questionID)
-}
-
-/*function runJava(prog){
-    JavaPoly.type('com.javapoly.demo.HomepageDemo').then(
-        function(HomepageDemo){
-            HomepageDemo.compileAndRun(document.getElementById('usercode').value);
-        }
-    );
-}*/
-
-
-
-/*function runPythonInSolution() { 
-    $("[name=resultingCode]").each(function(i, block) { 
-        block.setAttribute("name", "resultingCodeDone") //mark as processed
-        var node = document.getElementById(block.id+"Output")
-        var prog = block.innerText;  
-        runPython(prog, block.id, node);
-    });   
-}*/
 
 /**
- * @function runInTest
+ * @function runInExam
  * This function is called by the input button 'Run' during the test. 
  * According to the implement programming languages will call the worker 
  * for a Python or a JavaScript program
  * @param {string} language 
  * @param {string} questionID 
  */
-function runInTest(language,questionID){   
+function runInExam(language, questionID){   
     var prog = getTotalSourcecode(questionID);
     var maxLines = parseInt($('#max_lines-'+questionID).val());
     var maxMS = parseInt($('#timeout_ms-'+questionID).val());
@@ -467,13 +349,13 @@ function runInTest(language,questionID){
     // codeqst_edit_mode is a dummy language set by the PHP-script to avoid
     // collisions with the test and solution mode
     if (language === 'codeqst_edit_mode') {
-        var input = $('select#source_lang')['0'];
-        language = input.options[input.selectedIndex].value;
+        language = $('select#source_lang').val();
     }
     switch(language){
-        case 'python': runPython(prog, questionID,mypre,maxMS,maxLines); break;
+        case 'python': runPython(prog, questionID, mypre, maxMS, maxLines); break;
         case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
         case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'glsl':  runGLSL( questionID, undefined, prog, maxMS, maxLines); break;
     }
 }
 
@@ -484,18 +366,56 @@ function runInTest(language,questionID){
  * for a Python or a JavaScript program.
  * @param {string} language 
  */
-function runInSolution(language){
-    $("[name=resultingCode]").each(function(i, block) { 
-        block.setAttribute("name", "resultingCodeDone") //mark as processed
-        var node = document.getElementById(block.id+"Output")
-        var prog = block.innerText;  
+function runInSolution(language, questionID){
+    runInExam(language, questionID) 
+}
 
-        switch(language){
-            case 'python': runPython(prog, block.id, node); break;
-            case 'javascript':  runJavaScript( block.id, node, prog); break;
-            case 'java':  runJava( block.id, node, prog); break;
+/**
+ * Call when the program finished executing and pass the output string. We will send the output to all embeded canvas elements
+ * @param {*} output 
+ */
+function finishedExecutionWithOutput(output, questionID){
+    if (typeof displayResults !== "function"){
+        console.log('displayResults is not available here' );
+        return output;
+    }
+
+    //try to parse JSON
+    try {
+        output = JSON.parse(output)
+    } catch (e){}
+    $("area[data-question="+questionID+"]").each(function(i, block) {  
+        //console.log('output', output)
+        try {
+            output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
+        } catch (e){
+            console.error(e);
         }
-    });   
+    })
+    
+    return output;
+}
+
+/**This function will send the code provided by the student directly to the available canvas areas
+ * @param {string} questionID 
+ * @param {HTML-element} mypre The HTML element to write the standard output of the program
+ * @param {string} prog  String containing the Python, Java or JavaScript program
+ * @param {number} maxMS  Timeout to kill the worker
+ * @param {numner} maxLines Maximum number of lines allowd in the standard output
+ */
+function runGLSL(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+    var outputData = []
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return
+        if (!blockHasProgramCode(block)) return
+        const editor = editors[block.id]        
+        if (editor) {
+            outputData.push(block.value)
+        } else {
+            outputData.push(block.innerHTML)
+        }
+    });
+    finishedExecutionWithOutput(outputData, questionID)
 }
 
 
@@ -587,7 +507,9 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
             //only accept messages, when worker not terminated (workers do not immetiately terminate)
             if (testTimeout() === true) { return; }
             if( e.data[0] == 'finished' ){
-                output(''+ e.data[1].stdOut);
+                const result = finishedExecutionWithOutput(e.data[1].stdOut, questionID)
+                output(''+ result);
+                
                 worker.end(format_info("Info: Execution finished in : " + (Date.now() - start) + " ms"));
             }else if (e.data[0] ==='err'){
                 worker.end(format_error("ERROR: " + e.data[1]));
@@ -601,55 +523,7 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
     }
 } 
 
-
-
-function runPythonForSave(form, target, questionID){
-    try {
-        var prog = getTotalSourcecode(questionID);
-        prog = prog.replaceAll("\t", "  ")
-    
-        target.value = '';
-        Sk.configure({output:function(text) {
-            try {
-                target.value += text;
-            } catch (err) {
-                console.log(err);
-            }
-            //alert("result: " + text + " " + questionID+", "+target)
-        }, read:builtinRead, execLimit:1000}); 
-        try {
-            eval(Sk.importMainWithBody("<stdin>", false, prog));
-        }
-        catch(err) {
-          target.value += '[err]'+err+'[/err]';
-        }    
-        //Sk.importMainWithBody("<stdin>", false, prog, false);     
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-function preparePythonSave(nr){
-    try {
-        var form = $('#taForm');    
-        var target = document.getElementById('question'+nr+'result1');    
-
-        form.submit(function() {
-            console.log("Python Save");
-            //runPythonForSave(form, target, nr);
-            return true;
-        });
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-
-
-
-
-
-function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
+function runJavaScriptWorker( code, log_callback, max_ms, max_loglength, questionID){
     const maxLineLength = 256;
     function format_info(text){
         return '<span style="color:green">'+text+'</span>';
@@ -740,12 +614,15 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
         }
     }
     
+    var outputBuffer = ''
     worker.onmessage = function(e){
         if(executionFinished) return;
         //only accept messages, when worker not terminated (workers do not immetiately terminate)
 
         testTimeout();
         if( e.data[0] == 'finished' ){
+            outputBuffer = finishedExecutionWithOutput(outputBuffer, questionID)
+            output(''+ outputBuffer );   
             worker.end(format_info("Info: Execution finished in " + (Date.now() - start) + " ms"));
 
             //TODO:: perform additional calls to check for hidden testcases
@@ -762,7 +639,8 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
 */
 
         }else if(e.data[0]=='log'){
-            output(''+ e.data[1] );              
+            outputBuffer += e.data[1];
+                       
         }else{
             worker.end(format_error("HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test."));
         }
@@ -776,6 +654,177 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength){
     worker.postMessage(['start',[10,200]]);                                //start worker execution
 
     setTimeout( testTimeout, max_ms );
+}
+
+/**
+ * Create a new Edit Block in the Question Edit View
+ * @param {*} button 
+ * @param {*} useMode 
+ * @param {*} questionID 
+ */
+function addBlock(button, useMode, questionID){
+    button = $(button)
+    
+    let maxNr = 0
+    $("textarea[data-question]").each(function(i, block) {    
+        if (block.getAttribute('data-ignore')) return
+        maxNr = Math.max(maxNr, block.getAttribute('data-blocknr'))
+    })
+
+    const tpl = $('#blockTemplate')
+    let html = tpl.html()    
+    html = html.replace(/\[ID\]/g, (maxNr+1))
+    html = html.replace(/block_template/g, 'block['+(maxNr+1)+']')
+    $(html).insertBefore(button)
+
+    const block = $('#block\\['+(maxNr+1)+'\\]').get()[0]
+    block.removeAttribute('data-ignore')
+    initEditor(block, questionID, useMode)    
+    updateLineNumbers()
+    selectTheme()
+}
+
+function removeBlock(container, elName){
+    const ed = editors[elName]
+    if (ed) {
+        editors[elName] = undefined
+        ed.toTextArea()
+    }
+    
+    if (container){
+        container.remove()
+    }
+}
+
+/**
+ * @function selectType
+ * @param {*} elementID - The ID of the associated text area
+ * Called when the type of a Block-Element should change
+ */
+function selectType(select, elementID, blockNr, languageSelect=true){
+    const el = $('[data-blocknr='+blockNr+']')
+    const block = el.get()[0];
+    const ed = editors[el.attr('id')]
+    el.attr('data-blocktype', select.value)
+    ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
+    if ( blockIsReadOnly(block) ){
+        ed.setOption('theme', 'xq-light') 
+    } else {
+        const themeSelect = $('select#cm_theme');
+        const edTheme = themeSelect.val();
+        console.log(edTheme)
+        ed.setOption('theme', edTheme)
+    }
+    if (languageSelect) selectLanguage()
+    //console.log(select, elementID, el, blockNr, select.value, ed)
+}
+
+function initThreeJS(){
+    //currently we need no genereal purpose code to set up ThreeJS
+}
+
+/**
+ * Call this Object from a "Canvas Area" to create an WebGL rendering context. The 'threejs' data-block of the canvasElement will contain an object that provides references to the created scene, renderer and camera.
+ * @param {*} outputObject The value passed from the program to the canvas area
+ * @param {*} canvasElement The dom-element that should contain the canvas
+ * @param {function(scene, camera, renderer):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is sent to the renderLoopCallback in the userData-parameter
+ * @param {function(scene, camera, renderer, userData):void} renderLoopCallback  When defined, a render loop is set up that wil periodically call this function. Otherwise the scene is rendered exactly once. userData contains the value returned by createSceneCallback
+ */
+function setupThreeJSScene(outputObject, canvasElement, createSceneCallback, renderLoopCallback=undefined){
+    canvasElement = $(canvasElement)
+
+    //cleanup?
+    const tjs = canvasElement.data('threejs')
+    if (tjs){
+        tjs.renderer.dispose()
+        tjs.scene.dispose()
+        tjs.camera.dispose()
+        canvasElement.data('threejs') = undefined
+    }
+
+    //get dimension of the container
+    const w = canvasElement.width()
+    const h = canvasElement.height()
+
+    // Create an empty scene
+    var scene = new THREE.Scene();        
+
+    // Create a basic perspective camera
+    var camera = new THREE.PerspectiveCamera( 75, w/h, 0.1, 1000 );
+    camera.position.z = 4;
+
+    // Create a renderer with Antialiasing
+    var renderer = new THREE.WebGLRenderer({antialias:true});
+
+    // Configure renderer clear color
+    renderer.setClearColor("#000000");
+
+    // Configure renderer size
+    renderer.setSize( w, h );
+
+    // Append Renderer to DOM
+    canvasElement.append( renderer.domElement );
+
+    // Create a Cube Mesh with basic material
+    const userData = createSceneCallback(scene, camera, renderer)
+
+    //Store the Material
+    canvasElement.data('threejs', {
+        scene:scene,
+        renderer:renderer,
+        camera:camera,
+        userData:userData
+    })
+    console.log("setup", canvasElement.data('threejs'))
+    
+
+    if (renderLoopCallback!==undefined){
+        // Render Loop
+        var render = function () {
+            requestAnimationFrame( render );
+
+            renderLoopCallback(scene, camera, renderer, userData)
+
+            // Render the scene
+            renderer.render(scene, camera);
+        }   
+        render();     
+    } else {
+        renderer.render(scene, camera);
+    }
+}
+
+function initD3(){    
+    //currently we need no genereal purpose code to set up D3
+}
+
+/**
+ * Call this Object from a "Canvas Area" to create an D3 context. The 'd3' data-block of the canvasElement will contain an object that provides references to the created context
+ * @param {*} outputObject The value passed from the program to the canvas area
+ * @param {*} canvasElement The dom-element that should contain the canvas
+ * @param {function(canvas):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is stored as userData in the elements data-block
+ * @param {*} type svg or canvas
+ */
+function setupD3Scene(outputObject, canvasElement, createSceneCallback, type='svg'){
+    const domEl = canvasElement
+    canvasElement = $(canvasElement)
+    const w = canvasElement.width()
+    const h = canvasElement.height()
+    
+    //create the canvas once
+    var base = d3.select(canvasElement.get(0));
+    var canvas = base.append(type)
+        .attr("width", w)
+        .attr("height", h);
+
+    // Create stuff
+    const userData = createSceneCallback(canvas)
+
+    //Store the Material
+    canvasElement.data('d3', {
+        canvas:canvas,        
+        userData:userData
+    })
 }
 
 //@ sourceURL=helper.js

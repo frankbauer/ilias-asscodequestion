@@ -5,10 +5,17 @@
     <label for="question{QUESTION_ID}value1">
         <b>{LABEL_VALUE1}</b>
     </label>
-    <br> {OPENING_CODE_BOX}
-    <textarea id="question{QUESTION_ID}value1" name="question{QUESTION_ID}value1" class="assCodeQuestionCodeBox" />{VALUE1}</textarea>
-    {CLOSING_CODE_BOX}
+    {BLOCK_HTML}
     <br> {RUN_CODE_HTML}
     <input id="max_lines-question{QUESTION_ID}value1" style="display:none" input="number" value={MAX_LINES_VAL}>
     <input id="timeout_ms-question{QUESTION_ID}value1" style="display:none" input="number" value={TIMEOUT_VAL}>
 </p>
+<script type="text/javascript">
+function displayResults(outputObject, canvasElement, questionID, blockID){
+    if (!canvasElement || canvasElement.length==0) return;
+    canvasElement = $(canvasElement)
+    canvasElement.removeClass('hiddenBlock')    
+    {CANVAS_SCRIPT}  
+    return outputObject
+}
+</script>

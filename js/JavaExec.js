@@ -6,6 +6,8 @@ var JavaExec = {
   persistentFs: null,
   ready: false,
   running: false,
+  initializing: false,
+  initialized: false,
   terminate: null,
 
   constructPersistantFs: function (cb) {
@@ -39,6 +41,13 @@ var JavaExec = {
    * Initialize the System
    */
   initialize: function (cb) {
+    if (JavaExec.initializing) return;
+    if (JavaExec.initialized) {
+      console.log("No Initialization needed!")
+      cb();
+      return;
+    }
+    JavaExec.initializing = true;
     let options = Doppio.VM.JVM.getDefaultOptions('/sys');
     //options.bootstrapClasspath.push("/sys/classes/"); 
     options.classpath = ["/tmp", "/sys/classes"];
@@ -52,6 +61,8 @@ var JavaExec = {
       JavaExec.persistentFs = _fs;
       BrowserFS.initialize(_fs);
       cb();
+      JavaExec.initialized = true;
+      JavaExec.initializing = false;      
     });
   },
 
@@ -80,9 +91,17 @@ var JavaExec = {
     // mfs.mount('/sys', new BrowserFS.FileSystem.XmlHttpRequest('listings.json', baseFolder+'/js/doppio'));    
   },
 
-  setRunButton: function(enabled){
-    let runButton = document.getElementById('allow_run_button');
-    runButton.disabled = !enabled;
+  setRunButton: function(enabled, info=undefined){
+    $('[type=button][data-question]').each(function(i, runButton){
+      if (enabled){
+        if (runButton.getAttribute('data-info') != info)
+          return
+      }
+      runButton.disabled = !enabled;
+      if (info)
+        if (enabled) runButton.removeAttribute('data-info')
+        else runButton.setAttribute('data-info', info);
+    })    
   },
 
   showMessage: function (msg) {
@@ -248,7 +267,7 @@ var JavaExec = {
       }
     }
 
-    let iAmDone = function () {
+    let iAmDone = function (info=undefined) {
       JavaExec.showMessage(null);
       callWhenFinished();
       JavaExec.setRunButton(true)      
@@ -476,11 +495,11 @@ var JavaExec = {
     let iAmDone = function (stdout, stderr) {
       JavaExec.showMessage(null);
       whenFinished(stdout, stderr);
-      JavaExec.setRunButton(true)
+      JavaExec.setRunButton(true, 'run')
       JavaExec.running = false;
     }
 
-    JavaExec.setRunButton(false)  
+    JavaExec.setRunButton(false, 'run')  
     
     if (JavaExec.running) {
       alert("Please wait for the last Java-Process to finish...");

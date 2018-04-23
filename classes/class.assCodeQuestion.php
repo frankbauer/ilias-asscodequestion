@@ -6,6 +6,15 @@ require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 
+abstract class assCodeQuestionBlockTypes
+{
+    const Text = 0;
+    const StaticCode = 1;
+	const SolutionCode = 2;
+	const HiddenCode = 3;
+	const Canvas = 4;
+}
+
 /**
  * Example class for question type plugins
  *
@@ -14,7 +23,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoring
  * @ingroup ModulesTestQuestionPool
  */
 class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable
-{
+{	
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
@@ -85,7 +94,74 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['maxLines'] = (int)$newValue;
 	}
 
+	function getIncludeThreeJS() {
+		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
+	}
+	
+	function setIncludeThreeJS($newValue) {
+		$this->additional_data['includeThreeJS'] = (bool)$newValue;
+	}
+
+	function getIncludeD3() {
+		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
+	}
+	
+	function setIncludeD3($newValue) {
+		$this->additional_data['includeD3'] = (bool)$newValue;
+	}
+
+	function getNumberOfBlocks() {
+		if (is_array($this->additional_data['blocks'])){
+			return count($this->additional_data['blocks']);
+		} else {
+			return 3;
+		}
+	}
+
+	function clearBlocks(){
+		$this->additional_data['blocks'] = array();
+	}
+
+	function getTypeForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->additional_data['blocks'][$nr]['type'];
+		} else {
+			if ($nr==0) return assCodeQuestionBlockTypes::StaticCode;
+			if ($nr==1) return assCodeQuestionBlockTypes::SolutionCode;
+			if ($nr==2) return assCodeQuestionBlockTypes::StaticCode;
+
+			return assCodeQuestionBlockTypes::HiddenCode;
+		}
+	}
+
+	function setTypeForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['type'] = $value;
+	}
+
+	function getContentForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->fixLoadedCode($this->additional_data['blocks'][$nr]['content']);
+		} else {
+			if ($nr==0) return $this->fixLoadedCode($this->additional_data['prefixCode']);
+			if ($nr==1) return $this->fixLoadedCode($this->additional_data['bestSolution']);
+			if ($nr==2) return $this->fixLoadedCode($this->additional_data['postfixCode']);
+
+			return '';
+		}
+	}
+
+	function setContentForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['content'] = $value;
+	}
+
 	function getPrefixCode() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['prefixCode']);
 	}
 
@@ -94,6 +170,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function getPostfixCode() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['postfixCode']);
 	}
 
@@ -102,6 +179,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function getBestSolution() {
+		return "WRONG!!!!";
 		return $this->fixLoadedCode($this->additional_data['bestSolution']);
 	}
 
@@ -373,10 +451,17 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit()
-	{
+	{		
+		$data = $_POST['block'][$this->getId()];
+		$result = array();
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			if ($this->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+				$result[$i] = $data[$i];
+			}
+		}
 		return array(
-			'value1' => ilUtil::stripSlashes($_POST["question".$this->getId()."value1"]),
-			'value2' => ilUtil::stripSlashes($_POST["question".$this->getId()."result1"])
+			'value1' => json_encode($result),
+			'value2' => ''
 		);
 	}
 
