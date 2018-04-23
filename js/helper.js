@@ -378,9 +378,18 @@ function finishedExecutionWithOutput(output, questionID){
         console.log('displayResults is not available here' );
         return output;
     }
+
+    //try to parse JSON
+    try {
+        output = JSON.parse(output)
+    } catch (e){}
     $("area[data-question="+questionID+"]").each(function(i, block) {  
-        console.log('display', output)
-        output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
+        //console.log('output', output)
+        try {
+            output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
+        } catch (e){
+            console.error(e);
+        }
     })
     
     return output;
@@ -706,7 +715,7 @@ function selectType(select, elementID, blockNr, languageSelect=true){
         ed.setOption('theme', edTheme)
     }
     if (languageSelect) selectLanguage()
-    console.log(select, elementID, el, blockNr, select.value, ed)
+    //console.log(select, elementID, el, blockNr, select.value, ed)
 }
 
 function initThreeJS(){
