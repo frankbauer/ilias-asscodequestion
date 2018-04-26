@@ -121,6 +121,23 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['blocks'] = array();
 	}
 
+	function getLinesForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			$res = $this->additional_data['blocks'][$nr]['lines']+0;
+			if ($res==0) $res = 15;
+			return $res;
+		} else {
+			return 15;
+		}
+	}
+
+	function setLinesForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['lines'] = $value;
+	}
+
 	function getTypeForBlock($nr) {
 		if (is_array($this->additional_data['blocks'])){
 			return $this->additional_data['blocks'][$nr]['type'];
