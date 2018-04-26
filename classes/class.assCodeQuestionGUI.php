@@ -379,7 +379,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		$template->setVariable("MAX_LINES_VAL",$this->object->getMaxLines());
+		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
 		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
 
 		$questionoutput = $template->get();
@@ -781,15 +781,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$runtime->setValue($this->object->getTimeoutMS());
 		$form->addItem($runtime);
 
-		$id = 'max_lines-question'.$this->object->getId().'value1';
-		$maxLines = new ilNumberInputGUI($this->plugin->txt('max_lines'),$id);	
-		$maxLines->setInfo($this->plugin->txt('max_line_infos'));
-		$maxLines->setSize(5);
-		$maxLines->setMinValue(20);
-		$maxLines->allowDecimals(0);
+		$id = 'max_chars-question'.$this->object->getId().'value1';
+		$maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
+		$maxChars->setInfo($this->plugin->txt('max_chars_info'));
+		$maxChars->setSize(5);
+		$maxChars->setMinValue(512);
+		$maxChars->allowDecimals(0);
 		//$runtime->setRequired(true);
-		$maxLines->setValue($this->object->getMaxLines());
-		$form->addItem($maxLines);
+		$maxChars->setValue($this->object->getMaxChars());
+		$form->addItem($maxChars);
 
 		$selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
 		$selectTheme->setOptions(array(
@@ -856,7 +856,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->setPoints((int) $_POST["points"]);
 		$this->object->setLanguage((string) $_POST["source_lang"]);
 		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
-		$this->object->setMaxLines((int) $_POST["max_lines-question".$this->object->getId().'value1']);
+		$this->object->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
 		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
 		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
 		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');

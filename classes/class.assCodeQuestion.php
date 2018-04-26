@@ -85,12 +85,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['timeoutMS'] = (int)$newValue;
 	}
 
-	function getMaxLines() {
-		return isset($this->additional_data['maxLines']) ? $this->additional_data['maxLines'] : 20; 
+	function getMaxChars() {
+		return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000; 
 	}
 	
-	function setMaxLines($newValue) {
-		$this->additional_data['maxLines'] = (int)$newValue;
+	function setMaxChars($newValue) {
+		$this->additional_data['maxChars'] = (int)$newValue;
 	}
 
 	function getIncludeThreeJS() {

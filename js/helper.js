@@ -5,6 +5,12 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+function format_info(text){
+    return '<span style="color:green">'+text+'</span>';
+}
+function format_error(text){
+    return '<span style="color:red">'+text+'</span>';
+}
 $(document).ready(function(){
     //we need this for the manual scoring view, otherwise the boxes have to get clicked
     setTimeout(function() {
@@ -292,10 +298,8 @@ function getTotalSourcecode(questionID){
  * @param {string} questionID 
  * @param {HTML-element} mypre The HTML element to write the standard output of the program
  * @param {string} prog  String containing the Python, Java or JavaScript program
- * @param {number} maxMS  Timeout to kill the worker
- * @param {numner} maxLines Maximum number of lines allowd in the standard output
  */
-function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+function runJavaScript(questionID, mypre=undefined, prog=undefined){
     if(!prog) prog = getTotalSourcecode(questionID);
     if (mypre===undefined) {
         mypre = document.getElementById(questionID+"Output");     
@@ -307,10 +311,10 @@ function runJavaScript(questionID, mypre=undefined, prog=undefined,maxMS=500, ma
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaScriptWorker( prog, log, maxMS, maxLines, questionID);
+    runJavaScriptWorker( prog, log, maxMS, questionID);
 }
 
-function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+function runJava(questionID, mypre=undefined, prog=undefined){
     if(!prog) prog = getTotalSourcecode(questionID);
     if (mypre===undefined) {
         mypre = document.getElementById(questionID+"Output");     
@@ -322,7 +326,7 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
     function log(text){
         mypre.innerHTML = text; 
     }       
-    runJavaWorker( prog, log, maxMS, maxLines, questionID, finishedExecutionWithOutput);
+    runJavaWorker( prog, log, maxMS, questionID, finishedExecutionWithOutput);
 }
 
 /**
@@ -335,15 +339,7 @@ function runJava(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
  */
 function runInExam(language, questionID){   
     var prog = getTotalSourcecode(questionID);
-    var maxLines = parseInt($('#max_lines-'+questionID).val());
-    var maxMS = parseInt($('#timeout_ms-'+questionID).val());
-    // we don't know, what we get
-    if (isNaN(maxLines)) {
-        maxLines = 20;
-    } 
-    if (isNaN(maxMS)) {
-        maxMS = 1000;
-    } 
+        
     var mypre = undefined;
     // This is necessary to intearctively change the language in the edit mode.
     // codeqst_edit_mode is a dummy language set by the PHP-script to avoid
@@ -352,10 +348,10 @@ function runInExam(language, questionID){
         language = $('select#source_lang').val();
     }
     switch(language){
-        case 'python': runPython(prog, questionID, mypre, maxMS, maxLines); break;
-        case 'javascript':  runJavaScript( questionID, undefined, prog, maxMS, maxLines); break;
-        case 'java':  runJava( questionID, undefined, prog, maxMS, maxLines); break;
-        case 'glsl':  runGLSL( questionID, undefined, prog, maxMS, maxLines); break;
+        case 'python': runPython(prog, questionID, mypre); break;
+        case 'javascript':  runJavaScript( questionID, undefined, prog); break;
+        case 'java':  runJava( questionID, undefined, prog); break;
+        case 'glsl':  runGLSL( questionID, undefined, prog); break;
     }
 }
 
@@ -384,6 +380,15 @@ function finishedExecutionWithOutput(output, questionID){
     try {
         output = JSON.parse(output)
     } catch (e){}
+    
+
+    if (maxCharacters>0 && (typeof output==='string')){
+        console.log('enforce max', maxCharacters);
+        if (output.length > maxCharacters) {
+            output = format_info('Info: Removed ' + (output.length-maxCharacters) + ' Characters. \n<b>...</b>') + output.substr(output.length-maxCharacters)
+        }
+    }
+
     $("area[data-question="+questionID+"]").each(function(i, block) {  
         //console.log('output', output)
         try {
@@ -392,6 +397,10 @@ function finishedExecutionWithOutput(output, questionID){
             console.error(e);
         }
     })
+
+    if (typeof output!=='string'){
+        output = ''        
+    }
     
     return output;
 }
@@ -400,10 +409,9 @@ function finishedExecutionWithOutput(output, questionID){
  * @param {string} questionID 
  * @param {HTML-element} mypre The HTML element to write the standard output of the program
  * @param {string} prog  String containing the Python, Java or JavaScript program
- * @param {number} maxMS  Timeout to kill the worker
- * @param {numner} maxLines Maximum number of lines allowd in the standard output
+ * 
  */
-function runGLSL(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines=20){
+function runGLSL(questionID, mypre=undefined, prog=undefined){
     var outputData = []
     $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
         if (block.getAttribute('data-ignore')) return
@@ -425,10 +433,8 @@ function runGLSL(questionID, mypre=undefined, prog=undefined,maxMS=500, maxLines
  * @param {string} prog The Python program
  * @param {string} questionID The id of the question to read the Python program from html page
  * @param {HTML-element} mypre The HTML-element to write the output of the Python program.
- * @param {number} maxMS The timeout for the python program in milliseconds, must be an integer
- * @param {number} maxLines The maximum number of lines allowed in the output, must be an integer
  */
-function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) { 
+function runPython(prog, questionID, mypre=undefined) { 
     // the Python program
     prog = prog.replaceAll("\t", "    ")
    // the HTML-Element to write the output of the Python program
@@ -439,13 +445,6 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
    
     if (mypre){
         // output mypre.innerHTML = mypre.innerHTML + text; 
-        function format_info(text){
-            return '<span style="color:green">'+text+'</span>';
-        }
-        function format_error(text){
-            return '<span style="color:red">'+text+'</span>';
-        }
-
 
         // clear output, set to string to avoid undesired JavaScript snippets
         mypre.innerHTML = '';
@@ -473,17 +472,8 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
         
         // construct message for worker
         var pyInp = []; // not used jet
-        if (typeof maxLines === 'number') {
-            maxLines = Math.round(maxLines);
-        } else {
-            maxLines = 20;
-        }
-        if (typeof maxMS === 'number') {
-            maxMS = Math.round(maxMS);
-        } else {
-            maxMS = 500; // is this enough?
-        }
-        var messageData = {pyProg: prog, maxLines: maxLines, pyInp: pyInp, maxMS: maxMS};
+       
+        var messageData = {pyProg: prog, pyInp: pyInp, maxMS: maxMS};
         worker.postMessage(['b8e493ca02970aeb0ef734555526bf9b',messageData]);
         var start = Date.now();
         
@@ -523,14 +513,8 @@ function runPython(prog, questionID, mypre=undefined,maxMS=100,maxLines=20) {
     }
 } 
 
-function runJavaScriptWorker( code, log_callback, max_ms, max_loglength, questionID){
-    const maxLineLength = 256;
-    function format_info(text){
-        return '<span style="color:green">'+text+'</span>';
-    }
-    function format_error(text){
-        return '<span style="color:red">'+text+'</span>';
-    }
+function runJavaScriptWorker( code, log_callback, max_ms, questionID){
+    
 
     //console.log("submit");
     // TODO:: IE.11  does not support default arguments
@@ -541,14 +525,9 @@ function runJavaScriptWorker( code, log_callback, max_ms, max_loglength, questio
     var output = function(l){       // wrap the log
         //alert(l);
         if(!log_callback) console.log(l);
-        else{
-            if (l.length > maxLineLength) {
-                l = l.substring(0,maxLineLength);
-            }
+        else{            
             Log.push(l);
-            log_callback( Log.length>max_loglength ?   format_info('...(first '+(Log.length-max_loglength)+' Logs hidden)...\n') + Log.slice(Log.length-max_loglength,Log.length).join('\n')
-                                                    :   Log.join('\n')
-            );
+            log_callback( Log.join('\n') );
         }
     }
     log_callback('');
