@@ -149,6 +149,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if (!$this->didPrepare) {
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('span[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('span[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
 		}
 
 		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
@@ -321,6 +323,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
 			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
 			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
+			$questiontext = str_replace('[hl]', '<span class="'.$language.'" usebr="no" style="display:inline!important">', $questiontext);
+			$questiontext = str_replace('[/hl]', '</span>', $questiontext);
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
@@ -568,7 +572,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$this->didAddLinksToSolutions = true;
 			}
 
-			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
+			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("span[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
 		}
 		
 		
