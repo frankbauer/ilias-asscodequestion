@@ -18,8 +18,8 @@ run_code#:#Ausführen
 test_code#:#Testen Sie Ihre Implementierung
 timeout_ms#:#Laufzeitlimit in Millisekunden (ms)
 timeout_ms_info#:#Maximale Laufzeit, um Unendlich-Schleifen und andere mögliche Fehler zu vermeiden
-max_lines#:#Maximale Anzahl der Zeilen im Ausgabenbereich
-max_line_infos#:#Maximale Anzahl von Zeilen, die im Ausgabebereich zulässig sind, um Ausgaben von Unendlichen Schleifen zu vermeiden.
+max_chars#:#Maximale Anzahl der Zeichen im Ausgabenbereich
+max_chars_info#:#Maximale Anzahl von Zeichen, die im Ausgabebereich zulässig sind, um Ausgaben von Unendlichen Schleifen zu vermeiden.
 cm_theme#:#Farbschema für den Texteditor
 cm_theme_info#:#Wähle ein Farbschema für den Texteditor
 empty_text#:# 
