@@ -106,6 +106,14 @@ function selectLanguage() {
     updateCodeEditorUI()
 }
 
+function resizeBlock(lines, blockID){
+    editor = editors[blockID]
+    if (editor){
+        //console.log('resize', Math.round(20.533*lines)+2)
+        editor.setSize(null, Math.round(20.533*lines)+2);
+    }
+}
+
 /**
  * Counts the number of displayed lines within a Textarea fo
  * @param {*} block The Element to count the lines in
@@ -169,7 +177,7 @@ function initEditor(block, questionID, useMode){
         firstLineNumber: 1 
     }); 
     block.setAttribute('data-has-editor', true)
-    
+        
     editor.on('change',function(cMirror){
         block.value = cMirror.getValue(); 
     });           
@@ -182,8 +190,14 @@ function initEditor(block, questionID, useMode){
         updateLineNumbers(questionID)
         return CodeMirror.Pass;
     });
-
+    
+    //must be set before call to resizeBlock
     editors[block.id] = editor
+
+    let lines = block.getAttribute('data-show-lines')
+    if (lines!==null && lines>0){
+        resizeBlock(lines, block.id);
+    }
     return editor
 }
 
@@ -220,7 +234,7 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
-        }  
+        }          
     })
     finishedExecutionWithOutput(undefined, questionID)
 

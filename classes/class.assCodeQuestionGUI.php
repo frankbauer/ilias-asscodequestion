@@ -348,7 +348,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("NAME", $id);
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
-			$tpl->setVariable("QUESTION_ID", $questionID);
+			$tpl->setVariable("QUESTION_ID", $questionID);				
+			$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
 			if ($readOnly)
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
 			else
@@ -691,7 +692,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("CODE_EDITOR_ID", $elname);
 		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
 		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $type));
-
+		$tpl->setVariable("SHOW_LINES_TXT", $this->plugin->txt('show_lines_label'));
+		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
+		
 		return $tpl->get();		
 	}
 
@@ -702,6 +705,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("BLOCK_ID", $blockID==-1?'[ID]':$blockID);
 		$tpl->setVariable("BLOCK_TYPE", $blockType);
 		$tpl->setVariable("QUESTION_ID", $this->object->getId());	
+		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($blockID));
 		$tpl->setVariable("ADDITIONAL_ATTRIBUTES", ' '.($blockID==-1?'data-ignore=true':'').' ');	
 		$item = new ilCustomInputGUI('');
 		
@@ -863,12 +867,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
+			$lns = $_POST["block_lines"][$k] + 0;
 			$t = $_POST['block_type_'.$k];
 			if ($_POST["source_lang"]=='glsl' && $k==0){
 				$t = 4;
 				$this->object->setIncludeThreeJS(true);
 			}
 			$this->object->setTypeForBlock($i, $t);
+			$this->object->setLinesForBlock($i, $lns);
 			$this->object->setContentForBlock($i, $c);
 			$i = $i + 1;
 		}
