@@ -110,7 +110,7 @@ function resizeBlock(lines, blockID){
     editor = editors[blockID]
     if (editor){
         //console.log('resize', Math.round(20.533*lines)+2)
-        editor.setSize(null, Math.round(20.533*lines)+2);
+        editor.setSize(null, Math.round(20*lines)+9);
     }
 }
 
