@@ -34,9 +34,9 @@ function selectTheme() {
         const ed = editors[block.id];   
         if (!ed || ed===undefined) return;
 
-        if ( blockIsReadOnly(block) ){
+        /*if ( blockIsReadOnly(block) ){
             ed.setOption('theme', 'xq-light') 
-        } else {        
+        } else*/ {        
             ed.setOption('theme', edTheme)
         }
     })   
@@ -688,6 +688,7 @@ function selectType(select, elementID, blockNr, languageSelect=true){
     ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
     if ( blockIsReadOnly(block) ){
         ed.setOption('theme', 'xq-light') 
+        ed.setOption('theme', edTheme)
     } else {
         const themeSelect = $('select#cm_theme');
         const edTheme = themeSelect.val();
