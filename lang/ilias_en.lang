@@ -18,8 +18,8 @@ run_code#:#Run
 test_code#:#Test your code
 timeout_ms#:#Proccess timeout in ms
 timeout_ms_info#:#Maximum runtime allowed to avoid infinit loops and other possible errors
-max_lines#:#Maximum number of output lines
-max_line_infos#:#Maximum numbers of lines allowed in the output area to avoid ouputs of long or inifnit loops
+max_chars#:#Maximum number of output characters
+max_chars_info#:#Maximum numbers of characters allowed in the output area to avoid ouputs of long or inifnit loops
 cm_theme#:#Select theme for text editor
 cm_theme_info#:#Select color theme for the text editor
 empty_text#:# 
@@ -35,3 +35,4 @@ havethreejs#:#Include Three.JS
 havethreejs_info#:#Three.JS (https://threejs.org) is a WebGL-SceneGraph for Canvas Elements
 havedthree#:#Include D3
 havedthree_info#:#D3 (https://d3js.org) is a library for visualizing data using web standards.
+show_lines_label#:#Visible Lines

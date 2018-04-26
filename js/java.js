@@ -4,7 +4,7 @@
  * @type {int} javaRunOverhead execution overhead in ms
  */
 var javaRunOverhead = 4000;
-function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID, finishedExecutionWithOutputCb) {
+function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb) {
   function format_info(text) {
     return '<span style="color:green">' + text + '</span>';
   }
@@ -64,7 +64,7 @@ function runJavaWorker(code, log_callback, max_ms, max_loglength, questionID, fi
 
   }, false);
 
-  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms, questionID:questionID })
+  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms+1000, questionID:questionID })
 }
 
 (function () {

@@ -7,10 +7,10 @@
     </label>
     {BLOCK_HTML}
     <br> {RUN_CODE_HTML}
-    <input id="max_lines-question{QUESTION_ID}value1" style="display:none" input="number" value={MAX_LINES_VAL}>
-    <input id="timeout_ms-question{QUESTION_ID}value1" style="display:none" input="number" value={TIMEOUT_VAL}>
 </p>
 <script type="text/javascript">
+const maxCharacters = Math.max(32, Math.round({MAX_CHARACTERS_VAL}+0));
+const maxMS = Math.max(500, Math.round({TIMEOUT_VAL}+0));
 function displayResults(outputObject, canvasElement, questionID, blockID){
     if (!canvasElement || canvasElement.length==0) return;
     canvasElement = $(canvasElement)
