@@ -716,12 +716,19 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @access public
 	 * @see assQuestion::setExportDetailsXLS()
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
-	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
+	 */
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass, &$format_title='', &$format_bold='')
 	{
 		global $lng;
 
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		$il52 = file_exists('./Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php');
+		if (!$il52) {
+			include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		} else {
+			include_once './Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
+		}
+
+		
 		$solutions = $this->getSolutionValues($active_id, $pass);
 
 		if (is_array($solutions))
@@ -733,23 +740,41 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 
-		$format_title = '';
-		$format_bold = '';
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+		if ($il52){
+			$worksheet->setCell($startrow, 0, $this->plugin->txt($this->getQuestionType()));
+			$worksheet->setCell($startrow, 1, $this->getTitle());	
+		} else {
+			$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
+			$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+		}
 		$i = 1;
 
 		// now provide a result string and write it to excel
 		// it is also possible to write multiple rows
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
+			$worksheet->setCell($startrow + $i, 1, $value1);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+		}
 		$i++;
 
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
+			$worksheet->setCell($startrow + $i, 1, $value2);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+		}
 		
-		$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
-		$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_points"));
+			$worksheet->setCell($startrow + $i, 1, $points);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));
+		}
 		$i++;
 
 		return $startrow + $i + 1;
