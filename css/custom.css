@@ -66,3 +66,11 @@ area{
 
     transition: opacity 600ms, visibility 600ms;
 }
+
+hl {
+    display:inline!important;
+    padding-top:0px!important;
+    padding-bottom:0px!important;
+    padding-left:4px!important;
+    padding-right:4px!important;
+}
