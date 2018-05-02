@@ -2,11 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.1
+**Version**:  1.1.2
 
 **Company**:  Computer Graphics Group Erlangen
 
-**Supports**: ILIAS 5.2 - 5.2
+**Supports**: ILIAS 5.1 - 5.2
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -238,6 +238,8 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.2
+* combined version for ilias 5.1 AND 5.2
 
 ### Version 1.1.1
 * Added full support for canvas element drawing using data for the result output as datasource
@@ -251,3 +253,4 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 ### Version 1.0.3
 * Initial version
+ No newline at end of file
