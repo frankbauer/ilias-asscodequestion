@@ -104,10 +104,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$lngData = $this->getLanguageData();
 		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
 			if (!$this->tpl->hasJava){
-				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
-				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
 				$this->tpl->hasJava = true;
 			}
 		}
@@ -139,7 +139,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
 
-			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
+			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
 
 			$this->tpl->didPrepare = true;
 		}		
@@ -149,8 +149,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if (!$this->didPrepare) {
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('span[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('span[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
 		}
 
 		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
@@ -323,8 +323,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
 			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
 			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
-			$questiontext = str_replace('[hl]', '<span class="'.$language.'" usebr="no" style="display:inline!important">', $questiontext);
-			$questiontext = str_replace('[/hl]', '</span>', $questiontext);
+			$questiontext = str_replace('[hl]', '<hl class="'.$language.'" usebr="no">', $questiontext);
+			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
@@ -573,7 +573,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$this->didAddLinksToSolutions = true;
 			}
 
-			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("span[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
+			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("hl[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
 		}
 		
 		

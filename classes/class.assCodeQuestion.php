@@ -1,6 +1,4 @@
 <?php
-
-require_once './Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
 require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
@@ -541,32 +539,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
-
-	/**
-	 * Saves the learners input of the question to the database
-	 *
-	 * @param 	integer $test_id The database id of the test containing this question
-	 * @return 	boolean Indicates the save status (true if saved successful, false otherwise)
-	 * @access 	public
-	 * @see 	assQuestion::saveWorkingData()
-	 */
-	function saveWorkingData($active_id, $pass = NULL, $authorized = true)
-	{
-		global $ilDB;
-		global $ilUser;
-
-		if (is_null($pass))
-		{
-			include_once "./Modules/Test/classes/class.ilObjTest.php";
-			$pass = ilObjTest::_getPass($active_id);
-		}
-
-		// get the submitted solution
-		$solution = $this->getSolutionSubmit();
-
-		// lock to prevent race conditions
-		//$this->getProcessLocker()->requestUserSolutionUpdateLock();
-	  $this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+	private function saveWorkingDataInner ($solution, $active_id, $pass, $authorized, $value1, $value2) {
 		global $ilDB;
 		global $ilUser;
 		// save the answers of the learner to tst_solution table
@@ -615,13 +588,47 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					// in our example we allow to enter these values directly
 					"value1"      => array("clob", $solution["value1"]),
 					"value2"      => array("clob", $solution["value2"]),
-				)
-			);
+			));
+		};
+	}
+
+	/**
+	 * Saves the learners input of the question to the database
+	 *
+	 * @param 	integer $test_id The database id of the test containing this question
+	 * @return 	boolean Indicates the save status (true if saved successful, false otherwise)
+	 * @access 	public
+	 * @see 	assQuestion::saveWorkingData()
+	 */
+	function saveWorkingData($active_id, $pass = NULL, $authorized = true)
+	{
+		global $ilDB;
+		global $ilUser;
+
+		if (is_null($pass))
+		{
+			include_once "./Modules/Test/classes/class.ilObjTest.php";
+			$pass = ilObjTest::_getPass($active_id);
 		}
-	  });
-		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
-		// unlock
-		//$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+
+		// get the submitted solution
+		$solution = $this->getSolutionSubmit();
+
+
+		if (method_exists($this->getProcessLocker(), 'executeUserSolutionUpdateLockOperation')){ //ilias 5.2
+			$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+				$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
+			});
+		} else { // ilias 5.1
+			// lock to prevent race conditions
+			$this->getProcessLocker()->requestUserSolutionUpdateLock();
+
+			$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
+
+			// unlock
+			$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		}
+		
 
 		// Check if the user has entered something
 		// Then set entered_values accordingly
@@ -706,12 +713,22 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	/**
 	 * Creates an Excel worksheet for the detailed cumulated results of this question
+	 *
+	 * @access public
+	 * @see assQuestion::setExportDetailsXLS()
 	 */
-	//public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
-	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass, &$format_title='', &$format_bold='')
 	{
-		global $lng;		
-		//include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		global $lng;
+
+		$il52 = file_exists('./Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php');
+		if (!$il52) {
+			include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		} else {
+			include_once './Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
+		}
+
+		
 		$solutions = $this->getSolutionValues($active_id, $pass);
 
 		if (is_array($solutions))
@@ -723,31 +740,41 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 
-		$format_title = '';
-		$format_bold = '';
-		/*$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);*/
-		$worksheet->setCell($startrow, 0, $this->plugin->txt($this->getQuestionType()));
-		$worksheet->setCell($startrow, 1, $this->getTitle());
+		if ($il52){
+			$worksheet->setCell($startrow, 0, $this->plugin->txt($this->getQuestionType()));
+			$worksheet->setCell($startrow, 1, $this->getTitle());	
+		} else {
+			$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
+			$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+		}
 		$i = 1;
 
 		// now provide a result string and write it to excel
 		// it is also possible to write multiple rows
-		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-		//$worksheet->write($startrow + $i, 1, $value1);
-		$worksheet->setCell($startrow + $i, 1, $value1);
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
+			$worksheet->setCell($startrow + $i, 1, $value1);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+		}
 		$i++;
 
-		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-		//$worksheet->write($startrow + $i, 1, $value2);
-		$worksheet->setCell($startrow + $i, 1, $value2);
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
+			$worksheet->setCell($startrow + $i, 1, $value2);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+		}
 		
-		$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_points"));
-		//$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
-		//$worksheet->write($startrow + $i, 1, $points);
-		$worksheet->setCell($startrow + $i, 1, $points);
+		if ($il52){
+			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_points"));
+			$worksheet->setCell($startrow + $i, 1, $points);	
+		} else {
+			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));
+		}
 		$i++;
 
 		return $startrow + $i + 1;
