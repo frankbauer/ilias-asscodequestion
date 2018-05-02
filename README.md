@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.1
+**Version**:  1.1.2
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -238,6 +238,8 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.2
+* combined version for ilias 5.1 AND 5.2
 
 ### Version 1.1.1
 * Added full support for canvas element drawing using data for the result output as datasource
