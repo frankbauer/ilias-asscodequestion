@@ -1,5 +1,4 @@
 <?php
-
 require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
@@ -540,34 +539,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
-
-	/**
-	 * Saves the learners input of the question to the database
-	 *
-	 * @param 	integer $test_id The database id of the test containing this question
-	 * @return 	boolean Indicates the save status (true if saved successful, false otherwise)
-	 * @access 	public
-	 * @see 	assQuestion::saveWorkingData()
-	 */
-	function saveWorkingData($active_id, $pass = NULL, $authorized = true)
-	{
+	private function saveWorkingDataInner ($solution, $active_id, $pass, $authorized, $value1, $value2) {
 		global $ilDB;
 		global $ilUser;
-
-		if (is_null($pass))
-		{
-			include_once "./Modules/Test/classes/class.ilObjTest.php";
-			$pass = ilObjTest::_getPass($active_id);
-		}
-
-		// get the submitted solution
-		$solution = $this->getSolutionSubmit();
-
-		// lock to prevent race conditions
-		$this->getProcessLocker()->requestUserSolutionUpdateLock();
-	  //$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-		//global $ilDB;
-		//global $ilUser;
 		// save the answers of the learner to tst_solution table
 		// this data is question type specific
 		// it is used used by calculateReachedPointsForSolution() in this class
@@ -616,9 +590,45 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 					"value2"      => array("clob", $solution["value2"]),
 			));
 		};
+	}
 
-		// unlock
-		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+	/**
+	 * Saves the learners input of the question to the database
+	 *
+	 * @param 	integer $test_id The database id of the test containing this question
+	 * @return 	boolean Indicates the save status (true if saved successful, false otherwise)
+	 * @access 	public
+	 * @see 	assQuestion::saveWorkingData()
+	 */
+	function saveWorkingData($active_id, $pass = NULL, $authorized = true)
+	{
+		global $ilDB;
+		global $ilUser;
+
+		if (is_null($pass))
+		{
+			include_once "./Modules/Test/classes/class.ilObjTest.php";
+			$pass = ilObjTest::_getPass($active_id);
+		}
+
+		// get the submitted solution
+		$solution = $this->getSolutionSubmit();
+
+
+		if (method_exists($this->getProcessLocker(), 'executeUserSolutionUpdateLockOperation')){ //ilias 5.2
+			$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+				$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
+			});
+		} else { // ilias 5.1
+			// lock to prevent race conditions
+			$this->getProcessLocker()->requestUserSolutionUpdateLock();
+
+			$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
+
+			// unlock
+			$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		}
+		
 
 		// Check if the user has entered something
 		// Then set entered_values accordingly
