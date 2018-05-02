@@ -6,7 +6,7 @@
 
 **Company**:  Computer Graphics Group Erlangen
 
-**Supports**: ILIAS 5.1 - 5.1
+**Supports**: ILIAS 5.1 - 5.2
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
