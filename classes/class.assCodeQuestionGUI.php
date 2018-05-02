@@ -62,6 +62,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	var $didPrepare = false;
+	var $didAddLinksToSolutions = false;
 	private function getLanguageData(){
 		$language = $this->getLanguage();
 		$inLanguage = $language;
@@ -81,6 +82,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		} else if ($language=="objectivec") {
 			$language = "clike";
 			$mode = "text/x-objectivec";
+		} else if ($language=="glsl") {
+			$language = "clike";
+			$mode = "text/x-glsl";
 		} 
 
 		return array(
@@ -90,49 +94,78 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'org'=>$inLanguage
 			);
 	}
-	private function prepareTemplate($force=false) {
-		if ($this->didPrepare && !$force) return;
-		$this->didPrepare = true;
+
+	private function prepareTemplate($force=false, $negativeQuestionID=false)
+	{		
+		$qidf = $negativeQuestionID?-1:1;
+		//if (($this->didPrepare) && !$force) return;
+		
 		
 		$lngData = $this->getLanguageData();
-		//$this->tpl->addJavascript(self::URL_PATH.'/js/javapoly/javapoly.js');
-		/*if ($lngData['cmLanguage'] == "python" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt.min.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/skulpt/skulpt-stdlib.js');
-		} else*/ if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js?&v='.microtime());
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js?&v='.microtime());
+		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
+			if (!$this->tpl->hasJava){
+				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
+				$this->tpl->hasJava = true;
+			}
+		}
+		if (!$this->tpl->didPrepare) {
+			$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			
+			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
+
+			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
+
+			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
+
+			$this->tpl->didPrepare = true;
+		}		
+	
+		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
+
+		if (!$this->didPrepare) {
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
 		}
 
+		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
+			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
+			$this->tpl->addOnLoadCode('initThreeJS();');
+			$this->tpl->didIncludeThreeJS = true;			
+		}
 
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
-		$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+		if ($this->object->getIncludeD3() && !$this->tpl->didIncludeD3){
+			$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
+			$this->tpl->addOnLoadCode('initD3();');
+			$this->tpl->didIncludeD3 = true;			
+		}
 		
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
-
-		$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
-		$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js?v='.microtime());
-		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");');
-		$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-		$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+		$this->didPrepare = true;
 	}
 
 	/**
@@ -200,14 +233,38 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
 			$this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
 
-			
-
 			$this->saveTaxonomyAssignments();
 			return 0;
 		}
 		return 1;
 	}
 
+	private function printableString($value){
+		$value = str_replace("\t", "  ",$value);
+		$value = str_replace(" ", "&nbsp;",$value);
+		$value = str_replace("\n", "<br />", $value);
+
+		return $value;
+	}
+
+	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
+		if (empty($value)) return '';
+
+		$json = json_decode($value);				
+		if (!empty($json)) $value = $json->$blockID;
+
+		$value = ilUtil::prepareFormOutput($value);
+
+		if ($toHTMLOutput){
+			$value = str_replace('[err]', '<span style="color:red">', $value);
+			$value = str_replace('[/err]', '</span>', $value);	
+		}
+
+		if ($forPrint) {
+			$value = $this->printableString($value);
+		}
+		return $value;
+	}
 	
 	/**
 	 * Show the question in Test mode
@@ -227,6 +284,19 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->setVariable("FORMACTION", $formaction);
 	}*/
 
+	private function createRunHTMLCode($language, $questionID){
+		$runCode = "";
+		if ($this->object->getAllowRun()) {
+			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
+			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
+			$tpl->setVariable("QUESTION_ID", $questionID);
+			$tpl->setVariable("LANGUAGE", $language);
+			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
+			$runCode = $tpl->get();			
+		}
+		return $runCode;
+	}
+
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -234,119 +304,83 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false)
-	{
-		$this->prepareTemplate();
+	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=null, $print=false)
+	{		
+		$qidf = $negativeQuestionID?-1:1;
+		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();		
-		$runCode = "";
-		if ($this->object->getAllowRun()) {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-			$tpl->setVariable("QUESTION_ID", $this->object->getId());
-			$tpl->setVariable("LANGUAGE", $language);
-			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
-			$runCode = $tpl->get();			
-		}
-		
-		// fill the question output template
-		// in out example we have 1:1 relation for the database field
-		
+
+		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
+		//we can not run when we have multiple instances of the same question on screen
+		if ($active_id!=null || $print) $runCode='';
+
 		if ($template == nil) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
-		if ($show_question_text==true)
-		{
+		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
 			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
 			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
+			$questiontext = str_replace('[hl]', '<hl class="'.$language.'" usebr="no">', $questiontext);
+			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
 		}	
 
-		$value1 = empty($value1) ? "" : ilUtil::prepareFormOutput($value1);
 
-		$value2 = empty($value2) ? "" : ilUtil::prepareFormOutput($value2);
-		if ($htmlResults) {
-			$value2 = str_replace('[err]', '<span style="color:red">', $value2);
-			$value2 = str_replace('[/err]', '</span>', $value2);	
-		}
+		$html = '';
+		$script = '';
+		//Add Code Blocks
+		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+			$questionID = $this->object->getId()*$qidf ;
+			$code = $this->object->getContentForBlock($i);
+			if ($print) $code = $this->printableString($code);
+			$id = 'block['.$questionID.']['.$i.']';
+			if ($active_id!=null){
+				$id .= '['.$active_id.']';
+			}
+			$type = $this->object->getTypeForBlock($i);
 
-		//This should work, however it seems to be ignored 
-		/*if ($this->isRenderPurposePrintPdf()) {
-			$value1 = str_replace("\t", "  ",$value1);
-			$value1 = str_replace(" ", "&nbsp;",$value1);
-			$value1 = str_replace("\n", "<br />", $value1);
-
-			$value2 = str_replace("\t", "  ",$value2);
-			$value2 = str_replace(" ", "&nbsp;",$value2);
-			$value2 = str_replace("\n", "<br />", $value2);
-		}*/
-
-		//opening code
-		if ($this->getLanguage() == 'python' || $this->getLanguage() == 'javascript' || $this->getLanguage() == 'java') {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
-			$id = $id = "pre_question".$this->object->getId()."value1";
+			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
 			$tpl->setVariable("NAME", $id);
-			$code = $this->object->getPrefixCode();
-			if (trim($code)!='') {
-				//$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($this->object->getPrefixCode()));
+			$tpl->setVariable("BLOCK_ID", $i);
+			$tpl->setVariable("BLOCK_TYPE", $type);
+			$tpl->setVariable("QUESTION_ID", $questionID);				
+			$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
+			if ($readOnly)
+				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
+			else
+				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
+
+		
+			if ((trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) && $type!=assCodeQuestionBlockTypes::SolutionCode) {
+				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';
+			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
 				$tpl->setVariable("CONTENT", $code);
-				$template->setVariable("OPENING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
-			$id = $id = "post_question".$this->object->getId()."value1";
-			$tpl->setVariable("NAME", $id);
-			$code = $this->object->getPostfixCode();
-			if (trim($code)!='') {
-				//$this->createCodeEditorFormInput($form, 'code_postfix', $this->object->getPostfixCode());
-				$tpl->setVariable("CONTENT", $code);
-				$template->setVariable("CLOSING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("CLOSING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-		} else {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
-			$tpl->setVariable("LANGUAGE", $language);
-			$id = "pre_question".$this->object->getId()."value1";
-			$tpl->setVariable("ID", $id);
-			$code = $this->object->getPrefixCode();
-			if (trim($code)!='') {
-				$tpl->setVariable("CODE", $code);
-				$template->setVariable("OPENING_CODE_BOX", $tpl->get());
-			} else {
-				$template->setVariable("OPENING_CODE_BOX", '<span id="'.$id.'"></span>');
-			}
-			
-			//closing code
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_show_code.html');
-			$tpl->setVariable("LANGUAGE", $language);
-			$id = "post_question".$this->object->getId()."value1";
-			$tpl->setVariable("ID", $id);
-			$code = $this->object->getPostfixCode();
-			if (trim($code)!='') {
-				$tpl->setVariable("CODE", $code);
-				$template->setVariable("CLOSING_CODE_BOX", $tpl->get());		
-			} else {
-				$template->setVariable("CLOSING_CODE_BOX", '<span id="'.$id.'"></span>');
+				$html .= $tpl->get();
+			} else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
+				$tpl->setVariable("CONTENT", $this->prepareSolutionCode($value1, $i));
+				$html .= $tpl->get();
+			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
+				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
+			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
+				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
+				$html .= '<area id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></area>';	
+				$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
 			}
 		}
-
+		$template->setVariable("BLOCK_HTML", $html);		
+		$template->setVariable("CANVAS_SCRIPT", $script);	 
 		$template->setVariable("LANGUAGE", $language);
 		$template->setVariable("RUN_CODE_HTML", $runCode);
 
-		$template->setVariable("QUESTION_ID", $this->object->getId());
+		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		//$template->setVariable("OPENING_CODE", $this->object->getPrefixCode());
-		$template->setVariable("VALUE1", $value1);
-		//$template->setVariable("CLOSING_CODE", $this->object->getPostfixCode());
-		$template->setVariable("RESULT1", $value2);		
-		$template->setVariable("MAX_LINES_VAL",$this->object->getMaxLines());
+		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
 		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
 
 		$questionoutput = $template->get();
@@ -384,11 +418,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2);
-		/*if ($this->getLanguage() == "python") {
-			$this->tpl->addOnLoadCode("preparePythonSave(".$this->object->getId().");");
-		}
-		*/
+		$questionoutput = $this->getQuestionOutput($value1, $value2);		
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
@@ -440,12 +470,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
+		
+		$print = $this->isRenderPurposePrintPdf();		
+		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
 
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
-		if (($active_id > 0) && (!$show_correct_solution))
+		if ($showStudentResults)
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
@@ -454,12 +487,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 		else
 		{
+			$bestSolution = array();
+			for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+				if ($this->object->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+					$bestSolution[$i] = $this->object->getContentForBlock($i);
+				}
+			}
 			// show the correct solution
 			$solutions = array(array(
-				"value1" => $this->object->getBestSolution(),
+				"value1" => json_encode($bestSolution),
 				"value2" => "..."
 			));
-			$template->setVariable("NAME_MODIFIER", "_SOL");
+			$template->setVariable("NAME_MODIFIER", "_SOL");			
 		}
 
 		// loop through the saved values if more records exist
@@ -471,49 +510,23 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
 		}		
 		
-		/*if ($this->getLanguage() == "python" && $this->object->getAllowRun()) {			
-			$this->tpl->addOnLoadCode('runPythonInSolution();');
-		}*/
 		if ( $this->object->getAllowRun() ) {			
-			$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
+			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
 		}
 			
-		if (($active_id > 0) && (!$show_correct_solution))
+		if ($showStudentResults)
 		{
 			if ($graphicalOutput)
 			{
 				// copied from assNumericGUI, yet not really understood
-				if($this->object->getStep() === NULL)
-				{
-					$reached_points = $this->object->getReachedPoints($active_id, $pass);
-				}
-				else
-				{
-					$reached_points = $this->object->calculateReachedPoints($active_id, $pass);
-				}
-				
-				// output of ok/not ok icons for user entered solutions
-				// in this example we have ony one relevant input field (points)
-				// so we just need to tet the icon beneath this field
-				// question types with partial answers may have a more complex output
-				/*if ($this->object->getReachedPoints($active_id, $pass) == $this->object->getMaximumPoints())
-				{
-					$template->setCurrentBlock("icon_ok");
-					$template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-					$template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-					$template->parseCurrentBlock();
-				}
-				else
-				{
-					$template->setCurrentBlock("icon_ok");
-					$template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-					$template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-					$template->parseCurrentBlock();
-				}*/
+				if($this->object->getStep() === NULL) 
+					$reached_points = $this->object->getReachedPoints($active_id, $pass);				
+				else 
+					$reached_points = $this->object->calculateReachedPoints($active_id, $pass);	
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :null, $print);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -523,49 +536,53 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$solutionoutput = $solutiontemplate->get();
 
-		/*if ($this->isRenderPurposePrintPdf()) {
-
-			$solutionoutput = str_replace("<pre", "\n<code",$solutionoutput);
-			$solutionoutput = str_replace("</pre", "</code",$solutionoutput);
-			$solutionoutput = str_replace("\t", "  ",$solutionoutput);
-			$solutionoutput = str_replace(" ", "&nbsp;",$solutionoutput);
-		}*/		
-
 		//include everything we need to execute python code when we just want to display a brief answer
 		if ($_GET['cmd'] == 'getAnswerDetail' ) {
 			$lngData = $this->getLanguageData();
-			$solutionoutput .= '
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
-			<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
-			<script type="text/javascript" src="./Services/jQuery/js/2_2_4/jquery-min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="./Services/jQuery/js/ui_1_12_0/jquery-ui-min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/java/java.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
-			<script type="text/javascript">runPythonInSolution();hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
+			if (!$this->didAddLinksToSolutions) {
+				$solutionoutput .= '
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/css/custom.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-dark.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-light.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
+				
+				<script type="text/javascript" src="./Services/jQuery/js/2_2_4/jquery-min.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="./Services/jQuery/js/ui_1_12_0/jquery-ui-min.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>';
+
+				$this->didAddLinksToSolutions = true;
+			}
+
+			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("hl[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
 		}
+		
+		
 		if(!$show_question_only)
 		{
 			// get page object output
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
+		
 		return $solutionoutput;
 	}
 
@@ -656,22 +673,43 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addBackTab($ilTabs);
 	}
 
-	public function createCodeEditorFormInput(\ilPropertyFormGUI $form, $name, $value){
-		/*$txt1 = new ilTextAreaInputGUI($this->plugin->txt($name), $name);	
-		$txt1->usePurifier(false);				
-		$txt1->setUseRte(TRUE);		
-        $txt1->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
-		$txt1->setValue($value);
-		$form->addItem($txt1);*/
-		$item = new ilCustomInputGUI($this->plugin->txt($name));
-		$item->setInfo($this->plugin->txt($name.'_info'));
+	public function createBlockTypeOption($value, $nameRef, $currentValue=-1){
+		return '<option value="'.$value.'" '.($currentValue==$value?'selected':'').'>'.$this->plugin->txt($nameRef).'</option>';
+	}
+
+	public function createCodeBlockInput($i, $elname){
+		$type = $this->object->getTypeForBlock($i);
+		$options_html  = $this->createBlockTypeOption(assCodeQuestionBlockTypes::Text, 'plain_text', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::StaticCode, 'static_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::HiddenCode, 'hidden_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::SolutionCode, 'solution_code', $type);
+		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::Canvas, 'canvas', $type);			
+
+		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_block_ui.html');
+		$tpl->setVariable("BLOCK_ID", $i==-1?'[ID]':$i);
+		$tpl->setVariable("REMOVE_TXT", $this->plugin->txt('remove'));
+		$tpl->setVariable("BLOCK_TYPE_OPTIONS", $options_html);
+		$tpl->setVariable("CODE_EDITOR_ID", $elname);
+		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
+		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $type));
+		$tpl->setVariable("SHOW_LINES_TXT", $this->plugin->txt('show_lines_label'));
+		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
+		
+		return $tpl->get();		
+	}
+
+	public function createCodeEditorInput($name, $value, $blockID=-1, $blockType=1){
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
 		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
 		$tpl->setVariable("NAME", $name);
-		$item->setHTML($tpl->get());
-		$form->addItem($item);
-		/*$this->tpl->addOnLoadCode('$("[name='.$name.']").each(function(i, block) { CodeMirror.fromTextArea(block, {lineNumbers: true, mode:"'.$lngData['cmMode'].'", theme:"solarized"});});');*/
-
+		$tpl->setVariable("BLOCK_ID", $blockID==-1?'[ID]':$blockID);
+		$tpl->setVariable("BLOCK_TYPE", $blockType);
+		$tpl->setVariable("QUESTION_ID", $this->object->getId());	
+		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($blockID));
+		$tpl->setVariable("ADDITIONAL_ATTRIBUTES", ' '.($blockID==-1?'data-ignore=true':'').' ');	
+		$item = new ilCustomInputGUI('');
+		
+		return $tpl->get();		
 	}
 
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
@@ -691,39 +729,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// Add Source Code Type Selection
 		// first complete scripts for codemirror
 		$language = $this->getLanguage();
-		//this is just to debug variable content
-	/*	if ($language == 'c' || $language == 'c++' || $language == 'c#' || $language == 'objectivec') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
-		}
-		if ($language == 'fortran') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
-		}
-		if ($language == 'java') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js??'.$language.'-'.($language == 'java'));
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/java/java.js');
-		}
-		if ($language == 'javascript') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
-		}
-		if ($language == 'perl') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
-		}
-		if ($language == 'python') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
-		}
-		if ($language == 'r') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
-		}
-		if ($language == 'ruby') {
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-		}*/
-
+		$lngData = $this->getLanguageData();
 		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
         $select->setOptions(array(
 			'c'=>'C', 
 			'c++'=>'C++',
 			'c#' => 'C#', 
 			'fortran'=>'Fortran', 
+			'glsl'=>'GLSL', 
 			'java'=>'Java',
 			'javascript'=>'JavaScript',
 			'objectivec'=>'Objective-C',
@@ -739,13 +752,28 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
 		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		$allowRun->setChecked( $this->object->getAllowRun() );
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java') {
+		$allowRun->setChecked( $this->object->getAllowRun() );		
+		$form->addItem($allowRun);
+
+		$haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
+		$haved3->setInfo($this->plugin->txt('havedthree_info'));	
+		$haved3->setChecked( $this->object->getIncludeD3() );
+		$form->addItem($haved3);
+
+		$have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
+		$have3js->setInfo($this->plugin->txt('havethreejs_info'));	
+		$have3js->setChecked( $this->object->getIncludeThreeJS() );
+		$form->addItem($have3js);
+
+		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'glsl') {
 			$allowRun->setValue('true');
+			$haved3->setValue('true');
+			$have3js->setValue('true');
 		} else {
 			$allowRun->setValue('false');
+			$haved3->setValue('false');
+			$have3js->setValue('false');
 		}
-		$form->addItem($allowRun);
 
 		$id = 'timeout_ms-question'.$this->object->getId().'value1';
 		$runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
@@ -757,21 +785,23 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$runtime->setValue($this->object->getTimeoutMS());
 		$form->addItem($runtime);
 
-		$id = 'max_lines-question'.$this->object->getId().'value1';
-		$maxLines = new ilNumberInputGUI($this->plugin->txt('max_lines'),$id);	
-		$maxLines->setInfo($this->plugin->txt('max_line_infos'));
-		$maxLines->setSize(5);
-		$maxLines->setMinValue(20);
-		$maxLines->allowDecimals(0);
+		$id = 'max_chars-question'.$this->object->getId().'value1';
+		$maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
+		$maxChars->setInfo($this->plugin->txt('max_chars_info'));
+		$maxChars->setSize(5);
+		$maxChars->setMinValue(512);
+		$maxChars->allowDecimals(0);
 		//$runtime->setRequired(true);
-		$maxLines->setValue($this->object->getMaxLines());
-		$form->addItem($maxLines);
+		$maxChars->setValue($this->object->getMaxChars());
+		$form->addItem($maxChars);
 
 		$selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
 		$selectTheme->setOptions(array(
 			'default' => 'default',
 			'base16-dark' => 'base16-dark',
 			'base16-light' => 'base16-light',
+			'xq-light' => 'xq-light',
+			'xq-dark' => 'xq-dark',
 			'blackborard' => 'blackboard',
 			'midnight' => 'midnight',
 			'neo' => 'neo',
@@ -782,12 +812,22 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
 		$form->addItem($selectTheme);
 
-		$this->createCodeEditorFormInput($form, 'code_prefix', $this->object->getPrefixCode());
-		$this->createCodeEditorFormInput($form, 'best_solution', $this->object->getBestSolution());
-		$this->createCodeEditorFormInput($form, 'code_postfix', $this->object->getPostfixCode());
+		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
+		$item->setInfo($this->plugin->txt('cq_blocks_info'));
+		$form->addItem($item);
 
+		
+		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+			$elname = 'block['.$i.']';
+			$item = new ilCustomInputGUI('');		
+			$item->setHTML($this->createCodeBlockInput($i, $elname));
+			$form->addItem($item);			
+		}
 
-
+		//Add Button and Template UI
+		$rect = new ilCustomInputGUI('');
+		$rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
+		$form->addItem($rect);
 
 		//$this->prepareTemplate();
 		$language = $this->getLanguage();	
@@ -811,17 +851,33 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 	}
 
+	/**
+	 * Store the information from "Edit Question" in the Database
+	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
-	{
+	{		
 		// Here you can write the question type specific values
 		$this->object->setPoints((int) $_POST["points"]);
 		$this->object->setLanguage((string) $_POST["source_lang"]);
 		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
-		$this->object->setMaxLines((int) $_POST["max_lines-question".$this->object->getId().'value1']);
-		$this->object->setPrefixCode((string) $_POST["code_prefix"]);
-		$this->object->setPostfixCode((string) $_POST["code_postfix"]);
-		$this->object->setBestSolution((string) $_POST["best_solution"]);
+		$this->object->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
 		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
+		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
+		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');
+		$this->object->clearBlocks();
+		$i = 0;
+		foreach($_POST["block"] as $k=>$c){
+			$lns = $_POST["block_lines"][$k] + 0;
+			$t = $_POST['block_type_'.$k];
+			if ($_POST["source_lang"]=='glsl' && $k==0){
+				$t = 4;
+				$this->object->setIncludeThreeJS(true);
+			}
+			$this->object->setTypeForBlock($i, $t);
+			$this->object->setLinesForBlock($i, $lns);
+			$this->object->setContentForBlock($i, $c);
+			$i = $i + 1;
+		}
 	}
 
 	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)
@@ -869,7 +925,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		return ''; //print_r($relevant_answers,true);
 	}
-	
+
 	public function isRenderPurposePrintPdf() {
 		return isset($_GET['pdf']) && $_GET['pdf'];
 	}

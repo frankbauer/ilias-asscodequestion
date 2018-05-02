@@ -1,0 +1,10 @@
+<div id="container_{BLOCK_ID}" class="BlockContainer">
+    <select class="form-control" id="block_type_{BLOCK_ID}" name="block_type_{BLOCK_ID}" onchange="selectType(this, 'block[{BLOCK_ID}]', {BLOCK_ID})" style="display:inline;margin-right:16px">
+        {BLOCK_TYPE_OPTIONS}
+    </select> {SHOW_LINES_TXT}: <input type="text" value="{SHOW_LINES}" id="block_lines[{BLOCK_ID}]"  name="block_lines[{BLOCK_ID}]" style="width:50px" onchange="resizeBlock($(this).val(), 'block[{BLOCK_ID}]')">
+    {CODE_EDITOR}
+    <input type="button" class="remBlockButton {BUTTON_CLASS}" value="&uarr; {REMOVE_TXT} &uarr;" onClick="removeBlock($('#container_{BLOCK_ID}'),'{CODE_EDITOR_ID}')">
+    <script type="text/javascript">    
+        resizeBlock({SHOW_LINES}, 'block[{BLOCK_ID}]')
+    </script>
+</div>

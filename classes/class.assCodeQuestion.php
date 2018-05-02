@@ -5,6 +5,15 @@ require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 
+abstract class assCodeQuestionBlockTypes
+{
+    const Text = 0;
+    const StaticCode = 1;
+	const SolutionCode = 2;
+	const HiddenCode = 3;
+	const Canvas = 4;
+}
+
 /**
  * Example class for question type plugins
  *
@@ -13,7 +22,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoring
  * @ingroup ModulesTestQuestionPool
  */
 class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable
-{
+{	
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
@@ -76,36 +85,95 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['timeoutMS'] = (int)$newValue;
 	}
 
-	function getMaxLines() {
-		return isset($this->additional_data['maxLines']) ? $this->additional_data['maxLines'] : 20; 
+	function getMaxChars() {
+		return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000; 
 	}
 	
-	function setMaxLines($newValue) {
-		$this->additional_data['maxLines'] = (int)$newValue;
+	function setMaxChars($newValue) {
+		$this->additional_data['maxChars'] = (int)$newValue;
 	}
 
-	function getPrefixCode() {
-		return $this->fixLoadedCode($this->additional_data['prefixCode']);
+	function getIncludeThreeJS() {
+		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
+	}
+	
+	function setIncludeThreeJS($newValue) {
+		$this->additional_data['includeThreeJS'] = (bool)$newValue;
 	}
 
-	function setPrefixCode($newCode) {
-		$this->additional_data['prefixCode'] = $this->fixSentCode($newCode);
+	function getIncludeD3() {
+		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
+	}
+	
+	function setIncludeD3($newValue) {
+		$this->additional_data['includeD3'] = (bool)$newValue;
 	}
 
-	function getPostfixCode() {
-		return $this->fixLoadedCode($this->additional_data['postfixCode']);
+	function getNumberOfBlocks() {
+		if (is_array($this->additional_data['blocks'])){
+			return count($this->additional_data['blocks']);
+		} else {
+			return 3;
+		}
 	}
 
-	function setPostfixCode($newCode) {
-		$this->additional_data['postfixCode'] = $this->fixSentCode($newCode);
+	function clearBlocks(){
+		$this->additional_data['blocks'] = array();
 	}
 
-	function getBestSolution() {
-		return $this->fixLoadedCode($this->additional_data['bestSolution']);
+	function getLinesForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			$res = $this->additional_data['blocks'][$nr]['lines']+0;
+			if ($res==0) $res = 15;
+			return $res;
+		} else {
+			return 15;
+		}
 	}
 
-	function setBestSolution($newCode) {
-		$this->additional_data['bestSolution'] = $this->fixSentCode($newCode);
+	function setLinesForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['lines'] = $value;
+	}
+
+	function getTypeForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->additional_data['blocks'][$nr]['type'];
+		} else {
+			if ($nr==0) return assCodeQuestionBlockTypes::StaticCode;
+			if ($nr==1) return assCodeQuestionBlockTypes::SolutionCode;
+			if ($nr==2) return assCodeQuestionBlockTypes::StaticCode;
+
+			return assCodeQuestionBlockTypes::HiddenCode;
+		}
+	}
+
+	function setTypeForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['type'] = $value;
+	}
+
+	function getContentForBlock($nr) {
+		if (is_array($this->additional_data['blocks'])){
+			return $this->fixLoadedCode($this->additional_data['blocks'][$nr]['content']);
+		} else {
+			if ($nr==0) return $this->fixLoadedCode($this->additional_data['prefixCode']);
+			if ($nr==1) return $this->fixLoadedCode($this->additional_data['bestSolution']);
+			if ($nr==2) return $this->fixLoadedCode($this->additional_data['postfixCode']);
+
+			return '';
+		}
+	}
+
+	function setContentForBlock($nr, $value) {
+		if (!is_array($this->additional_data['blocks'])){
+			$this->additional_data['blocks'] = array();			
+		} 	
+		$this->additional_data['blocks'][$nr]['content'] = $value;
 	}
 
 	function setJSONEncodedAdditionalData($data) {
@@ -372,10 +440,17 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit()
-	{
+	{		
+		$data = $_POST['block'][$this->getId()];
+		$result = array();
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			if ($this->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+				$result[$i] = $data[$i];
+			}
+		}
 		return array(
-			'value1' => ilUtil::stripSlashes($_POST["question".$this->getId()."value1"]),
-			'value2' => ilUtil::stripSlashes($_POST["question".$this->getId()."result1"])
+			'value1' => json_encode($result),
+			'value2' => ''
 		);
 	}
 
@@ -714,6 +789,85 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	public static function isObligationPossible($questionId)
 	{
 		return true;
+	}
+
+
+	/*-----------------*/
+	/* EST Integration */
+	/*-----------------*/
+
+	function getExportExtension() {
+		$language = $this->getLanguage();
+		if ($language=='c') return 'c';
+		if ($language=='c++') return 'cpp';		
+		if ($language=='c#') return 'cs';
+		if ($language=='fortran') return 'f';
+		if ($language=='glsl') return 'glsl';
+		if ($language=='java') return 'java';
+		if ($language=='javascript') return 'js';
+		if ($language=='objectivec') return 'm';
+		if ($language=='perl') return 'pl';
+		if ($language=='python') return 'py';
+		if ($language=='r') return 'r';
+		if ($language=='ruby') return 'rb';
+
+		return 'txt';
+	}
+
+	function getExportFilename() {
+		if (is_string($this->additional_data['export_filename'])) {
+			return $this->additional_data['export_filename'];
+		} else if ($this->getLanguage()=='java'){
+			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
+			$className = trim($matches[1][0]);
+			if ($className=='') $className="Unbekannt";
+			return $className.'.java';
+		} else {
+			return sprintf('Question_%09d.%s', $this->getId(), $this->getExportExtension());
+		}
+	}
+
+	public function getBestSolution(){
+		$res = '';
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			$t = $this->getTypeForBlock($i);
+			if ($t == assCodeQuestionBlockTypes::SolutionCode || $t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode){
+				$res .= $this->getContentForBlock($i)."\n";
+			}
+		}
+		return $res;
+	}
+
+	public function getExportSolution($active_id=NULL, $pass=NULL){
+		if(is_null($pass)){
+			$pass = $this->getSolutionMaxPass($active_id);
+		}
+
+		$solutions = $this->getSolutionValues($active_id, $pass);
+		if (count($solutions)>0) return $solutions[count($solutions)-1];
+
+		return NULL;
+	}
+
+	public function getCompleteSource($solution){	
+		if(is_null($solution)){
+			$solution = array('value1'=>array());
+		}
+
+		$studentCode = json_decode($solution['value1']);
+	
+		$res = '';
+		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+			$t = $this->getTypeForBlock($i);
+			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+				if (!empty($studentCode)){
+					$res .= $studentCode->$i."\n";
+				}
+			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
+				$res .= $this->getContentForBlock($i)."\n";
+			}
+		}
+		return $res;
 	}
 }
 
