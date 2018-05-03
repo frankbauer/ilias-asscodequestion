@@ -9,8 +9,6 @@
     <br> {RUN_CODE_HTML}
 </p>
 <script type="text/javascript">
-const maxCharacters = Math.max(32, Math.round({MAX_CHARACTERS_VAL}+0));
-const maxMS = Math.max(500, Math.round({TIMEOUT_VAL}+0));
 function displayResults(outputObject, canvasElement, questionID, blockID){
     if (!canvasElement || canvasElement.length==0) return;
     canvasElement = $(canvasElement)
