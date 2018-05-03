@@ -176,6 +176,7 @@ function initEditor(block, questionID, useMode){
         autoCloseBrackets: true,
         firstLineNumber: 1 
     }); 
+    editor.display.input.textarea.className ="noRTEditor"
     block.setAttribute('data-has-editor', true)
         
     editor.on('change',function(cMirror){
@@ -386,7 +387,7 @@ function runInSolution(language, questionID){
  */
 function finishedExecutionWithOutput(output, questionID){
     if (typeof displayResults !== "function"){
-        console.log('displayResults is not available here' );
+        //console.log('displayResults is not available here' );
         return output;
     }
 
