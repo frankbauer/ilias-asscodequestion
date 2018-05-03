@@ -176,6 +176,7 @@ function initEditor(block, questionID, useMode){
         autoCloseBrackets: true,
         firstLineNumber: 1 
     }); 
+    editor.display.input.textarea.className ="noRTEditor"
     block.setAttribute('data-has-editor', true)
         
     editor.on('change',function(cMirror){
@@ -386,7 +387,7 @@ function runInSolution(language, questionID){
  */
 function finishedExecutionWithOutput(output, questionID){
     if (typeof displayResults !== "function"){
-        console.log('displayResults is not available here' );
+        //console.log('displayResults is not available here' );
         return output;
     }
 
@@ -698,14 +699,15 @@ function selectType(select, elementID, blockNr, languageSelect=true){
     const el = $('[data-blocknr='+blockNr+']')
     const block = el.get()[0];
     const ed = editors[el.attr('id')]
+    const themeSelect = $('select#cm_theme');
+    const edTheme = themeSelect.val();
+    
     el.attr('data-blocktype', select.value)
     ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
     if ( blockIsReadOnly(block) ){
         ed.setOption('theme', 'xq-light') 
         ed.setOption('theme', edTheme)
-    } else {
-        const themeSelect = $('select#cm_theme');
-        const edTheme = themeSelect.val();
+    } else {        
         console.log(edTheme)
         ed.setOption('theme', edTheme)
     }

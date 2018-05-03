@@ -155,6 +155,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
 			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/OrbitControls.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/TrackballControls.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/Detector.js');			
 			$this->tpl->addOnLoadCode('initThreeJS();');
 			$this->tpl->didIncludeThreeJS = true;			
 		}
