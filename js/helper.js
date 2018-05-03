@@ -698,14 +698,15 @@ function selectType(select, elementID, blockNr, languageSelect=true){
     const el = $('[data-blocknr='+blockNr+']')
     const block = el.get()[0];
     const ed = editors[el.attr('id')]
+    const themeSelect = $('select#cm_theme');
+    const edTheme = themeSelect.val();
+    
     el.attr('data-blocktype', select.value)
     ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
     if ( blockIsReadOnly(block) ){
         ed.setOption('theme', 'xq-light') 
         ed.setOption('theme', edTheme)
-    } else {
-        const themeSelect = $('select#cm_theme');
-        const edTheme = themeSelect.val();
+    } else {        
         console.log(edTheme)
         ed.setOption('theme', edTheme)
     }
