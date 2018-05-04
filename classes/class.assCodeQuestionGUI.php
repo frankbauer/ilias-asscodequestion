@@ -377,7 +377,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
 				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
 				$html .= '<area id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></area>';	
-				$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
+				//$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
+				$script .= "if (calls[$questionID]===undefined) calls[$questionID]=[];\n";
+				$script .= 'calls['.$questionID.']['.$i."]= ".$code."\n";
 			}
 		}
 		$template->setVariable("BLOCK_HTML", $html);		
