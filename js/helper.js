@@ -299,7 +299,7 @@ function getTotalSourcecode(questionID){
         if (editor) {
             code += block.value + "\n"      
         } else {
-            code += block.innerHTML+ "\n"   
+            code += block.innerText+ "\n"   
         }
     });
     return code
