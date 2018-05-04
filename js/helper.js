@@ -721,12 +721,11 @@ function initThreeJS(){
 
 /**
  * Call this Object from a "Canvas Area" to create an WebGL rendering context. The 'threejs' data-block of the canvasElement will contain an object that provides references to the created scene, renderer and camera.
- * @param {*} outputObject The value passed from the program to the canvas area
  * @param {*} canvasElement The dom-element that should contain the canvas
  * @param {function(scene, camera, renderer):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is sent to the renderLoopCallback in the userData-parameter
  * @param {function(scene, camera, renderer, userData):void} renderLoopCallback  When defined, a render loop is set up that wil periodically call this function. Otherwise the scene is rendered exactly once. userData contains the value returned by createSceneCallback
  */
-function setupThreeJSScene(outputObject, canvasElement, createSceneCallback, renderLoopCallback=undefined){
+function setupThreeJSScene(canvasElement, createSceneCallback, renderLoopCallback=undefined){
     canvasElement = $(canvasElement)
 
     //cleanup?
@@ -771,9 +770,7 @@ function setupThreeJSScene(outputObject, canvasElement, createSceneCallback, ren
         camera:camera,
         userData:userData
     })
-    console.log("setup", canvasElement.data('threejs'))
     
-
     if (renderLoopCallback!==undefined){
         // Render Loop
         var render = function () {
@@ -796,12 +793,11 @@ function initD3(){
 
 /**
  * Call this Object from a "Canvas Area" to create an D3 context. The 'd3' data-block of the canvasElement will contain an object that provides references to the created context
- * @param {*} outputObject The value passed from the program to the canvas area
  * @param {*} canvasElement The dom-element that should contain the canvas
  * @param {function(canvas):object} createSceneCallback  Called when everything is set up, you may use this to set up the actual scene. The returned object is stored as userData in the elements data-block
  * @param {*} type svg or canvas
  */
-function setupD3Scene(outputObject, canvasElement, createSceneCallback, type='svg'){
+function setupD3Scene( canvasElement, createSceneCallback, type='svg'){
     const domEl = canvasElement
     canvasElement = $(canvasElement)
     const w = canvasElement.width()
