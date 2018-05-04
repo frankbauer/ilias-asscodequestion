@@ -46,27 +46,31 @@ that is passed to the `outputObject`-variable of the canvas Area.
 If you define a GLSL-Question (enable threeJS) where the first answer box represents the Vertex, and the second the fragment 
 shader, the following canvas-area-code will allow you to use that shader on the scene:
 
-    {   init: function(canvasElement) {
-            setupThreeJSScene(
-                canvasElement, 
-                function(scene, camera, renderer){ //delegate that creates the actual scene. 
-                    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-                    var material = new THREE.MeshBasicMaterial( { color: "#FF00FF" } );
-                    var cube = new THREE.Mesh( geometry, material );
-                    scene.add(cube);
-                
-                    return {cube:cube, geometry:geometry}
-                },
-                function(scene, camera, renderer, userData){ //called in the render loop
-                    userData.cube.rotation.x += 0.01;
-                    userData.cube.rotation.y += 0.01;
-                }
-            )
+    {   cube: null,
+        material: null,
+
+        createScene: function(scene, camera, renderer){ 
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            this.material = new THREE.MeshBasicMaterial( { color: "#FF3F81" } );
+            this.cube = new THREE.Mesh( geometry, this.material );
+            scene.add(this.cube);                                  
         },
 
+        updateScene: function(scene, camera, renderer){
+            this.cube.rotation.x += 0.01;
+            this.cube.rotation.y += 0.01;
+        },
+
+        init: function(canvasElement) {
+            setupThreeJSScene(
+                canvasElement, 
+                this.createScene.bind(this),
+                this.updateScene.bind(this)
+            )
+        }, //init
+
         update: function(outputObject, canvasElement) {
-            var threeJS = canvasElement.data('threejs')        
-            threeJS.userData.cube.material = new THREE.ShaderMaterial(
+            this.cube.material = new THREE.ShaderMaterial(
             {
                 vertexShader:outputObject[0], 
                 fragmentShader:outputObject[1]
@@ -81,29 +85,28 @@ Add the following Code, to get a very basic D3 Sample. Your code must return a c
 which is used to display a simple circle.
 
 
-    {   init: function(canvasElement) {
+    {   canvas:null,
+        
+        init: function(canvasElement) {
             //get dimension of the container
             const w = canvasElement.width()
             const h = canvasElement.height()
 
             //create the canvas once
             var base = d3.select(canvasElement.get(0));
-            var canvas = base.append("svg")
+            this.canvas = base.append("svg")
                 .attr("width", w)
                 .attr("height", h);
             
             //store a reference to the canvas
-            canvasElement.data('svg', canvas)
+            canvasElement.data('svg', this.canvas)
 
             //hide the canvas when the question is first loaded
             canvasElement.addClass('hiddenBlock')
         }, //init
 
         update: function(outputObject, canvasElement) {
-            //load the canvas
-            const canvas = canvasElement.data('svg')        
-
-            canvas.append("circle")
+            this.canvas.append("circle")
                 .style("stroke", "gray")
                 .style("fill", outputObject.trim())
                 .attr("r", 40)
@@ -125,7 +128,7 @@ Alternativley you may use the built-in setup function to prepare a default D3 re
                 function(canvas){ //delegate that creates the actual content
                     canvas.append("circle")
                         .style("stroke", "gray")
-                        .style("fill", '#0000ff')
+                        .style("fill", '#ff00ff')
                         .attr("r", 10)
                         .attr("cx", 150)
                         .attr("cy", 70)
@@ -161,7 +164,10 @@ Add the following Code, to get a very basic ThreeJS Sample. Your code must retur
 which is used to change the color of a spinning cube.
 
 
-    {   init: function(canvasElement) {
+    {   
+        material: null,
+        
+        init: function(canvasElement) {
             //get dimension of the container
             const w = canvasElement.width()
             const h = canvasElement.height()
@@ -187,11 +193,8 @@ which is used to change the color of a spinning cube.
 
             // Create a Cube Mesh with basic material
             var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( { color: "#FF3F81" } );
-            var cube = new THREE.Mesh( geometry, material );
-            
-            //Store the Material
-            canvasElement.data('material', material)
+            this.material = new THREE.MeshBasicMaterial( { color: "#FF3F81" } );
+            var cube = new THREE.Mesh( geometry, this.material );            
 
             // Add cube to Scene
             scene.add( cube );
@@ -212,35 +215,39 @@ which is used to change the color of a spinning cube.
 
         update: function(outputObject, canvasElement) {
             //change color to the css-string generated by the program
-            var material = canvasElement.data('material')
-            material.color.set(outputObject.trim())
+            this.material.color.set(outputObject.trim())
         } // update
     }
 
 Alternativley you may use the built-in setup function to prepare a default ThreeJS rendering context:
 
 
-    {   init: function(canvasElement) {
+    {   
+        cube: null,
+        material: null,
+
+        createScene: function(scene, camera, renderer){ 
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            this.material = new THREE.MeshBasicMaterial( { color: "#FF3F81" } );
+            this.cube = new THREE.Mesh( geometry, this.material );
+            scene.add(this.cube);                                  
+        },
+
+        updateScene: function(scene, camera, renderer){
+            this.cube.rotation.x += 0.01;
+            this.cube.rotation.y += 0.01;
+        },
+
+        init: function(canvasElement) {
             setupThreeJSScene(
                 canvasElement, 
-                function(scene, camera, renderer){ //delegate that creates the actual scene. 
-                    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-                    var material = new THREE.MeshBasicMaterial( { color: "#FF3F81" } );
-                    var cube = new THREE.Mesh( geometry, material );
-                    scene.add(cube);
-                
-                    return {cube:cube, material:material}
-                },
-                function(scene, camera, renderer, userData){ //called in the render loop
-                    userData.cube.rotation.x += 0.01;
-                    userData.cube.rotation.y += 0.01;
-                }
+                this.createScene.bind(this),
+                this.updateScene.bind(this)
             )
         }, //init
 
         update: function(outputObject, canvasElement) {
-            var threeJS = canvasElement.data('threejs')
-            threeJS.userData.material.color.set(outputObject.trim())
+            this.material.color.set(outputObject.trim())
         } // update
     }
 
