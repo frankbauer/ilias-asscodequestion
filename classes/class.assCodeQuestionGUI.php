@@ -146,11 +146,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	
 		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
 
-		if (!$this->didPrepare) {
+		if (!$this->didPrepare) {			
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+					
 		}
 
 		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
@@ -167,6 +168,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addOnLoadCode('initD3();');
 			$this->tpl->didIncludeD3 = true;			
 		}
+
+		
 		
 		$this->didPrepare = true;
 	}
@@ -293,6 +296,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 			$tpl->setVariable("QUESTION_ID", $questionID);
+			$tpl->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
+			$tpl->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
 			$tpl->setVariable("LANGUAGE", $language);
 			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
 			$runCode = $tpl->get();			
@@ -838,6 +843,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 		$tpl->setVariable("QUESTION_ID", $this->object->getId());
 		$tpl->setVariable("LANGUAGE", 'codeqst_edit_mode');
+		$tpl->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
+		$tpl->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
 
 		$item = new ilCustomInputGUI(" ");
 		$item->setInfo(" ");
