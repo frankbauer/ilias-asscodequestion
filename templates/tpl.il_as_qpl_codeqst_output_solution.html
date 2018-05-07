@@ -8,20 +8,8 @@
 <br>
 {RUN_CODE_HTML}
 <script type="text/javascript">
-if (typeof displayResults === "undefined") {
+if (typeof calls === "undefined") {
     var calls = {}
-    var displayResults = function(outputObject, canvasElement, questionID, blockID){
-        if (!canvasElement || canvasElement.length==0) return;
-        canvasElement = $(canvasElement)
-        canvasElement.removeClass('hiddenBlock')
-        if (outputObject===undefined) {            
-            calls[questionID][blockID].init(canvasElement)
-        } else {
-            const result = calls[questionID][blockID].update(outputObject, canvasElement)
-            if (result!==undefined) outputObject = result
-        }
-        return outputObject
-    }
 }
 
 {CANVAS_SCRIPT}  

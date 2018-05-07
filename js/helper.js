@@ -344,6 +344,55 @@ function runJava(questionID, mypre=undefined, prog=undefined){
     runJavaWorker( prog, log, maxMS, questionID, finishedExecutionWithOutput);
 }
 
+function displayResults(
+        outputObject, 
+        canvasElement, 
+        questionID, 
+        blockID, 
+        initialOutput=undefined, 
+        parseError=undefined, 
+        obj=undefined){
+    if (obj===undefined && typeof calls !== 'undefined') {
+        obj = calls[questionID][blockID]
+    }
+
+    if (!canvasElement || canvasElement.length==0 || obj === undefined) return;
+
+    if (parseError!=null && typeof calls !== 'undefined'){
+        if (obj.onParseError) {
+            obj.onParseError(initialOutput, parseError)
+        }
+    }
+
+    canvasElement = $(canvasElement)
+    canvasElement.removeClass('hiddenBlock')
+    if (outputObject===undefined) {            
+        obj.init(canvasElement)
+    } else {
+        const result = obj.update(outputObject, canvasElement)
+        if (result!==undefined) outputObject = result
+    }
+    return outputObject
+}
+
+function cleanupCanvasBlockInQuestionEditor(questionID){
+    $("area[data-question="+questionID+"]").each(function(i, block) {
+        $(block).remove()
+    })
+
+    $("textarea[data-question="+questionID+"][data-blocktype=4]").each(function(i, block) {
+        //$html .= '<area id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></area>';	
+        const blocknr = block.getAttribute('data-blocknr')
+        const area = document.createElement('area')
+        area.setAttribute('data-question', questionID)
+        area.setAttribute('data-blocknr', blocknr)
+        area.className = 'assCodeQuestionCanvas'
+        area.setAttribute('id', 'block['+questionID+']['+blocknr+']')
+        area.setAttribute('data-src-id', block.id)
+        $(area).insertAfter(block)
+    })
+}
+
 /**
  * @function runInExam
  * This function is called by the input button 'Run' during the test. 
@@ -354,6 +403,11 @@ function runJava(questionID, mypre=undefined, prog=undefined){
  */
 function runInExam(language, questionID){   
     var prog = getTotalSourcecode(questionID);
+    const inQuestionEditMode = $('input#allow_run').length!==0
+    if (inQuestionEditMode){
+        cleanupCanvasBlockInQuestionEditor(questionID)
+    }
+
         
     var mypre = undefined;
     // This is necessary to intearctively change the language in the edit mode.
@@ -386,28 +440,42 @@ function runInSolution(language, questionID){
  * @param {*} output 
  */
 function finishedExecutionWithOutput(output, questionID){
-    if (typeof displayResults !== "function"){
-        //console.log('displayResults is not available here' );
-        return output;
+    const inQuestionEditMode = $('input#allow_run').length!==0    
+    var parseError = null
+    var initialOutput = output
+
+    if (output !== undefined){
+        //try to parse JSON
+        try {
+            output = JSON.parse(output)
+        } catch (e){
+            parseError = e;        
+        }
     }
 
-    //try to parse JSON
-    try {
-        output = JSON.parse(output)
-    } catch (e){}
-    
-
     if (maxCharacters>0 && (typeof output==='string')){
-        console.log('enforce max', maxCharacters);
+        //console.log('enforce max', maxCharacters);
         if (output.length > maxCharacters) {
             output = format_info('Info: Removed ' + (output.length-maxCharacters) + ' Characters. \n<b>...</b>') + output.substr(output.length-maxCharacters)
         }
     }
 
     $("area[data-question="+questionID+"]").each(function(i, block) {  
-        //console.log('output', output)
+        console.log('output', output, block, inQuestionEditMode)
         try {
-            output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
+            const blockID = block.getAttribute('data-blocknr')
+            
+            if (!inQuestionEditMode){
+                output = displayResults(output, block, questionID, blockID, initialOutput, parseError)
+            } else {
+                const src = document.getElementById(block.getAttribute('data-src-id'))
+                if (src) {
+                    const obj = eval( '(function(){ return '+src.value+'})()');
+                    displayResults(undefined, block, questionID, blockID, undefined, null, obj)
+                    output = displayResults(output, block, questionID, blockID, initialOutput, parseError, obj)
+                }
+                
+            }
         } catch (e){
             console.error(e);
         }
