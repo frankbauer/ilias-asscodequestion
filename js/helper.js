@@ -167,6 +167,7 @@ function updateLineNumbers(questionID){
 }
 
 function initEditor(block, questionID, useMode){
+    const inQuestionEditMode = $('input#allow_run').length!==0
     const type = block.getAttribute('data-blocktype');
     var editor = CodeMirror.fromTextArea(block, {
         lineNumbers: blockHasProgramCode(block) || blockIsCanvas(block), 
@@ -181,12 +182,25 @@ function initEditor(block, questionID, useMode){
         
     editor.on('change',function(cMirror){
         block.value = cMirror.getValue(); 
-    });           
+    })
+    
+    if (inQuestionEditMode) {
+        const buildIt = function (){
+            runInExam('codeqst_edit_mode',questionID)
+        }
+        
+        editor.addKeyMap({
+           "Cmd-B": function(cMirror) { buildIt() },
+            "Ctrl-B": function(cMirror) { buildIt() }
+        });
+    }
+
     editor.addKeyMap({
         "Tab": function(cMirror) {
             cMirror.execCommand("insertSoftTab");              
         }
     });
+
     editor.on('changes', function(cm) {
         updateLineNumbers(questionID)
         return CodeMirror.Pass;
