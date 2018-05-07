@@ -256,7 +256,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
 		if (empty($value)) return '';
 
-		$json = json_decode($value);				
+		$json = $this->object->decodeSolution($value);				
 		if (!empty($json)) $value = $json->$blockID;
 
 		$value = ilUtil::prepareFormOutput($value);
@@ -292,15 +292,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	private function createRunHTMLCode($language, $questionID){
 		$runCode = "";
+		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
+		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
+		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
+		$runCode = $tplPrep->get();	
+
 		if ($this->object->getAllowRun()) {
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-			$tpl->setVariable("QUESTION_ID", $questionID);
-			$tpl->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-			$tpl->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
+			$tpl->setVariable("QUESTION_ID", $questionID);			
 			$tpl->setVariable("LANGUAGE", $language);
 			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
-			$runCode = $tpl->get();			
+			$runCode += $tpl->get();			
 		}
 		return $runCode;
 	}
@@ -841,6 +844,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		//$this->prepareTemplate();
 		$language = $this->getLanguage();	
+		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
+		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
+		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
+		$runCode = $tplPrep->get();	
+
 		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
 		$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 		$tpl->setVariable("QUESTION_ID", $this->object->getId());
@@ -850,7 +858,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$item = new ilCustomInputGUI(" ");
 		$item->setInfo(" ");
-		$item->setHTML($tpl->get());
+		$item->setHTML($tplPrep->get() + $tpl->get());
 
 		$form->addItem($item);
 
