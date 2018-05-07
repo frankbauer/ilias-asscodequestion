@@ -391,14 +391,20 @@ function finishedExecutionWithOutput(output, questionID){
         return output;
     }
 
-    //try to parse JSON
-    try {
-        output = JSON.parse(output)
-    } catch (e){}
-    
+    var parseError = null
+    var initialOutput = output
+
+    if (output !== undefined){
+        //try to parse JSON
+        try {
+            output = JSON.parse(output)
+        } catch (e){
+            parseError = e;        
+        }
+    }
 
     if (maxCharacters>0 && (typeof output==='string')){
-        console.log('enforce max', maxCharacters);
+        //console.log('enforce max', maxCharacters);
         if (output.length > maxCharacters) {
             output = format_info('Info: Removed ' + (output.length-maxCharacters) + ' Characters. \n<b>...</b>') + output.substr(output.length-maxCharacters)
         }
@@ -407,7 +413,13 @@ function finishedExecutionWithOutput(output, questionID){
     $("area[data-question="+questionID+"]").each(function(i, block) {  
         //console.log('output', output)
         try {
-            output = displayResults(output, block, questionID, block.getAttribute('data-blocknr'))        
+            const blockID = block.getAttribute('data-blocknr')
+            if (parseError!=null && typeof calls !== 'undefined'){
+                if (calls[questionID][blockID] && calls[questionID][blockID].onParseError) {
+                    calls[questionID][blockID].onParseError(initialOutput, parseError)
+                }
+            }
+            output = displayResults(output, block, questionID, blockID)        
         } catch (e){
             console.error(e);
         }
