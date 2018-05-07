@@ -426,6 +426,21 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		parent::syncWithOriginal();
 	}
 
+	/**
+	 * Used to generate a token for each solution. 
+	 * We will use this when talking to a solution as a salt.
+	 */
+	private function guidv4()
+	{
+		if (function_exists('com_create_guid') === true)
+			return trim(com_create_guid(), '{}');
+
+		$data = openssl_random_pseudo_bytes(16);
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+	}
+
 
 	/**
 	 * Get a submitted solution array from $_POST
@@ -441,6 +456,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	protected function getSolutionSubmit()
 	{		
 		$data = $_POST['block'][$this->getId()];
+		//$result = array('token'=>$this->guidv4());
 		$result = array();
 		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
 			if ($this->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
@@ -884,12 +900,25 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return NULL;
 	}
 
+	public function decodeSolution($value){
+		$res = json_decode($value);
+		if (is_array($res)){
+			$alt = new \stdClass();
+			foreach ($res as $i=>$val){
+				$alt->$i = $val;
+			}
+			
+			return $alt;
+		}
+		return $res;
+	}
+
 	public function getCompleteSource($solution){	
 		if(is_null($solution)){
 			$solution = array('value1'=>array());
 		}
 
-		$studentCode = json_decode($solution['value1']);
+		$studentCode = $this->decodeSolution($solution['value1']);
 	
 		$res = '';
 		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){

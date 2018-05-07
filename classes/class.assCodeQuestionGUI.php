@@ -256,7 +256,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
 		if (empty($value)) return '';
 
-		$json = json_decode($value);				
+		$json = $this->object->decodeSolution($value);				
 		if (!empty($json)) $value = $json->$blockID;
 
 		$value = ilUtil::prepareFormOutput($value);
