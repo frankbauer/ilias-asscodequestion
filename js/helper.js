@@ -478,7 +478,7 @@ function finishedExecutionWithOutput(output, questionID){
     }
 
     $("area[data-question="+questionID+"]").each(function(i, block) {  
-        console.log('output', output, block, inQuestionEditMode)
+        //console.log('output', output, block, inQuestionEditMode)
         try {
             const blockID = block.getAttribute('data-blocknr')
             
