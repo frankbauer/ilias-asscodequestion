@@ -20,13 +20,15 @@ self.addEventListener('message', function (e) {
         case 'run':
             JavaExec.initialize(function () {
                 console.log("Initializing Filesystem", JavaExec.persistentFs);
-                JavaExec.initFileSystems('../', function () {
+                JavaExec.initFileSystems('../', data.forceReload, function () {
                     JavaExec.reroutStdStreams();
                     JavaExec.ready = true;
                     JavaExec.compileAndRun(data.code, data.className, data.max_ms, function (stdout, stderr) {
                         self.postMessage({ event: 'finished', stderr: stderr, stdout: stdout })
                     }, function () {
                         self.postMessage({ event: 'startTimer' })
+                    }, function (err){                        
+                        self.postMessage({event:'cleanCache'})                                                
                     })
                 })
             })
@@ -34,6 +36,7 @@ self.addEventListener('message', function (e) {
             break
         case 'kill':
             if (JavaExec.terminate()) {
+                console.log("Received kill command", JavaExec.terminate)
                 JavaExec.terminate()
                 self.postMessage({ event: 'finished', stderr: "Terminated Execution after timeout", stdout: JavaExec.combinedStream })
             }
