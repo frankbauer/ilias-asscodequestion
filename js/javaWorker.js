@@ -35,8 +35,8 @@ self.addEventListener('message', function (e) {
 
             break
         case 'kill':
-            if (JavaExec.terminate()) {
-                console.log("Received kill command", JavaExec.terminate)
+            console.log("Received kill command", JavaExec.terminate)                
+            if (JavaExec.terminate) {
                 JavaExec.terminate()
                 self.postMessage({ event: 'finished', stderr: "Terminated Execution after timeout", stdout: JavaExec.combinedStream })
             }
