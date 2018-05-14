@@ -19,7 +19,7 @@ self.addEventListener('message', function (e) {
     switch (data.cmd) {
         case 'run':
             JavaExec.initialize(function () {
-                console.log("Initializing Filesystem", JavaExec.persistentFs);
+                console.log("Initializing Filesystem");
                 JavaExec.initFileSystems('../', data.forceReload, function () {
                     JavaExec.reroutStdStreams();
                     JavaExec.ready = true;
