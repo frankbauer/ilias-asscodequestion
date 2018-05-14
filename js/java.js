@@ -48,6 +48,14 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
         timer = setTimeout(function (e) {
           console.log("Sending kill command")
           worker.postMessage({ cmd: 'kill' })
+          timer = setTimeout(function(){
+            console.log("Terminating Worker")
+            worker.terminate()            
+          }, 5000);
+          log_callback(format_error("Terminated long running Process (>"+Math.round((max_ms + javaRunOverhead)/1000)+"s)."))
+            JavaExec.setRunButton(true, 'run')
+            JavaExec.setRunButton(true)
+            JavaExec.showMessage(null)
         }, max_ms + javaRunOverhead) //we need about 4000ms to spin up the execution unit
         break
 
