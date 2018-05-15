@@ -4,7 +4,7 @@
  * @type {int} javaRunOverhead execution overhead in ms
  */
 var javaRunOverhead = 4000;
-function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb) {
+function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb, forceReload=false) {
   function format_info(text) {
     return '<span style="color:green">' + text + '</span>';
   }
@@ -25,6 +25,7 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
 
   let worker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/javaWorker.js');
   let timer = null
+
   worker.addEventListener('message', function (e) {
     const data = e.data
     //console.log(data)
@@ -47,6 +48,14 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
         timer = setTimeout(function (e) {
           console.log("Sending kill command")
           worker.postMessage({ cmd: 'kill' })
+          timer = setTimeout(function(){
+            console.log("Terminating Worker")
+            worker.terminate()            
+          }, 5000);
+          log_callback(format_error("Terminated long running Process (>"+Math.round((max_ms + javaRunOverhead)/1000)+"s)."))
+            JavaExec.setRunButton(true, 'run')
+            JavaExec.setRunButton(true)
+            JavaExec.showMessage(null)
         }, max_ms + javaRunOverhead) //we need about 4000ms to spin up the execution unit
         break
 
@@ -59,18 +68,32 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
         //console.log("setRunButton", data)
         JavaExec.setRunButton(data.enabled, data.info)
         break
+
+      case 'cleanCache':
+        log_callback('')
+        if (!forceReload) {
+          worker.postMessage({ cmd: 'kill' })
+          console.log("Restarting...")
+          setTimeout(function(){
+            runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb, true)
+          }, 500)
+        } else {
+          JavaExec.setRunButton(false)
+          JavaExec.showMessage("Failed to initialize JVM.")
+        }
+        break
     }
 
 
   }, false);
 
-  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms+1000, questionID:questionID })
+  worker.postMessage({ cmd: 'run', code: code, className: className, max_ms: max_ms+1000, questionID:questionID, forceReload:forceReload })
 }
 
 (function () {
   JavaExec.initialize(function () {
-    console.log("Initializing Filesystem", JavaExec.persistentFs);
-    JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', function () {
+    console.log("Initializing Filesystem");
+    JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', false, function () {
       //JavaExec.printDirContent('sys/vendor');      
 
       JavaExec.reroutStdStreams();

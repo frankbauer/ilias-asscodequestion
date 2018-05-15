@@ -52,7 +52,7 @@ var JavaExec = {
     //options.bootstrapClasspath.push("/sys/classes/"); 
     options.classpath = ["/tmp", "/sys/classes"];
     options.nativeClasspath = ["/sys/natives"];
-    console.log("options", options);
+    //console.log("options", options);
 
     JavaExec.options = options;
 
@@ -248,7 +248,7 @@ var JavaExec = {
   /**
    * Load All files listed in listings.js in the doppio folder
    */
-  loadFiles: function (targetFolder, sourceFolder, callWhenFinished) {
+  loadFiles: function (targetFolder, sourceFolder, forceReload, callWhenFinished) {
     let files = [];
 
     let process = function (object, base, ) {
@@ -356,7 +356,7 @@ var JavaExec = {
       JavaExec.fs.exists(infoFilename, function (exists) {
         let clearAll = false;
         //file does not exist => restart entire upload
-        if (!exists) { console.log("new"); prepAndStartDownloads(true); }
+        if (!exists || forceReload) { console.log("rebuilding JVM"); prepAndStartDownloads(true); }
         else {
           JavaExec.fs.readFile(infoFilename, function (err, infoBuffer) {
             try {
@@ -377,7 +377,7 @@ var JavaExec = {
   /**
    * First download all files from the java home, then set up the runtime filesystem in the browser
    */
-  initFileSystems: function (baseFolder, cb) {
+  initFileSystems: function (baseFolder, forceReload, cb) {
     var fs = BrowserFS.BFSRequire('fs');
     JavaExec.fs = fs;
 
@@ -385,7 +385,7 @@ var JavaExec = {
     mfs.mount('/persist', JavaExec.persistentFs);
     BrowserFS.initialize(mfs);
 
-    JavaExec.loadFiles('/persist', baseFolder + '/js/doppio', function () {
+    JavaExec.loadFiles('/persist', baseFolder + '/js/doppio', forceReload, function () {
       JavaExec._initFileSystem(baseFolder)
       cb()
     });
@@ -486,7 +486,7 @@ var JavaExec = {
 
   
   _compileAndRunClass: null,
-  compileAndRun: function (code, className, max_ms, whenFinished, beforeExecuting) {
+  compileAndRun: function (code, className, max_ms, whenFinished, beforeExecuting, onCacheFail) {
     if (!className || !code) {
         console.error("Nothing to do");
         return
@@ -521,7 +521,20 @@ var JavaExec = {
       JavaExec._whenReady(function () {
         new Doppio.VM.JVM(JavaExec.options, function (err, jvmObject) {
           //console.log("jvm", err, jvmObject);
-       
+          if (err){
+            JavaExec.terminate = null;
+            console.log("Error Initializing JVM:", err);
+            JavaExec.setRunButton(true, 'run')
+            JavaExec.setRunButton(false)
+            JavaExec.cacheFail = true
+            console.timeEnd('javac');
+            console.timeEnd('run');
+            JavaExec.showMessage("Error initializing JVM, rebuilding...");
+                        
+            JavaExec.running = false;               
+            onCacheFail(err);      
+            return;
+          }
           let _compileAndRunWithClass = function (cls) {
             var cdataStatics =  cls.getConstructor(jvmObject.firstThread);
             //console.log("cdataStatics?", cdataStatics, jvmObject, Doppio)
