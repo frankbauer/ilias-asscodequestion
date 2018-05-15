@@ -173,7 +173,8 @@ function initEditor(block, questionID, useMode){
         lineNumbers: blockHasProgramCode(block) || blockIsCanvas(block), 
         mode:useMode,
         theme:"solarized light",
-        tabSize: 2,
+        tabSize: 4,
+        indentUnit: 4,
         autoCloseBrackets: true,
         firstLineNumber: 1 
     }); 
