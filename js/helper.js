@@ -394,14 +394,14 @@ function displayResults(
 }
 
 function cleanupCanvasBlockInQuestionEditor(questionID){
-    $("area[data-question="+questionID+"]").each(function(i, block) {
+    $("playground[data-question="+questionID+"]").each(function(i, block) {
         $(block).remove()
     })
 
     $("textarea[data-question="+questionID+"][data-blocktype=4]").each(function(i, block) {
-        //$html .= '<area id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></area>';	
+        //$html .= '<playground id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></playground>';	
         const blocknr = block.getAttribute('data-blocknr')
-        const area = document.createElement('area')
+        const area = document.createElement('playground')
         area.setAttribute('data-question', questionID)
         area.setAttribute('data-blocknr', blocknr)
         area.className = 'assCodeQuestionCanvas'
@@ -478,7 +478,7 @@ function finishedExecutionWithOutput(output, questionID){
         }
     }
 
-    $("area[data-question="+questionID+"]").each(function(i, block) {  
+    $("playground[data-question="+questionID+"]").each(function(i, block) {  
         //console.log('output', output, block, inQuestionEditMode)
         try {
             const blockID = block.getAttribute('data-blocknr')
