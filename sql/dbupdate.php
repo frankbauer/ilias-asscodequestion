@@ -28,10 +28,8 @@ if ($res->numRows() == 0)
 	 * Add table for additional settings
 	 *
 	 */
-
-	$val = $ilDB->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'il_qpl_qst_codeqst_dat'");
-	
-	if ($val->numRows() == 0) {
+    if(!$ilDB->tableExists('il_qpl_qst_codeqst_dat'))
+    {
 		$fields = array(
 			'question_fi' => array(
 				'type' => 'integer',
@@ -39,12 +37,12 @@ if ($res->numRows() == 0)
 			),
 
 			'data' => array(
-			'type' => 'clob'
+				'type' => 'clob'
 			)
 		);
 
 		$ilDB->createTable("il_qpl_qst_codeqst_dat", $fields);
 		$ilDB->addPrimaryKey("il_qpl_qst_codeqst_dat", array("question_fi"));
-	}
-	
+
+    }
 ?>
