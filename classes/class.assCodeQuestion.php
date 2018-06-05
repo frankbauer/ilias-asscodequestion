@@ -915,7 +915,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	private function createCommentedCodeLine($str){
 		$language = $this->getLanguage();
-		$language = $this->getLanguage();
 		if ($language=='python' || $language=='perl' || $language=='ruby' || $language=='r') return '# '.$str;
 		if ($language=='fortran') return 'c '.$str;				
 
