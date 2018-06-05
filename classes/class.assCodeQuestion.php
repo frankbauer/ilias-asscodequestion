@@ -913,10 +913,33 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return $res;
 	}
 
+	private function createCommentedCodeLine($str){
+		$language = $this->getLanguage();
+		$language = $this->getLanguage();
+		if ($language=='python' || $language=='perl' || $language=='ruby' || $language=='r') return '# '.$str;
+		if ($language=='fortran') return 'c '.$str;				
+
+		return '// '.$str;
+	}
+
 	public function getCompleteSource($solution){	
-		if(is_null($solution)){
-			$solution = array('value1'=>array());
+		//in StudOn we sometimes have solutions without any data, 
+		//create a skleton solution that contains a special type of line comment
+		if(is_null($solution)){	
+			$res = '';
+			for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+				$t = $this->getTypeForBlock($i);
+				if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+					if ($res != '') {
+						$res .= ', ';
+					}
+					$res .= '"'.$i.'":"'.$this->createCommentedCodeLine('Student had a null answer!').'"';
+				}
+			}		
+			$res = '{'.$res.'}';
+			$solution = array('value1'=>$res);
 		}
+		
 
 		$studentCode = $this->decodeSolution($solution['value1']);
 	
