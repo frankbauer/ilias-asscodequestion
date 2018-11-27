@@ -13,6 +13,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoring
  * @ingroup ModulesTestQuestionPool
  *
  * @ilctrl_iscalledby assCodeQuestionGUI: ilObjQuestionPoolGUI, ilObjTestGUI, ilQuestionEditGUI, ilTestExpressPageObjectGUI
+ * @ilCtrl_Calls assCodeQuestionGUI: ilFormPropertyDispatchGUI
  */
 class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
