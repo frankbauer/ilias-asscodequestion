@@ -251,7 +251,7 @@ var JavaExec = {
   loadFiles: function (targetFolder, sourceFolder, forceReload, callWhenFinished) {
     let files = [];
 
-    let process = function (object, base, ) {
+    let process = function (object, base) {
       for (var key in object) {
         let val = object[key]
         let name = base + '/' + key;
