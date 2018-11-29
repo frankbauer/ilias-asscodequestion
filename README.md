@@ -2,11 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.3
+**Version**:  1.1.4
 
 **Company**:  Computer Graphics Group Erlangen
 
-**Supports**: ILIAS 5.1 - 5.2
+**Supports**: ILIAS 5.1 - 5.3
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -261,6 +261,9 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.4
+* fix controller error in question editor when taxomonies are used
+
 ### Version 1.1.3
 * canvas-element code needs to return an object containing at least the following methods `init(canvasElement)` and `update(outputObject, canvasElement)`. The later can return a string that is presented to the student as the result.
 
