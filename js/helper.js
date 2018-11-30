@@ -461,11 +461,13 @@ function finishedExecutionWithOutput(output, questionID){
     const inQuestionEditMode = $('input#allow_run').length!==0    
     var parseError = null
     var initialOutput = output
+    let plygrounds = $("playground[data-question="+questionID+"]");    
 
-    if (output !== undefined){
+    if (output !== undefined && plygrounds.length>0){
         //try to parse JSON
         try {
             output = JSON.parse(output)
+            console.log(output);
         } catch (e){
             parseError = e;        
         }
@@ -477,8 +479,8 @@ function finishedExecutionWithOutput(output, questionID){
             output = format_info('Info: Removed ' + (output.length-maxCharacters) + ' Characters. \n<b>...</b>') + output.substr(output.length-maxCharacters)
         }
     }
-
-    $("playground[data-question="+questionID+"]").each(function(i, block) {  
+    
+    plygrounds.each(function(i, block) {  
         //console.log('output', output, block, inQuestionEditMode)
         try {
             const blockID = block.getAttribute('data-blocknr')
