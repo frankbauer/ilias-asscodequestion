@@ -463,11 +463,15 @@ function finishedExecutionWithOutput(output, questionID){
     var initialOutput = output
     let plygrounds = $("playground[data-question="+questionID+"]");    
 
-    if (output !== undefined && plygrounds.length>0){
+    if (output !== undefined && plygrounds.length>0){        
         //try to parse JSON
         try {
-            output = JSON.parse(output)
-            console.log(output);
+            if (output.indexOf('[')!=-1 || output.indexOf('{')!=-1) {
+                output = JSON.parse(output)
+                console.log(output);
+            } else {
+                console.log("Output did neither contain an array nor object.");
+            }
         } catch (e){
             parseError = e;        
         }
