@@ -467,8 +467,7 @@ function finishedExecutionWithOutput(output, questionID){
         //try to parse JSON
         try {
             if (output.indexOf('[')!=-1 || output.indexOf('{')!=-1) {
-                output = JSON.parse(output)
-                console.log(output);
+                output = JSON.parse(output);
             } else {
                 console.log("Output did neither contain an array nor object.");
             }
