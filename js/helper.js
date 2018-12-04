@@ -1,5 +1,6 @@
 var lastCodeMirrorInstance = []
-
+var SEVERITY_ERROR = 2;
+var SEVERITY_WARNING = 1;
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -34,7 +35,7 @@ $(document).ready(function(){
     setTimeout(function() {
         $.each(editors, function(i, e){            
             e.refresh();
-        })
+        });
     }, 500);    
 });
 
@@ -195,7 +196,8 @@ function initEditor(block, questionID, useMode){
         tabSize: 4,
         indentUnit: 4,
         autoCloseBrackets: true,
-        firstLineNumber: 1 
+        firstLineNumber: 1,
+        gutters: ["diagnostics", "CodeMirror-linenumbers"]
     }); 
     
     if (editor.display.input.textarea)  {
@@ -351,7 +353,7 @@ function getTotalSourcecode(questionID){
  * @param {int} maxRuntime time in ms the app is allowed to run
  * @param {function(text)} logCallback called whenever the app writes to stdout. 
  * @param {function(text)} errCallback called whenever the app writes to stderr. 
- * @param {function(error, questionID)} compileErrorCallback called whenever a compiletime error occurs. 
+ * @param {function(error)} compileErrorCallback called whenever a compiletime error occurs. 
  * @param {function()} finishCallback called when execution finished. 
  */
 function runDummy(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {    
@@ -510,7 +512,12 @@ function runInExam(language, questionID){
         outdiv.innerHTML += format_error(text); 
     } 
 
-    plugin.run(questionID, prog, mypre, maxMS, log, info, err, undefined, function(){
+    clearDiagnostics(questionID);
+    gutterSeverity = [];
+    gutterElements = [];
+    plugin.run(questionID, prog, mypre, maxMS, log, info, err, function(error){
+        processDiagnostics(error, questionID, gutterElements, gutterSeverity)    
+    }, function(){
         waitdiv.innerHTML = '';        
         return finishedExecution(output, sansoutput, questionID, outdiv);
     });
@@ -926,6 +933,80 @@ function setupD3Scene( canvasElement, createSceneCallback, type='svg'){
         canvas:canvas
     })
 }
+function clearDiagnostics(questionID){
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return;
+        if (!blockHasProgramCode(block)) return;
+        const editor = editors[block.id]; 
+        
+        editor.getDoc().clearGutter('diagnostics');
+        var allMarks = editor.getDoc().getAllMarks();
+        $.each(allMarks, function(idx, e){            
+            e.clear();
+        })
+    });
+}
+function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
+    console.log(questionID, error);
+    var line = error.start.line;
+    
+    if (gutterSeverity[line]===undefined || gutterSeverity[line] < error.severity) {
+        gutterSeverity[line] = error.severity;
+    }
+    var gutterClassName = '';
+    switch (gutterSeverity[line]) {
+        case SEVERITY_ERROR:
+            gutterClassName = "exclamation-sign gutter-error";
+            break;
+        case SEVERITY_WARNING:
+            gutterClassName = "warning-sign gutter-warning";
+            break;
+        default:
+        console.log("severity", gutterSeverity[line]);
+            return;
+    }
+
+    var element = gutterElements[line];
+    if (element == null) {
+        element = document.createElement("span");
+        gutterElements[line] = element;
+    }
+    element.className = "glyphicon glyphicon-" + gutterClassName;
+
+    var title = element.title;
+    title = title!='' ? title + "\n" + error.message : error.message;
+    element.title = title;    
+
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return;
+        if (!blockHasProgramCode(block)) return;
+        const editor = editors[block.id];  
+
+        if (editor) {
+            var first = editor.getOption('firstLineNumber');
+            var last = first + block.value.split(/\r\n|\r|\n/).length - 1;
+            if (error.start.line >= first && error.start.line <= last) {
+                editor.getDoc().markText(
+                    {line:error.start.line-first + 1, ch:error.start.column}, 
+                    {line:error.end.line-first + 1, ch:error.end.column}, 
+                    {
+                        className:'red-wave',
+                        inclusiveLeft:true,
+                        inclusiveRight:true                
+                    }
+                );
+
+                var info = editor.getDoc().lineInfo(error.start.line-first + 1);
+                editor.getDoc().setGutterMarker(error.start.line-first + 1, "diagnostics", element);
+            }
+            console.log("editor from",first,"to",last);
+        } else {
+         
+        }
+    });
+}
+
+
 function hideGlobalState(){
     displayGlobalState(null);
 }

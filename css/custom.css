@@ -74,3 +74,20 @@ hl {
     padding-left:4px!important;
     padding-right:4px!important;
 }
+
+.red-wave {
+    background: url("red-wave.png") repeat-x;
+    background-position-y: bottom;
+}
+
+.yellow-wave {
+    background: url("yellow-wave.png") repeat-x;
+    background-position-y: bottom;
+}
+
+.gutter-error {
+    color: red;
+}
+.gutter-warning {
+    color: #b8a600;
+}

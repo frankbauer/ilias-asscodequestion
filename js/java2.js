@@ -1,6 +1,6 @@
 var teaworker;
 var isReady = false;
-
+var isRunning = false;
 
 function createTeaWorker(questionID, whenReady){
     if (teaworker === undefined) {
@@ -36,12 +36,17 @@ function createTeaWorker(questionID, whenReady){
     return false;
 }
 
-function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate=true) { 
+function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate=true) {
+    if (isRunning) {
+        err_callback("System is busy. Please wait until compilation finishes or call a tutor.");
+        return;
+    } 
+    isRunning = true;
     if (runCreate){
         if (createTeaWorker(questionID, function(){
+            isRunning = false;
             runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, false);
         })){
-            finishedExecutionCB();
             return;
         } 
     }
@@ -51,6 +56,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
         return;
     }  
 
+    
     var mainClass = 'Unknown';
     let regexpMainClass = /(['"])(?:[^"'\\]+|(?!\1)["']|\\{2}|\\[\s\S])*\1|public\s*?class\s*?([a-zA-Z_$0-9]*?)\s*?(\{|implements|extends)/gm
     while (match = regexpMainClass.exec(code)) {
@@ -74,17 +80,20 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                 }
             } else if (e.data.command == 'compiler-diagnostic') {
                 if (compileFailedCallback){
-                    compileFailedCallback();
+                    compileFailedCallback({
+                        message:e.data.message,
+                        start:{line:e.data.startLineNumber, column:e.data.startColumn},
+                        end:{line:e.data.endLineNumber, column:e.data.endColumn},
+                        severity:e.data.kind=='ERROR' ? SEVERITY_ERROR : SEVERITY_WARNING
+                    });
+                } 
+
+                msg = e.data.humanReadable + "\n";
+                if (e.data.kind == 'ERROR') {
+                    err_callback(msg);
                 } else {
-                    msg = e.data.message.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
-                        return '&#'+i.charCodeAt(0)+';';
-                     }) + " (in " + e.data.object.name + " " + e.data.lineNumber + ":" + e.data.columnNumber + ")\n";
-                    if (e.data.kind == 'ERROR') {
-                        err_callback(msg);
-                    } else {
-                        info_callback(msg);
-                    }
-                }
+                    info_callback(msg);
+                }                
             } else if (e.data.command == 'compilation-complete') {            
                 teaworker.removeEventListener('message', myListener);
 
@@ -92,6 +101,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     hideGlobalState();  
                     finishedExecutionCB(); 
                     setAllRunButtons(true);
+                    isRunning = false;
                 } else {
                     displayGlobalState("Executing <b>"+mainClass+"</b>");
                     var workerrun = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/workerrun.js');
@@ -102,6 +112,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                             hideGlobalState();  
                             finishedExecutionCB(); 
                             setAllRunButtons(true);
+                            isRunning = false;
                         } else if (ee.data.command == 'stdout') {
                             log_callback(ee.data.line);
                         } else if (ee.data.command == 'stderr') {
