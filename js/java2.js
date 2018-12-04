@@ -1,7 +1,7 @@
 var teaworker;
 var isReady = false;
 var isRunning = false;
-
+var teaVMRunOverhead = 4000;
 function createTeaWorker(questionID, whenReady){
     if (teaworker === undefined) {
         setAllRunButtons(false);
@@ -37,6 +37,9 @@ function createTeaWorker(questionID, whenReady){
 }
 
 function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate=true) {
+    var start = Date.now();
+    var executionFinished = false;    
+
     if (isRunning) {
         err_callback("System is busy. Please wait until compilation finishes or call a tutor.");
         return;
@@ -90,16 +93,16 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
                 msg = e.data.humanReadable + "\n";
                 if (e.data.kind == 'ERROR') {
-                    err_callback(msg);
+                    err_callback(msg+"\n");
                 } else {
-                    info_callback(msg);
+                    info_callback(msg+"\n");
                 }                
             } else if (e.data.command == 'compilation-complete') {            
                 teaworker.removeEventListener('message', myListener);
 
                 if (e.data.status == 'errors') {
                     hideGlobalState();  
-                    finishedExecutionCB(); 
+                    finishedExecutionCB(false); 
                     setAllRunButtons(true);
                     isRunning = false;
                 } else {
@@ -112,11 +115,13 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                             hideGlobalState();  
                             finishedExecutionCB(); 
                             setAllRunButtons(true);
+                            info_callback("Info: Execution finished in " + (Date.now() - start) + " ms\n");
+                            executionFinished = true;
                             isRunning = false;
                         } else if (ee.data.command == 'stdout') {
-                            log_callback(ee.data.line);
+                            log_callback(ee.data.line+"\n");
                         } else if (ee.data.command == 'stderr') {
-                            err_callback(ee.data.line);
+                            err_callback(ee.data.line+"\n");
                         }
                     });
         
@@ -124,7 +129,26 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                       command:'run',
                       id:''+questionID,
                       code: e.data.script
-                    });  
+                    }); 
+                    
+                    workerrun.end = function(msg){
+                        if(executionFinished) return;
+                        workerrun.terminate();
+                        hideGlobalState();  
+                        finishedExecutionCB(false); 
+                        setAllRunButtons(true);
+                        executionFinished = true;
+                        if(msg) err_callback( msg + "\n");
+                    };
+
+                    var testTimeout = function(){    
+                        var time = Date.now()-start;
+                        if(time > max_ms){
+                            workerrun.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");
+                        }
+                    }
+
+                    setTimeout( testTimeout, max_ms );
                 }
             }
         }

@@ -354,7 +354,7 @@ function getTotalSourcecode(questionID){
  * @param {function(text)} logCallback called whenever the app writes to stdout. 
  * @param {function(text)} errCallback called whenever the app writes to stderr. 
  * @param {function(error)} compileErrorCallback called whenever a compiletime error occurs. 
- * @param {function()} finishCallback called when execution finished. 
+ * @param {function(success)} finishCallback called when execution finished. 
  */
 function runDummy(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {    
     if (finishCallback) {
@@ -517,8 +517,9 @@ function runInExam(language, questionID){
     gutterElements = [];
     plugin.run(questionID, prog, mypre, maxMS, log, info, err, function(error){
         processDiagnostics(error, questionID, gutterElements, gutterSeverity)    
-    }, function(){
-        waitdiv.innerHTML = '';        
+    }, function(success=true){
+        waitdiv.innerHTML = '';  
+        if (!success) return undefined;      
         return finishedExecution(output, sansoutput, questionID, outdiv);
     });
     /*switch(language){
