@@ -83,15 +83,20 @@ function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callb
 }
 
 (function () {
-  JavaExec.initialize(function () {
-    console.log("Initializing Filesystem");
-    JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', false, function () {
-      //JavaExec.printDirContent('sys/vendor');      
+  try {  
+    JavaExec.initialize(function () {
+      console.log("Initializing Filesystem");
+      JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', false, function () {
+        //JavaExec.printDirContent('sys/vendor');      
 
-      JavaExec.reroutStdStreams();
-      JavaExec.ready = true;
+        JavaExec.reroutStdStreams();
+        JavaExec.ready = true;
+      });
     });
-  });
+    registerLanguage('java', runJavaWorker);
+  } catch (e) {
+    registerLanguage('java', runDummy);
+  }
 
-  registerLanguage('java', runJavaWorker);
+  
 })();

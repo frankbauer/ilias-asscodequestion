@@ -13,11 +13,19 @@ function format_error(text){
 }
 
 var $executables = {};
-function registerLanguage(name, fktRun) {
+/**
+ * 
+ * @param {*} name The language name in our plugin system
+ * @param {*} fktRun the runFunction (see runDummy)
+ * @param {*} languageStyle The language name for our highlighters
+ */
+function registerLanguage(name, fktRun, languageStyle=undefined) {
+    if (languageStyle===undefined) languageStyle = name
     console.log("[registered new language: " + name + "]");
     $executables[name] = {
         name: name,
-        run: fktRun
+        run: fktRun,
+        style: languageStyle
     };
 }
 
@@ -473,7 +481,7 @@ function runInExam(language, questionID){
         language = $('select#source_lang').val();
     }
 
-    let plugin = $executables[language] || {name:language, run:runDummy};
+    let plugin = $executables[language] || {name:language, run:runDummy, style:language};
 
     var output = '';
     var sansoutput = '';
@@ -917,5 +925,38 @@ function setupD3Scene( canvasElement, createSceneCallback, type='svg'){
         canvas:canvas
     })
 }
+function hideGlobalState(){
+    displayGlobalState(null);
+}
+function displayGlobalState(msg) {
+    let waitBoxes = document.querySelectorAll("#stateBox");
+    let infoBoxes = document.querySelectorAll("#stateMessageBox");
+    //console.log(msg, waitBoxes, infoBoxes)    
+    for (let nr in infoBoxes) {
+      let box = infoBoxes[nr];
+      if (box.id) {
+        box.innerHTML = msg;
+      }
+    }
+    for (let nr in waitBoxes) {
+      let box = waitBoxes[nr];
+      if (box.style) {
+        box.style.display = msg === null ? "none" : "inline-block";
+      }
+    }
+}
+
+function setAllRunButtons(enabled, info=undefined){
+    $('[type=button][data-question]').each(function(i, runButton){
+      if (enabled){
+        if (runButton.getAttribute('data-info') != info)
+          return
+      }
+      runButton.disabled = !enabled;
+      if (info)
+        if (enabled) runButton.removeAttribute('data-info')
+        else runButton.setAttribute('data-info', info);
+    })    
+ };
 
 //@ sourceURL=helper.js

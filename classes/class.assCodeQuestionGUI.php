@@ -135,22 +135,19 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
 
 
-			if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
+			if ($lngData['org'] == "java") {
 				if (!$this->tpl->hasJava){
-					$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
-					$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
-					$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
-					$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-					$this->tpl->hasJava = true;
+					if ($this->object->getAllowRun()){
+						$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+						$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+						$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+						$this->tpl->hasJava = true;
+					}										
 				}
 			}
-
-			if ($lngData['org'] == "javascript" && $this->object->getAllowRun()) {
-				if (!$this->tpl->hasJavaScript){
-					$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');
-					$this->tpl->hasJavaScript = true;
-				}
-			}
+			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
 
 			$this->tpl->didPrepare = true;
 		}		
@@ -591,7 +588,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>';
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>';
 
 				$this->didAddLinksToSolutions = true;
 
