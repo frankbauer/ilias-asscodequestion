@@ -494,7 +494,7 @@ function runInExam(language, questionID){
         output += text;
         if (!didClip) {
             if (maxCharacters>0 && output.length > maxCharacters) {
-                outdiv.innerHTML += format_info('Info: Output too long. Removed some Characters. \n<b>...</b>');
+                outdiv.innerHTML += format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
                 didClip = true;
             } else {
                 outdiv.innerText += text;
