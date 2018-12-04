@@ -145,6 +145,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				}
 			}
 
+			if ($lngData['org'] == "javascript" && $this->object->getAllowRun()) {
+				if (!$this->tpl->hasJavaScript){
+					$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');
+					$this->tpl->hasJavaScript = true;
+				}
+			}
 
 			$this->tpl->didPrepare = true;
 		}		
