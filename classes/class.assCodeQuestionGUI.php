@@ -73,6 +73,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($language=="java") {
 			$language = "clike";
 			$mode = "text/x-java";
+		} if ($language=="java2") {
+			$language = "java";
+			$mode = "text/x-java";
 		} else if ($language=="c++") {
 			$hljslanguage = 'cpp';
 			$language = "clike";
@@ -148,6 +151,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');
 
 			$this->tpl->didPrepare = true;
 		}		
@@ -590,6 +594,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/java2.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>';
 
 				$this->didAddLinksToSolutions = true;
@@ -765,7 +770,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'c#' => 'C#', 
 			'fortran'=>'Fortran', 
 			'glsl'=>'GLSL', 
-			'java'=>'Java',
+			'java'=>'Java (legacy)',
+			'java2'=>'Java',
 			'javascript'=>'JavaScript',
 			'objectivec'=>'Objective-C',
 			'perl'=>'Perl',
@@ -793,7 +799,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$have3js->setChecked( $this->object->getIncludeThreeJS() );
 		$form->addItem($have3js);
 
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'glsl') {
+		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
 			$allowRun->setValue('true');
 			$haved3->setValue('true');
 			$have3js->setValue('true');

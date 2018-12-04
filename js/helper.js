@@ -74,6 +74,7 @@ var cmMode = {
     'glsl': 'text/x-glsl', // (GLSL)
     'html': 'text/html', // (HTML)
     'java': 'text/x-java', // (Java),
+    'java2': 'text/x-java', // (Java),
     'javascript': 'text/javascript', // (JavaScript)
     'objectivec': 'text/x-objectivec', // (Objective-C),
     'perl': 'text/x-perl', // (Perl)
