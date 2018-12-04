@@ -103,15 +103,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 		
 		$lngData = $this->getLanguageData();
-		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			if (!$this->tpl->hasJava){
-				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-				$this->tpl->hasJava = true;
-			}
-		}
+		
 		if (!$this->tpl->didPrepare) {
 			$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
@@ -141,6 +133,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
 
 			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
+
+
+			if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
+				if (!$this->tpl->hasJava){
+					$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+					$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+					$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+					$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
+					$this->tpl->hasJava = true;
+				}
+			}
+
 
 			$this->tpl->didPrepare = true;
 		}		
