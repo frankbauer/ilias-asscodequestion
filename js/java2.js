@@ -1,6 +1,7 @@
 var teaworker;
 var isReady = false;
 
+
 function createTeaWorker(questionID, whenReady){
     if (teaworker === undefined) {
         setAllRunButtons(false);
@@ -34,6 +35,7 @@ function createTeaWorker(questionID, whenReady){
 
     return false;
 }
+
 function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate=true) { 
     if (runCreate){
         if (createTeaWorker(questionID, function(){
@@ -48,17 +50,27 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
         err_callback("System is not yet ready. Please wait until Initialization finishes or call a tutor.");
         return;
     }  
-    
+
+    var mainClass = 'Unknown';
+    let regexpMainClass = /(['"])(?:[^"'\\]+|(?!\1)["']|\\{2}|\\[\s\S])*\1|public\s*?class\s*?([a-zA-Z_$0-9]*?)\s*?(\{|implements|extends)/gm
+    while (match = regexpMainClass.exec(code)) {
+        if (match[2]) {
+            mainClass = match[2];
+            break;
+        }
+    }
+
+    console.log(mainClass, code);
     var myListener = function(e) {        
         console.log(questionID, e.data);
         if (e.data.id == ''+questionID){
             if (e.data.command == 'phase') {
                 if (e.data.phase == 'DEPENDENCY_ANALYSIS') {
-                    displayGlobalState("Compiling & Analyzing");
+                    displayGlobalState("Compiling & Analyzing <b>"+mainClass+".java</b>");
                 } else if (e.data.phase == 'LINKING') {
-                    displayGlobalState("Linking");
+                    displayGlobalState("Linking <b>"+mainClass+".java</b>");
                 } else if (e.data.phase == 'OPTIMIZATION') {
-                    displayGlobalState("Optimizing");
+                    displayGlobalState("Optimizing <b>"+mainClass+".java</b>");
                 }
             } else if (e.data.command == 'compiler-diagnostic') {
                 if (compileFailedCallback){
@@ -81,7 +93,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     finishedExecutionCB(); 
                     setAllRunButtons(true);
                 } else {
-                    displayGlobalState("Executing <b>Main.java</b>");
+                    displayGlobalState("Executing <b>"+mainClass+"</b>");
                     var workerrun = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/workerrun.js');
                     workerrun.addEventListener('message', function(ee) {
                         if (ee.data.command == 'run-finished-setup') {
@@ -109,12 +121,15 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
     
     teaworker.addEventListener('message', myListener);
     console.log(code);
-    setAllRunButtons(false);
-    displayGlobalState("Starting Compiler");
+    setAllRunButtons(false);    
+    displayGlobalState("Starting Compiler for <b>" + mainClass + ".java</b>");
+
+
     teaworker.postMessage({
         command:"compile",
         id:''+questionID,
-        text:code
+        text:code,
+        mainClass:mainClass
     });
 }
 
