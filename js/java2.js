@@ -1,7 +1,7 @@
 var teaworker;
 var isReady = false;
 var isRunning = false;
-var teaVMRunOverhead = 10000;
+var teaVMRunOverhead = 30000;
 function createTeaWorker(questionID, whenReady){
     if (teaworker === undefined) {
         setAllRunButtons(false);
