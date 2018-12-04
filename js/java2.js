@@ -1,7 +1,7 @@
 var teaworker;
 var isReady = false;
 var isRunning = false;
-var teaVMRunOverhead = 4000;
+var teaVMRunOverhead = 10000;
 function createTeaWorker(questionID, whenReady){
     if (teaworker === undefined) {
         setAllRunButtons(false);
@@ -38,7 +38,8 @@ function createTeaWorker(questionID, whenReady){
 
 function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate=true) {
     var start = Date.now();
-    var executionFinished = false;    
+    var executionFinished = false; 
+    var booted = false;   
 
     if (isRunning) {
         err_callback("System is busy. Please wait until compilation finishes or call a tutor.");
@@ -97,7 +98,8 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                 } else {
                     info_callback(msg+"\n");
                 }                
-            } else if (e.data.command == 'compilation-complete') {            
+            } else if (e.data.command == 'compilation-complete') {  
+                booted = true;          
                 teaworker.removeEventListener('message', myListener);
 
                 if (e.data.status == 'errors') {
@@ -138,16 +140,16 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                         hideGlobalState();  
                         finishedExecutionCB(false); 
                         setAllRunButtons(true);
+                        isRunning = false;
                         executionFinished = true;
                         if(msg) err_callback( msg + "\n");
                     };
 
+                    var runStart = Date.now();
                     var testTimeout = function(){    
-                        var time = Date.now()-start;
-                        if(time > max_ms){
-                            workerrun.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");
-                        }
-                    }
+                        var time = Date.now()-runStart;
+                        workerrun.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");                                                    
+                    };
 
                     setTimeout( testTimeout, max_ms );
                 }
@@ -160,13 +162,31 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
     setAllRunButtons(false);    
     displayGlobalState("Starting Compiler for <b>" + mainClass + ".java</b>");
 
-
     teaworker.postMessage({
         command:"compile",
         id:''+questionID,
         text:code,
         mainClass:mainClass
     });
+
+    teaworker.end = function(msg){
+        if(booted) return;
+        teaworker.terminate();
+        hideGlobalState();  
+        finishedExecutionCB(false); 
+        setAllRunButtons(true);
+        isRunning = false;
+        isReady = false;
+        if(msg) err_callback( msg + "\n");
+    };
+
+    setTimeout( function(){
+        if(!booted){
+            var time = Date.now()-start;
+            teaworker.end("TimeoutError:  Compilation took too long (>"+time+"ms) and was terminated. Trying to reset the System. Please re-run your code and call a Tutor if this Problem persists.");            
+            teaworker = undefined;
+        }
+    }, teaVMRunOverhead );
 }
 
 
