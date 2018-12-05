@@ -490,6 +490,7 @@ function runInExam(language, questionID){
     var sansoutput = '';
     var didClip = false;
     function log(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         console.log("log", text);
         output += text;
         if (!didClip) {
@@ -497,19 +498,24 @@ function runInExam(language, questionID){
                 outdiv.innerHTML += format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
                 didClip = true;
             } else {
-                outdiv.innerText += text;
+                outdiv.innerHTML += text;
             }
         }
     } 
     function info(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_info(text);
         console.log("nfo", text);
-        sansoutput += format_info(text); 
-        outdiv.innerHTML += format_info(text); 
+        sansoutput += text; 
+        outdiv.innerHTML += text;  
     } 
+
     function err(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_error(text);
         console.log("err", text);
-        sansoutput += format_error(text); 
-        outdiv.innerHTML += format_error(text); 
+        sansoutput += text; 
+        outdiv.innerHTML += text; 
     } 
 
     clearDiagnostics(questionID);
@@ -598,7 +604,7 @@ function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
 
     if (didChangeOutput && myoutput!=output) {
         //console.log("changed output");
-        outputDiv.innerText = output;
+        outputDiv.innerHTML = output;
         outputDiv.innerHTML += infoErrorOutput;
     }
 }
