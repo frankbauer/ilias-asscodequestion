@@ -940,11 +940,13 @@ function clearDiagnostics(questionID){
         if (!blockHasProgramCode(block)) return;
         const editor = editors[block.id]; 
         
-        editor.getDoc().clearGutter('diagnostics');
-        var allMarks = editor.getDoc().getAllMarks();
-        $.each(allMarks, function(idx, e){            
-            e.clear();
-        })
+        if (editor) {
+            editor.getDoc().clearGutter('diagnostics');
+            var allMarks = editor.getDoc().getAllMarks();
+            $.each(allMarks, function(idx, e){            
+                e.clear();
+            })
+        }
     });
 }
 function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
