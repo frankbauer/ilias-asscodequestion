@@ -520,7 +520,10 @@ function runInExam(language, questionID){
     }, function(success=true){
         waitdiv.innerHTML = '';  
         if (!success) return undefined;      
-        return finishedExecution(output, sansoutput, questionID, outdiv);
+        var res = finishedExecution(output, sansoutput, questionID, outdiv);
+        hideGlobalState();  
+        setAllRunButtons(true);
+        return res;            
     });
     /*switch(language){
         case 'python': runPython(prog, questionID, mypre); break;
