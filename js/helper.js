@@ -489,10 +489,10 @@ function runInExam(language, questionID){
     var output = '';
     var sansoutput = '';
     var didClip = false;
-    function log(text){
-        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    function log(text){        
         console.log("log", text);
         output += text;
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         if (!didClip) {
             if (maxCharacters>0 && output.length > maxCharacters) {
                 outdiv.innerHTML += format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
@@ -604,6 +604,7 @@ function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
 
     if (didChangeOutput && myoutput!=output) {
         //console.log("changed output");
+        output = output.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         outputDiv.innerHTML = output;
         outputDiv.innerHTML += infoErrorOutput;
     }
