@@ -525,7 +525,11 @@ function runInExam(language, questionID){
         processDiagnostics(error, questionID, gutterElements, gutterSeverity)    
     }, function(success=true){
         waitdiv.innerHTML = '';  
-        if (!success) return undefined;      
+        if (!success) {
+            hideGlobalState();  
+            setAllRunButtons(true);
+            return undefined;      
+        }
         var res = finishedExecution(output, sansoutput, questionID, outdiv);
         hideGlobalState();  
         setAllRunButtons(true);
