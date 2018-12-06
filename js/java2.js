@@ -102,10 +102,8 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                 booted = true;          
                 teaworker.removeEventListener('message', myListener);
 
-                if (e.data.status == 'errors') {
-                    hideGlobalState();  
+                if (e.data.status == 'errors') {                    
                     finishedExecutionCB(false); 
-                    setAllRunButtons(true);
                     isRunning = false;                    
                 } else {
                     displayGlobalState("Executing <b>"+mainClass+"</b>");
@@ -114,9 +112,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                         if (ee.data.command == 'run-finished-setup') {
 
                         } else if (ee.data.command == 'run-completed'){
-                            hideGlobalState();  
                             finishedExecutionCB(); 
-                            setAllRunButtons(true);
                             info_callback("Info: Execution finished in " + (Date.now() - start) + " ms\n");
                             executionFinished = true;
                             isRunning = false;
@@ -137,9 +133,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     workerrun.end = function(msg){
                         if(executionFinished) return;
                         workerrun.terminate();
-                        hideGlobalState();  
                         finishedExecutionCB(false); 
-                        setAllRunButtons(true);
                         isRunning = false;
                         executionFinished = true;
                         if(msg) err_callback( msg + "\n");
@@ -172,9 +166,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
     teaworker.end = function(msg){
         if(booted) return;
         teaworker.terminate();
-        hideGlobalState();  
         finishedExecutionCB(false); 
-        setAllRunButtons(true);
         isRunning = false;
         isReady = false;
         if(msg) err_callback( msg + "\n");

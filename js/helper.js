@@ -489,27 +489,33 @@ function runInExam(language, questionID){
     var output = '';
     var sansoutput = '';
     var didClip = false;
-    function log(text){
+    function log(text){        
         console.log("log", text);
         output += text;
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         if (!didClip) {
             if (maxCharacters>0 && output.length > maxCharacters) {
                 outdiv.innerHTML += format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
                 didClip = true;
             } else {
-                outdiv.innerText += text;
+                outdiv.innerHTML += text;
             }
         }
     } 
     function info(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_info(text);
         console.log("nfo", text);
-        sansoutput += format_info(text); 
-        outdiv.innerHTML += format_info(text); 
+        sansoutput += text; 
+        outdiv.innerHTML += text;  
     } 
+
     function err(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_error(text);
         console.log("err", text);
-        sansoutput += format_error(text); 
-        outdiv.innerHTML += format_error(text); 
+        sansoutput += text; 
+        outdiv.innerHTML += text; 
     } 
 
     clearDiagnostics(questionID);
@@ -520,7 +526,10 @@ function runInExam(language, questionID){
     }, function(success=true){
         waitdiv.innerHTML = '';  
         if (!success) return undefined;      
-        return finishedExecution(output, sansoutput, questionID, outdiv);
+        var res = finishedExecution(output, sansoutput, questionID, outdiv);
+        hideGlobalState();  
+        setAllRunButtons(true);
+        return res;            
     });
     /*switch(language){
         case 'python': runPython(prog, questionID, mypre); break;
@@ -595,7 +604,8 @@ function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
 
     if (didChangeOutput && myoutput!=output) {
         //console.log("changed output");
-        outputDiv.innerText = output;
+        output = output.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        outputDiv.innerHTML = output;
         outputDiv.innerHTML += infoErrorOutput;
     }
 }
@@ -940,11 +950,13 @@ function clearDiagnostics(questionID){
         if (!blockHasProgramCode(block)) return;
         const editor = editors[block.id]; 
         
-        editor.getDoc().clearGutter('diagnostics');
-        var allMarks = editor.getDoc().getAllMarks();
-        $.each(allMarks, function(idx, e){            
-            e.clear();
-        })
+        if (editor) {
+            editor.getDoc().clearGutter('diagnostics');
+            var allMarks = editor.getDoc().getAllMarks();
+            $.each(allMarks, function(idx, e){            
+                e.clear();
+            })
+        }
     });
 }
 function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
