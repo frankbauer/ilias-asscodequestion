@@ -998,7 +998,10 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
         if (editor) {
             var first = editor.getOption('firstLineNumber');
             var last = first + block.value.split(/\r\n|\r|\n/).length - 1;
-            if (error.start.line >= first && error.start.line <= last) {
+            console.log("editor from",first,"to",last);
+            
+            if (error.start.line+1 >= first && error.start.line+1 <= last) {
+                console.log("Adding Marker for", error);
                 editor.getDoc().markText(
                     {line:error.start.line-first + 1, ch:error.start.column}, 
                     {line:error.end.line-first + 1, ch:error.end.column}, 
@@ -1013,7 +1016,7 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
                 var info = editor.getDoc().lineInfo(error.start.line-first + 1);
                 editor.getDoc().setGutterMarker(error.start.line-first + 1, "diagnostics", element);
             }
-            console.log("editor from",first,"to",last);
+            
         } else {
          
         }
