@@ -975,7 +975,7 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
     element.className = "glyphicon glyphicon-" + gutterClassName;
 
     var title = element.title;
-    title = title!='' ? title + "\n" + error.message : error.message;
+    title = title!='' ? (title + "\n\n" + '- ' + error.message) : ('- ' +error.message);
     element.title = title;    
 
     $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
@@ -993,7 +993,8 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
                     {
                         className:'red-wave',
                         inclusiveLeft:true,
-                        inclusiveRight:true                
+                        inclusiveRight:true,
+                        title:error.message                
                     }
                 );
 
