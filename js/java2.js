@@ -186,16 +186,14 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
     $( document ).ready(function() {
         var preloadElement = $('input[data-preload-runtime=java2]');
         if (preloadElement && preloadElement.length>0){
-            console.log("Preloading TeaVM for Java");
+            console.log("[Preloading TeaVM for Java]");
             isRunning = true;
             createTeaWorker(function(){
                 isRunning = false;
                 hideGlobalState();  
                 setAllRunButtons(true);
             });
-        } else {
-            console.log(preloadElement);
-        }
+        } 
     });
     
     
