@@ -523,14 +523,14 @@ function runInExam(language, questionID){
     gutterElements = [];
     plugin.run(questionID, prog, mypre, maxMS, log, info, err, function(error){
         processDiagnostics(error, questionID, gutterElements, gutterSeverity)    
-    }, function(success=true){
+    }, function(success=true, overrideOutput=undefined){
         waitdiv.innerHTML = '';  
         if (!success) {
             hideGlobalState();  
             setAllRunButtons(true);
             return undefined;      
         }
-        var res = finishedExecution(output, sansoutput, questionID, outdiv);
+        var res = finishedExecution(overrideOutput?overrideOutput:output, sansoutput, questionID, outdiv);
         hideGlobalState();  
         setAllRunButtons(true);
         return res;            
@@ -671,36 +671,6 @@ function finishedExecutionWithOutput(output,  questionID){
     
     return output;
 }
-
-/**This function will send the code provided by the student directly to the available canvas areas
- * @param {string} questionID 
- * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python, Java or JavaScript program
- * 
- */
-function runGLSL(questionID, mypre=undefined, prog=undefined){
-    var outputData = []
-    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
-        if (block.getAttribute('data-ignore')) return
-        if (!blockHasProgramCode(block)) return
-        const editor = editors[block.id]        
-        if (editor) {
-            outputData.push(block.value)
-        } else {
-            outputData.push(block.innerHTML)
-        }
-    });
-    finishedExecutionWithOutput(outputData, questionID)
-}
-
-
-/**
- * The function pass the Python program to a worker. The worker runs the program
- * and return the standard output to the main thread.
- * @param {string} prog The Python program
- * @param {string} questionID The id of the question to read the Python program from html page
- * @param {HTML-element} mypre The HTML-element to write the output of the Python program.
- */
 
 /**
  * Create a new Edit Block in the Question Edit View
