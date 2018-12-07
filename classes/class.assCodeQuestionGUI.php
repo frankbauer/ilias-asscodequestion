@@ -150,9 +150,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/python.js');						
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');		
 			$this->tpl->addJavascript(self::URL_PATH.'/js/glsl.js');
 
 			$this->tpl->didPrepare = true;

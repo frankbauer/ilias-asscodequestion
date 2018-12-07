@@ -1,18 +1,6 @@
 //function runJavaScriptWorker( code, log_callback, max_ms, questionID){
 function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback,  finishedExecutionCB){
     
-    //console.log("submit");
-    // TODO:: IE.11  does not support default arguments
-    //    if(max_ms==undefined) max_ms=50;
-    //    if(max_loglength==undefined) max_loglength=2000;
-        
-    var output = function(l){       // wrap the log
-        //alert(l);
-        if(!log_callback) console.log(l);
-        else{                        
-            log_callback( l + "\n");
-        }
-    }
     log_callback('');
 
     if(!window.Worker){
@@ -37,10 +25,12 @@ function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, inf
         "for(var c in console) console[c]=null;"   //delete all console functionality
     ,   "for(var t in this) if(t!='close' && t!='postMessage' && t!='console') this[t]=null;"   //delete all worker functionality
     ,   "this.console = {};"
-    ,   "console.log = function(s){"                    // only allow .log , .warn and .error
+    ,   "console.log = function(s){"                    // only allow .log , .warn
     ,   "   postMessage(['log',''+s]);"
     ,   "};"
-    ,   "console.error = console.log;"
+    ,   "console.error = function(s){"                    // only allow .error
+    ,   "   postMessage(['err',''+s]);"
+    ,   "};"
     ,   "console.warn = console.log;"
     ,   "onmessage = function(input){"
     ,   "   postMessage(['finished',"
@@ -88,6 +78,8 @@ function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, inf
             worker.end();
         }else if(e.data[0]=='log'){
             log_callback(e.data[1] + "\n");
+        }else if(e.data[0]=='err'){
+            err_callback(e.data[1] + "\n");
         }else{
             worker.end("HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test.");
         }

@@ -1,5 +1,10 @@
-//function runDummy(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback)
-
+/**
+ * The function pass the Python program to a worker. The worker runs the program
+ * and return the standard output to the main thread.
+ * @param {string} prog The Python program
+ * @param {string} questionID The id of the question to read the Python program from html page
+ * @param {HTML-element} mypre The HTML-element to write the output of the Python program.
+ */
 function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) { 
     // the Python program
     prog = prog.replaceAll("\t", "    ");    

@@ -354,51 +354,13 @@ function getTotalSourcecode(questionID){
  * @param {function(text)} logCallback called whenever the app writes to stdout. 
  * @param {function(text)} errCallback called whenever the app writes to stderr. 
  * @param {function(error)} compileErrorCallback called whenever a compiletime error occurs. 
- * @param {function(success)} finishCallback called when execution finished. 
+ * @param {function(success=true, overrideOutput=undefined)} finishCallback called when execution finished. 
  */
 function runDummy(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {    
-    if (finishCallback) {
-        console.log("Dummy");
+    if (finishCallback) {        
+        console.error("[No actual Runner available!]");
         finishCallback('This language is not supported', questionID);
     }
-}
-
-/**
- * @function runJavaScript
- * This function collect the program, the HTML-element to write the program's output
- * and define a log function to print the standard output of the program
- * @param {string} questionID 
- * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python, Java or JavaScript program
- */
-function runJavaScript(questionID, mypre=undefined, prog=undefined){
-    if(!prog) prog = getTotalSourcecode(questionID);
-    if (mypre===undefined) {
-        mypre = document.getElementById(questionID+"Output");     
-    }  
-    if (mypre){
-        mypre.style.display = '';
-        mypre.innerHTML = ''; 
-    }
-    function log(text){
-        mypre.innerHTML = text; 
-    }       
-    runJavaScriptWorker( prog, log, maxMS, questionID);
-}
-
-function runJava(questionID, mypre=undefined, prog=undefined){
-    if(!prog) prog = getTotalSourcecode(questionID);
-    if (mypre===undefined) {
-        mypre = document.getElementById(questionID+"Output");     
-    }  
-    if (mypre){
-        mypre.style.display = '';
-        mypre.innerHTML = ''; 
-    }
-    function log(text){
-        mypre.innerHTML = text; 
-    }       
-    runJavaWorker( prog, log, maxMS, questionID, finishedExecutionWithOutput);
 }
 
 function displayResults(
@@ -535,12 +497,6 @@ function runInExam(language, questionID){
         setAllRunButtons(true);
         return res;            
     });
-    /*switch(language){
-        case 'python': runPython(prog, questionID, mypre); break;
-        case 'javascript':  runJavaScript( questionID, undefined, prog); break;
-        case 'java':  runJava( questionID, undefined, prog); break;
-        case 'glsl':  runGLSL( questionID, undefined, prog); break;
-    }*/
 }
 
 /**
@@ -566,7 +522,8 @@ function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
     var didChangeOutput = false;
     let plygrounds = $("playground[data-question="+questionID+"]");    
 
-    if (output !== undefined && plygrounds.length>0){        
+    if (output !== undefined && plygrounds.length>0){  
+        console.log("output", output);      
         //try to parse JSON
         try {
             if (output.indexOf('[')!=-1 || output.indexOf('{')!=-1) {
