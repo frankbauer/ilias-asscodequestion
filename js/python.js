@@ -9,18 +9,12 @@ function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoC
     // the Python program
     prog = prog.replaceAll("\t", "    ");    
     
-    
-    
     if(!window.Worker){
         errCallback("CRITICAL-ERROR: your browser does not support WebWorkers!! (please consult a Tutor).");
         return;
     }
 
-    //var urlLoc = {url: document.location.href.substring(0, document.location.href.lastIndexOf("/"))};
-    //var path = urlLoc.url+'/data/assCodeQuestion';
-    //var path  = './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion';
     var worker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/pyWorker.js');
-    //var urlLoc = {url: document.location.href.substring(0, document.location.href.lastIndexOf("/")) + '/'};
     
     // construct message for worker
     var pyInp = []; // not used jet
@@ -36,20 +30,22 @@ function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoC
             return true;
         }
         return false;
-    }
+    };
     var executionFinished = false;
     worker.end = function(msg){
-            if(executionFinished) return;
-            worker.terminate(); 
-            executionFinished = true;
-            finishCallback(false);
-            if(msg) errCallback( msg );
-        }
+        if(executionFinished) return;
+        worker.terminate(); 
+        executionFinished = true;
+        finishCallback(false);
+        if(msg) errCallback( msg );
+    };
+
     worker.onmessage = function(e){
         if(executionFinished) return;
         //only accept messages, when worker not terminated (workers do not immetiately terminate)
         if (testTimeout() === true) { return; }
         if( e.data[0] == 'finished' ){
+            logCallback(e.data[1].stdOut);
             finishCallback();            
             infoCallback("Info: Execution finished in : " + (Date.now() - start) + " ms");
             worker.end();
