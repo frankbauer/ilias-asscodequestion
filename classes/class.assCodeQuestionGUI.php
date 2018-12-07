@@ -773,15 +773,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'c++'=>'C++',
 			'c#' => 'C#', 
 			'fortran'=>'Fortran', 
-			'glsl'=>'GLSL', 
-			'java'=>'Java (legacy)',
+			'glsl'=>'GLSL', 			
 			'java2'=>'Java',
 			'javascript'=>'JavaScript',
 			'objectivec'=>'Objective-C',
 			'perl'=>'Perl',
 			'python'=>'Python',
 			'r' => 'R', 
-			'ruby'=>'Ruby')
+			'ruby'=>'Ruby',
+			'java'=>'[Java (legacy)]')
 			);
 		$select->addCustomAttribute('onchange="selectLanguage( )"');
 		$select->setValue($this->getLanguage());
