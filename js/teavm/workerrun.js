@@ -1,16 +1,16 @@
 self.importScripts("worker/runtime.js");
 
-var $stdoutBuffer = "";
 var $stderrBuffer = "";
+var $stdoutBuffer = "";
 
 var $rt_global = {
     id : '',
-    $rt_putStdout : function(ch) {
+    $rt_putStdout : function(ch) {        
         if (ch === 0xA) {
-            self.postMessage({ command: "stdout", line: $rt_stdoutBuffer, id:$rt_global.id });
-            $rt_stdoutBuffer = "";
+            self.postMessage({ command: "stdout", line: $stdoutBuffer, id:$rt_global.id });
+            $stdoutBuffer = "";
         } else {
-            $rt_stdoutBuffer += String.fromCharCode(ch);
+            $stdoutBuffer += String.fromCharCode(ch);
         }
     },
     $rt_putStderr : function(ch) {
@@ -31,8 +31,9 @@ self.addEventListener("message", function(event) {
         var blob = new Blob([request.code], {type: 'application/javascript'});            
         self.importScripts(URL.createObjectURL(blob));
         self.postMessage({ command: "run-finished-setup", id:request.id });  
-              
+        
         main();
+        
         if ($stderrBuffer != '') self.postMessage({ command: "stderr", line: $stderrBuffer, id:request.id });
         if ($stdoutBuffer != '') self.postMessage({ command: "stdout", line: $stdoutBuffer, id:request.id }); 
         
