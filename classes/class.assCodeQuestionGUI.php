@@ -150,7 +150,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/python.js');						
 			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');
 
 			$this->tpl->didPrepare = true;
@@ -595,7 +596,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/java2.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>';
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/python.js'.self::URL_SUFFIX.'"></script>';
 
 				$this->didAddLinksToSolutions = true;
 
