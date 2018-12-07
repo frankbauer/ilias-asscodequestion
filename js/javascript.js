@@ -62,16 +62,21 @@ function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, inf
     var start = Date.now();
     var testTimeout = function(){    
         var time = Date.now()-start;
+        worker.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");        
+    };
+
+    var testTimeoutIntern = function(){    
+        var time = Date.now()-start;
         if(time > max_ms){
-            worker.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");
+            testTimeout
         }
-    }
+    };
         
     worker.onmessage = function(e){
         if(executionFinished) return;
         //only accept messages, when worker not terminated (workers do not immetiately terminate)
 
-        testTimeout();
+        testTimeoutIntern();
         if( e.data[0] == 'finished' ){
             finishedExecutionCB();            
             info_callback("Info: Execution finished in " + (Date.now() - start) + " ms\n");

@@ -23,14 +23,19 @@ function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoC
     worker.postMessage(['b8e493ca02970aeb0ef734555526bf9b',messageData]);
     var start = Date.now();
     
-    var testTimeout = function(){    
+    var testTimeout = function(){         
+        var time = Date.now()-start;
+        worker.end("TimeoutError:  Execution took too long (> "+time+" ms) and was terminated. There might be an endless loop in your code.");        
+    };
+
+    var testTimeoutIntern = function(){
         var time = Date.now()-start;
         if(time > maxRuntime){
-            worker.end("TimeoutError:  Execution took too long (> "+time+" ms) and was terminated. There might be an endless loop in your code.");
+            testTimeout();
             return true;
         }
         return false;
-    };
+    }
     var executionFinished = false;
     worker.end = function(msg){
         if(executionFinished) return;
@@ -43,7 +48,7 @@ function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoC
     worker.onmessage = function(e){
         if(executionFinished) return;
         //only accept messages, when worker not terminated (workers do not immetiately terminate)
-        if (testTimeout() === true) { return; }
+        if (testTimeoutIntern() === true) { return; }
         if( e.data[0] == 'finished' ){
             logCallback(e.data[1].stdOut);
             finishCallback();            
