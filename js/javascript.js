@@ -65,6 +65,7 @@ function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, inf
         if(executionFinished) return;
         worker.terminate();
         executionFinished = true;
+        finishCallback(false); 
         if(msg) err_callback( msg + "\n");
     }
 

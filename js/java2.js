@@ -140,9 +140,9 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     workerrun.end = function(msg){
                         if(executionFinished) return;
                         workerrun.terminate();
+                        executionFinished = true;
                         finishedExecutionCB(false); 
                         isRunning = false;
-                        executionFinished = true;
                         if(msg) err_callback( msg + "\n");
                     };
 

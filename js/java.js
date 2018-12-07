@@ -5,7 +5,6 @@
  */
 var javaRunOverhead = 4000;
 
-//function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb, forceReload=false) {
 function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, forceReload=false) {    
   let exp = new RegExp("public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)");
   let match = exp.exec(code);
