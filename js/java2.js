@@ -11,7 +11,12 @@ function createTeaWorker(whenReady){
         teaworker.addEventListener('message', function(e) {
             console.log(e.data);
             if (e.data.command == 'ok' && e.data.id == 'didload-classlib') {
-                
+                teaworker.postMessage({
+                    command:"compile",
+                    id:'prep',
+                    text:'public class Bootstrap { public static void main(String[] args){}}',
+                    mainClass:'Bootstrap'
+                });
                 isReady = true;
                 if (whenReady) {
                     console.log("loopback to initial caller");
@@ -20,6 +25,8 @@ function createTeaWorker(whenReady){
                     setAllRunButtons(true);
                     hideGlobalState();
                 }
+            } else if (e.data.id == 'prep' && e.data.command=='compilation-complete'){
+                /* We could finish initialization here if there appear to be races when compiling multiple sources at once */
             }
         });
 
