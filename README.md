@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.4
+**Version**:  1.1.5
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -261,6 +261,11 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.5
+* new, simplified subsystem to add support fpr new runable languages
+* added new, much faster java runtime based on TeaVM-javac (original at https://github.com/konsoletyper/teavm-javac, fork used in this plugin at https://github.com/frankbauer/teavm-javac/tree/custom-fielname)
+* compile errors from new java runtime are displayed inside the code editor view.
+
 ### Version 1.1.4
 * fix controller error in question editor when taxomonies are used
 
