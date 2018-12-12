@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.4
+**Version**:  1.1.5
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -252,15 +252,23 @@ Alternativley you may use the built-in setup function to prepare a default Three
     }
 
 ## Included Software
-* dopioJVM (http://plasma-umass.org/doppio-demo/)
-* browserfs (https://github.com/jvilk/BrowserFS)
+* teaVM-javac (https://github.com/konsoletyper/teavm-javac, [plugin specific fork at https://github.com/frankbauer/teavm-javac/tree/custom-fielname])
 * highlight.js (https://highlightjs.org)
 * skulpt (http://www.skulpt.org)
 * three.js (https://threejs.org)
 * d3 (https://d3js.org)
+* browserfs (https://github.com/jvilk/BrowserFS)
+* dopioJVM (http://plasma-umass.org/doppio-demo/)
+
+
 
 
 ## Version History
+### Version 1.1.5
+* new, simplified subsystem to add support fpr new runable languages
+* added new, much faster java runtime based on TeaVM-javac 
+* compile errors from new java runtime are displayed inside the code editor view.
+
 ### Version 1.1.4
 * fix controller error in question editor when taxomonies are used
 

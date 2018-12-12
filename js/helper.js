@@ -1,8 +1,15 @@
 var lastCodeMirrorInstance = []
-
+var SEVERITY_ERROR = 2;
+var SEVERITY_WARNING = 1;
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
+};
+String.prototype.replaceRec = function (pattern, replacement) {
+    var newstr = this.replace(pattern, replacement);
+    if (newstr == this)
+        return newstr;
+    return newstr.replaceRec(pattern, replacement);
 };
 
 function format_info(text){
@@ -11,12 +18,30 @@ function format_info(text){
 function format_error(text){
     return '<span style="color:red">'+text+'</span>';
 }
+
+var $executables = {};
+/**
+ * 
+ * @param {*} name The language name in our plugin system
+ * @param {*} fktRun the runFunction (see runDummy)
+ * @param {*} languageStyle The language name for our highlighters
+ */
+function registerLanguage(name, fktRun, languageStyle=undefined) {
+    if (languageStyle===undefined) languageStyle = name
+    console.log("[registered new language: " + name + "]");
+    $executables[name] = {
+        name: name,
+        run: fktRun,
+        style: languageStyle
+    };
+}
+
 $(document).ready(function(){
     //we need this for the manual scoring view, otherwise the boxes have to get clicked
     setTimeout(function() {
         $.each(editors, function(i, e){            
             e.refresh();
-        })
+        });
     }, 500);    
 });
 
@@ -56,6 +81,7 @@ var cmMode = {
     'glsl': 'text/x-glsl', // (GLSL)
     'html': 'text/html', // (HTML)
     'java': 'text/x-java', // (Java),
+    'java2': 'text/x-java', // (Java),
     'javascript': 'text/javascript', // (JavaScript)
     'objectivec': 'text/x-objectivec', // (Objective-C),
     'perl': 'text/x-perl', // (Perl)
@@ -176,7 +202,8 @@ function initEditor(block, questionID, useMode){
         tabSize: 4,
         indentUnit: 4,
         autoCloseBrackets: true,
-        firstLineNumber: 1 
+        firstLineNumber: 1,
+        gutters: ["diagnostics", "CodeMirror-linenumbers"]
     }); 
     
     if (editor.display.input.textarea)  {
@@ -265,7 +292,8 @@ function initSolutionBox(useMode, qLanguage, questionID){
 }
 
 function isRunnableLanguage(qLanguage){
-    return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java'|| qLanguage === 'glsl';
+    return $executables[qLanguage] !== undefined;
+    //return qLanguage === 'python' || qLanguage === 'javascript' || qLanguage === 'java'|| qLanguage === 'glsl';
 }
 
 /**
@@ -323,43 +351,22 @@ function getTotalSourcecode(questionID){
     return code
 }
 
-
 /**
- * @function runJavaScript
- * This function collect the program, the HTML-element to write the program's output
- * and define a log function to print the standard output of the program
+ * 
  * @param {string} questionID 
- * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python, Java or JavaScript program
+ * @param {string} prog the sourcecode
+ * @param {HTML-element} mypre the dom element that receives the output
+ * @param {int} maxRuntime time in ms the app is allowed to run
+ * @param {function(text)} logCallback called whenever the app writes to stdout. 
+ * @param {function(text)} errCallback called whenever the app writes to stderr. 
+ * @param {function(error)} compileErrorCallback called whenever a compiletime error occurs. 
+ * @param {function(success=true, overrideOutput=undefined)} finishCallback called when execution finished. 
  */
-function runJavaScript(questionID, mypre=undefined, prog=undefined){
-    if(!prog) prog = getTotalSourcecode(questionID);
-    if (mypre===undefined) {
-        mypre = document.getElementById(questionID+"Output");     
-    }  
-    if (mypre){
-        mypre.style.display = '';
-        mypre.innerHTML = ''; 
+function runDummy(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {    
+    if (finishCallback) {        
+        console.error("[No actual Runner available!]");
+        finishCallback('This language is not supported', questionID);
     }
-    function log(text){
-        mypre.innerHTML = text; 
-    }       
-    runJavaScriptWorker( prog, log, maxMS, questionID);
-}
-
-function runJava(questionID, mypre=undefined, prog=undefined){
-    if(!prog) prog = getTotalSourcecode(questionID);
-    if (mypre===undefined) {
-        mypre = document.getElementById(questionID+"Output");     
-    }  
-    if (mypre){
-        mypre.style.display = '';
-        mypre.innerHTML = ''; 
-    }
-    function log(text){
-        mypre.innerHTML = text; 
-    }       
-    runJavaWorker( prog, log, maxMS, questionID, finishedExecutionWithOutput);
 }
 
 function displayResults(
@@ -427,19 +434,75 @@ function runInExam(language, questionID){
     }
 
         
-    var mypre = undefined;
+    var mypre = document.getElementById(questionID+"Output");     
+    var outdiv = undefined;
+    var waitdiv = undefined;  
+    if (mypre){
+        mypre.style.display = '';
+        mypre.innerHTML = '<div id="waiter"><div class="sk-three-bounce"><div class="sk-child sk-bounce1"></div><div class="sk-child sk-bounce2"></div><div class="sk-child sk-bounce3"></div></div></div><div id="out"></div>'; 
+        outdiv = mypre.querySelector('#out')
+        waitdiv = mypre.querySelector('#waiter')
+    }
+    
+
     // This is necessary to intearctively change the language in the edit mode.
     // codeqst_edit_mode is a dummy language set by the PHP-script to avoid
     // collisions with the test and solution mode
     if (language === 'codeqst_edit_mode') {
         language = $('select#source_lang').val();
     }
-    switch(language){
-        case 'python': runPython(prog, questionID, mypre); break;
-        case 'javascript':  runJavaScript( questionID, undefined, prog); break;
-        case 'java':  runJava( questionID, undefined, prog); break;
-        case 'glsl':  runGLSL( questionID, undefined, prog); break;
-    }
+
+    let plugin = $executables[language] || {name:language, run:runDummy, style:language};
+
+    var output = '';
+    var sansoutput = '';
+    var didClip = false;
+    function log(text){        
+        console.log("log", text);
+        output += text;
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        if (!didClip) {
+            if (maxCharacters>0 && output.length > maxCharacters) {
+                outdiv.innerHTML += format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
+                didClip = true;
+            } else {
+                outdiv.innerHTML += text;
+            }
+        }
+    } 
+    function info(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_info(text);
+        console.log("nfo", text);
+        sansoutput += text; 
+        outdiv.innerHTML += text;  
+    } 
+
+    function err(text){
+        text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        text = format_error(text);
+        console.log("err", text);
+        sansoutput += text; 
+        outdiv.innerHTML += text; 
+    } 
+
+    clearDiagnostics(questionID);
+    gutterSeverity = [];
+    gutterElements = [];
+    plugin.run(questionID, prog, mypre, maxMS, log, info, err, function(error){
+        processDiagnostics(error, questionID, gutterElements, gutterSeverity)    
+    }, function(success=true, overrideOutput=undefined){
+        waitdiv.innerHTML = '';  
+        if (!success) {
+            hideGlobalState();  
+            setAllRunButtons(true);
+            return undefined;      
+        }
+        var res = finishedExecution(overrideOutput?overrideOutput:output, sansoutput, questionID, outdiv);
+        hideGlobalState();  
+        setAllRunButtons(true);
+        return res;            
+    });
 }
 
 /**
@@ -456,8 +519,69 @@ function runInSolution(language, questionID){
 /**
  * Call when the program finished executing and pass the output string. We will send the output to all embeded canvas elements
  * @param {*} output 
+ * @param {*} infoErrorOutput outpit generated by info or error messages
  */
-function finishedExecutionWithOutput(output, questionID){
+function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
+    const inQuestionEditMode = $('input#allow_run').length!==0    
+    var parseError = null
+    var initialOutput = output
+    var didChangeOutput = false;
+    let plygrounds = $("playground[data-question="+questionID+"]");    
+
+    if (output !== undefined && plygrounds.length>0){  
+        console.log("output", output);      
+        //try to parse JSON
+        try {
+            if (output.indexOf('[')!=-1 || output.indexOf('{')!=-1) {
+                output = JSON.parse(output);
+                didChangeOutput = true;
+            } else {
+                console.log("Output did neither contain an array nor object.");
+            }
+        } catch (e){
+            parseError = e;        
+        }
+    }
+    var myoutput = output;
+    plygrounds.each(function(i, block) {  
+        //console.log('output', output, block, inQuestionEditMode)
+        try {
+            const blockID = block.getAttribute('data-blocknr')
+            
+            if (!inQuestionEditMode){
+                output = displayResults(output, block, questionID, blockID, initialOutput, parseError)
+                didChangeOutput = true;
+            } else {
+                const src = document.getElementById(block.getAttribute('data-src-id'))
+                if (src) {
+                    const obj = eval( '(function(){ return '+src.value+'})()');
+                    displayResults(undefined, block, questionID, blockID, undefined, null, obj)
+                    output = displayResults(output, block, questionID, blockID, initialOutput, parseError, obj)
+                    didChangeOutput = true;
+                }                
+            }
+        } catch (e){
+            console.error(e);
+        }
+    })
+
+    if (typeof output!=='string'){
+        output = ''        
+    }
+
+    if (didChangeOutput && myoutput!=output) {
+        //console.log("changed output");
+        output = output.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        outputDiv.innerHTML = output;
+        outputDiv.innerHTML += infoErrorOutput;
+    }
+}
+
+/**
+ * Call when the program finished executing and pass the output string. We will send the output to all embeded canvas elements
+ * @param {*} output 
+ */
+function finishedExecutionWithOutput(output,  questionID){
     const inQuestionEditMode = $('input#allow_run').length!==0    
     var parseError = null
     var initialOutput = output
@@ -509,236 +633,6 @@ function finishedExecutionWithOutput(output, questionID){
     }
     
     return output;
-}
-
-/**This function will send the code provided by the student directly to the available canvas areas
- * @param {string} questionID 
- * @param {HTML-element} mypre The HTML element to write the standard output of the program
- * @param {string} prog  String containing the Python, Java or JavaScript program
- * 
- */
-function runGLSL(questionID, mypre=undefined, prog=undefined){
-    var outputData = []
-    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
-        if (block.getAttribute('data-ignore')) return
-        if (!blockHasProgramCode(block)) return
-        const editor = editors[block.id]        
-        if (editor) {
-            outputData.push(block.value)
-        } else {
-            outputData.push(block.innerHTML)
-        }
-    });
-    finishedExecutionWithOutput(outputData, questionID)
-}
-
-
-/**
- * The function pass the Python program to a worker. The worker runs the program
- * and return the standard output to the main thread.
- * @param {string} prog The Python program
- * @param {string} questionID The id of the question to read the Python program from html page
- * @param {HTML-element} mypre The HTML-element to write the output of the Python program.
- */
-function runPython(prog, questionID, mypre=undefined) { 
-    // the Python program
-    prog = prog.replaceAll("\t", "    ")
-   // the HTML-Element to write the output of the Python program
-    if (mypre===undefined) {
-        mypre = document.getElementById(questionID+"Output");     
-    }
-    //console.log(prog, mypre);
-   
-    if (mypre){
-        // output mypre.innerHTML = mypre.innerHTML + text; 
-
-        // clear output, set to string to avoid undesired JavaScript snippets
-        mypre.innerHTML = '';
-        mypre.style.display = ''; // make the code output visible
-        
-        /**
-         * Function to write the output of the code or some other info for the students,
-         * e.g. the code does not compile, or there is a timeout
-         * @param {string} l Output of the code as text string
-         */
-        var output = function(l) {
-            mypre.innerHTML += l;
-        }
-        
-        if(!window.Worker){
-            output(format_error("CRITICAL-ERROR: your browser does not support WebWorkers!! (please consult a Tutor)."));
-            return;
-        }
-
-        //var urlLoc = {url: document.location.href.substring(0, document.location.href.lastIndexOf("/"))};
-        //var path = urlLoc.url+'/data/assCodeQuestion';
-        //var path  = './Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion';
-        var worker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/pyWorker.js');
-        //var urlLoc = {url: document.location.href.substring(0, document.location.href.lastIndexOf("/")) + '/'};
-        
-        // construct message for worker
-        var pyInp = []; // not used jet
-       
-        var messageData = {pyProg: prog, pyInp: pyInp, maxMS: maxMS};
-        worker.postMessage(['b8e493ca02970aeb0ef734555526bf9b',messageData]);
-        var start = Date.now();
-        
-        var testTimeout = function(){    
-            var time = Date.now()-start;
-            if(time > maxMS){
-                worker.end(format_error("TimeoutError:  Execution took too long (> "+time+" ms) and was terminated. There might be an endless loop in your code."));
-                return true;
-            }
-            return false;
-        }
-        var executionFinished = false;
-        worker.end = function(msg){
-                if(executionFinished) return;
-                worker.terminate();
-                executionFinished = true;
-                if(msg) output( msg );//"HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test.");
-            }
-        worker.onmessage = function(e){
-            if(executionFinished) return;
-            //only accept messages, when worker not terminated (workers do not immetiately terminate)
-            if (testTimeout() === true) { return; }
-            if( e.data[0] == 'finished' ){
-                const result = finishedExecutionWithOutput(e.data[1].stdOut, questionID)
-                output(''+ result);
-                
-                worker.end(format_info("Info: Execution finished in : " + (Date.now() - start) + " ms"));
-            }else if (e.data[0] ==='err'){
-                worker.end(format_error("ERROR: " + e.data[1]));
-            }
-            else {
-                worker.end(format_error("Unknown error: " + e.data[1]));
-            }
-        }
-        // in any case use the window timeout to terminate the worker
-        setTimeout(testTimeout,maxMS);
-    }
-} 
-
-function runJavaScriptWorker( code, log_callback, max_ms, questionID){
-    
-
-    //console.log("submit");
-    // TODO:: IE.11  does not support default arguments
-    //    if(max_ms==undefined) max_ms=50;
-    //    if(max_loglength==undefined) max_loglength=2000;
-    
-    var Log = [];
-    var output = function(l){       // wrap the log
-        //alert(l);
-        if(!log_callback) console.log(l);
-        else{            
-            Log.push(l);
-            log_callback( Log.join('\n') );
-        }
-    }
-    log_callback('');
-
-    if(!window.Worker){
-        output(format_error("CRITICAL-ERROR: your browser does not support WebWorkers!! (please consult a Tutor)."));
-        return;
-    }
-
-    var not_allowed_keywords =['postMessage','close','onmessage','debugger'];      // blacklist (can be evaded, ... see below)
-    for(var key in not_allowed_keywords){
-        if(code.indexOf(not_allowed_keywords[key]) != -1){        // the user is not allowed to use the functionallity of the WebWorker
-            output(format_error("PermissionError: The usage of '"+not_allowed_keywords[key]+"' is not allowed (reserved keyword)!"));
-            return;
-        }
-    }
-    var lines = code.split('\n').length;
-
-    // The user-code is sourrounded by webworker start and finish code (one line each)
-    // additionally, the console.log fnc is replaced, because the original log fnc is consuming much cpu ressources,
-    //      and continues logging, even after the worker was terminated.
-
-    var prefixCode =[
-        "for(var c in console) console[c]=null;"   //delete all console functionality
-    ,   "for(var t in this) if(t!='close' && t!='postMessage' && t!='console') this[t]=null;"   //delete all worker functionality
-    ,   "this.console = {};"
-    ,   "console.log = function(s){"                    // only allow .log , .warn and .error
-    ,   "   postMessage(['log',''+s]);"
-    ,   "};"
-    ,   "console.error = console.log;"
-    ,   "console.warn = console.log;"
-    ,   "onmessage = function(input){"
-    ,   "   postMessage(['finished',"
-    ,   "   ''+(function(input){"
-    ,   "           'use strict';"
-    ,   "\n"
-    ];
-    var postfixCode=[
-        "\n"
-    ,   "})(input.data[1])]);"
-    ,   "   close();"
-    ,   "};"
-    ];
-    code = prefixCode.join('') + code + postfixCode.join('');
-
-
-    //TODO:: creating a WebWorker from an URL is throwing a SecurityError in  IE 11  ...
-    //          is there any workaround?
-    var worker = new Worker(URL.createObjectURL(new Blob([code], {type: 'text/javascript'})));
-    var executionFinished = false;
-    worker.end = function(msg){
-        if(executionFinished) return;
-        worker.terminate();
-        executionFinished = true;
-        if(msg) output( msg );//"HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test.");
-    }
-
-    var start = Date.now();
-    var testTimeout = function(){    
-        var time = Date.now()-start;
-        if(time > max_ms){
-            worker.end(format_error("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code."));
-        }
-    }
-    
-    var outputBuffer = ''
-    worker.onmessage = function(e){
-        if(executionFinished) return;
-        //only accept messages, when worker not terminated (workers do not immetiately terminate)
-
-        testTimeout();
-        if( e.data[0] == 'finished' ){
-            outputBuffer = finishedExecutionWithOutput(outputBuffer, questionID)
-            output(''+ outputBuffer );   
-            worker.end(format_info("Info: Execution finished in " + (Date.now() - start) + " ms"));
-
-            //TODO:: perform additional calls to check for hidden testcases
-
-/*
-            var result = '' + e.data[1];
-            if(typeof expected_result === 'undefined'){
-                worker.end("Info: Execution finished.");
-            }else{
-                worker.end("Info: Execution finished returning '"+result+"'");
-                if( result == ''+expected_result )  worker.end("Success:  result is matching expectation.");
-                else                                worker.end("NOT Succesful:  result is not matching expectation.");
-            }
-*/
-
-        }else if(e.data[0]=='log'){
-            outputBuffer += e.data[1];
-                       
-        }else{
-            worker.end(format_error("HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test."));
-        }
-    }
-    worker.onerror   = function(e){         
-        //errors before and after the user code are handled specially (to not confuse the user).
-        if(e.lineno == 1)             worker.end(format_error("Error: "+e.message));
-        else if(e.lineno >= lines+1)  worker.end(format_error("EndOfFile: "+ e.message ));
-        else                          worker.end(format_error('Line '+(e.lineno-1)+": "+e.message));
-    }
-    worker.postMessage(['start',[10,200]]);                                //start worker execution
-
-    setTimeout( testTimeout, max_ms );
 }
 
 /**
@@ -907,5 +801,118 @@ function setupD3Scene( canvasElement, createSceneCallback, type='svg'){
         canvas:canvas
     })
 }
+function clearDiagnostics(questionID){
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return;
+        if (!blockHasProgramCode(block)) return;
+        const editor = editors[block.id]; 
+        
+        if (editor) {
+            editor.getDoc().clearGutter('diagnostics');
+            var allMarks = editor.getDoc().getAllMarks();
+            $.each(allMarks, function(idx, e){            
+                e.clear();
+            })
+        }
+    });
+}
+function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
+    console.log(questionID, error);
+    var line = error.start.line;
+    
+    if (gutterSeverity[line]===undefined || gutterSeverity[line] < error.severity) {
+        gutterSeverity[line] = error.severity;
+    }
+    var gutterClassName = '';
+    switch (gutterSeverity[line]) {
+        case SEVERITY_ERROR:
+            gutterClassName = "exclamation-sign gutter-error";
+            break;
+        case SEVERITY_WARNING:
+            gutterClassName = "warning-sign gutter-warning";
+            break;
+        default:
+        console.log("severity", gutterSeverity[line]);
+            return;
+    }
+
+    var element = gutterElements[line];
+    if (element == null) {
+        element = document.createElement("span");
+        gutterElements[line] = element;
+    }
+    element.className = "glyphicon glyphicon-" + gutterClassName;
+
+    var title = element.title;
+    title = title!='' ? (title + "\n\n" + '- ' + error.message) : ('- ' +error.message);
+    element.title = title;    
+
+    $("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
+        if (block.getAttribute('data-ignore')) return;
+        if (!blockHasProgramCode(block)) return;
+        const editor = editors[block.id];  
+
+        if (editor) {
+            var first = editor.getOption('firstLineNumber');
+            var last = first + block.value.split(/\r\n|\r|\n/).length - 1;
+            console.log("editor from",first,"to",last);
+            
+            if (error.start.line+1 >= first && error.start.line+1 <= last) {
+                console.log("Adding Marker for", error);
+                editor.getDoc().markText(
+                    {line:error.start.line-first + 1, ch:error.start.column}, 
+                    {line:error.end.line-first + 1, ch:error.end.column}, 
+                    {
+                        className:'red-wave',
+                        inclusiveLeft:true,
+                        inclusiveRight:true,
+                        title:error.message                
+                    }
+                );
+
+                var info = editor.getDoc().lineInfo(error.start.line-first + 1);
+                editor.getDoc().setGutterMarker(error.start.line-first + 1, "diagnostics", element);
+            }
+            
+        } else {
+         
+        }
+    });
+}
+
+
+function hideGlobalState(){
+    displayGlobalState(null);
+}
+function displayGlobalState(msg) {
+    let waitBoxes = document.querySelectorAll("#stateBox");
+    let infoBoxes = document.querySelectorAll("#stateMessageBox");
+    //console.log(msg, waitBoxes, infoBoxes)    
+    for (let nr in infoBoxes) {
+      let box = infoBoxes[nr];
+      if (box.id) {
+        box.innerHTML = msg;
+      }
+    }
+    for (let nr in waitBoxes) {
+      let box = waitBoxes[nr];
+      if (box.style) {
+        box.style.display = msg === null ? "none" : "inline-block";
+      }
+    }
+}
+
+function setAllRunButtons(enabled, info=undefined){
+    $('[type=button][data-question]').each(function(i, runButton){
+      if (enabled){
+        if (runButton.getAttribute('data-info') != info)
+          return
+      }
+      runButton.disabled = !enabled;
+      if (info)
+        if (enabled) runButton.removeAttribute('data-info')
+        else runButton.setAttribute('data-info', info);
+    })    
+ };
 
 //@ sourceURL=helper.js

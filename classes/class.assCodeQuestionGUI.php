@@ -73,6 +73,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($language=="java") {
 			$language = "clike";
 			$mode = "text/x-java";
+		} if ($language=="java2") {
+			$language = "java";
+			$mode = "text/x-java";
 		} else if ($language=="c++") {
 			$hljslanguage = 'cpp';
 			$language = "clike";
@@ -103,15 +106,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		
 		
 		$lngData = $this->getLanguageData();
-		if ($lngData['org'] == "java" && $this->object->getAllowRun()) {
-			if (!$this->tpl->hasJava){
-				$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
-				$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-				$this->tpl->hasJava = true;
-			}
-		}
+		
 		if (!$this->tpl->didPrepare) {
 			$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
@@ -141,6 +136,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
 
 			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
+
+
+			if ($lngData['org'] == "java") {
+				if (!$this->tpl->hasJava){
+					if ($this->object->getAllowRun()){
+						$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
+						$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
+						$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
+						$this->tpl->hasJava = true;
+					}										
+				}
+			}
+			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
+			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
+			$this->tpl->addJavascript(self::URL_PATH.'/js/python.js');						
+			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');		
+			$this->tpl->addJavascript(self::URL_PATH.'/js/glsl.js');
 
 			$this->tpl->didPrepare = true;
 		}		
@@ -581,7 +594,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>';
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/java2.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/python.js'.self::URL_SUFFIX.'"></script>
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/glsl.js'.self::URL_SUFFIX.'"></script>';
 
 				$this->didAddLinksToSolutions = true;
 
@@ -755,14 +773,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'c++'=>'C++',
 			'c#' => 'C#', 
 			'fortran'=>'Fortran', 
-			'glsl'=>'GLSL', 
-			'java'=>'Java',
+			'glsl'=>'GLSL', 			
+			'java2'=>'Java',
 			'javascript'=>'JavaScript',
 			'objectivec'=>'Objective-C',
 			'perl'=>'Perl',
 			'python'=>'Python',
 			'r' => 'R', 
-			'ruby'=>'Ruby')
+			'ruby'=>'Ruby',
+			'java'=>'[Java (legacy)]')
 			);
 		$select->addCustomAttribute('onchange="selectLanguage( )"');
 		$select->setValue($this->getLanguage());
@@ -784,7 +803,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$have3js->setChecked( $this->object->getIncludeThreeJS() );
 		$form->addItem($have3js);
 
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'glsl') {
+		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
 			$allowRun->setValue('true');
 			$haved3->setValue('true');
 			$have3js->setValue('true');

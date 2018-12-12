@@ -4,22 +4,14 @@
  * @type {int} javaRunOverhead execution overhead in ms
  */
 var javaRunOverhead = 4000;
-function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb, forceReload=false) {
-  function format_info(text) {
-    return '<span style="color:green">' + text + '</span>';
-  }
-  function format_error(text) {
-    return '<span style="color:red">' + text + '</span>';
-  }
 
+function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, forceReload=false) {    
   let exp = new RegExp("public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)");
   let match = exp.exec(code);
   if (match == null) {
     console.error("Unable to determine class Name!", match, code);
     return;
   }
-
-  log_callback('<div class="sk-three-bounce"><div class="sk-child sk-bounce1"></div><div class="sk-child sk-bounce2"></div><div class="sk-child sk-bounce3"></div>');
 
   let className = match[1];
 
@@ -35,14 +27,13 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
           clearTimeout(timer)
           timer = null
         }
-
-        const outputBuffer = finishedExecutionWithOutputCb(data.stdout, questionID);
-        let tex = '';
-        if (data.stderr && data.stderr != '') tex += format_error(data.stderr) + "\n";
-        if (data.stdout && data.stdout != '') tex += format_info(outputBuffer);
-        log_callback(tex)
-        //console.log("Done", data.stdout, data.stderr);
-        break
+        
+        if (data.stderr && data.stderr != '') err_callback(data.stderr + "\n") ;
+        if (data.stdout && data.stdout != '') log_callback(data.stdout);
+        
+        console.log("Done", data.stdout, data.stderr, finishedExecutionCB);
+        finishedExecutionCB();
+        break;
 
       case 'startTimer':
         timer = setTimeout(function (e) {
@@ -52,10 +43,10 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
             console.log("Terminating Worker")
             worker.terminate()            
           }, 5000);
-          log_callback(format_error("Terminated long running Process (>"+Math.round((max_ms + javaRunOverhead)/1000)+"s)."))
-            JavaExec.setRunButton(true, 'run')
-            JavaExec.setRunButton(true)
-            JavaExec.showMessage(null)
+          err_callback("Terminated long running Process (>"+Math.round((max_ms + javaRunOverhead)/1000)+"s).");
+            JavaExec.setRunButton(true, 'run');
+            JavaExec.setRunButton(true);
+            JavaExec.showMessage(null);
         }, max_ms + javaRunOverhead) //we need about 4000ms to spin up the execution unit
         break
 
@@ -70,12 +61,12 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
         break
 
       case 'cleanCache':
-        log_callback('')
+        //log_callback('')
         if (!forceReload) {
           worker.postMessage({ cmd: 'kill' })
           console.log("Restarting...")
           setTimeout(function(){
-            runJavaWorker(code, log_callback, max_ms, questionID, finishedExecutionWithOutputCb, true)
+            runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecution, true);            
           }, 500)
         } else {
           JavaExec.setRunButton(false)
@@ -91,13 +82,20 @@ function runJavaWorker(code, log_callback, max_ms, questionID, finishedExecution
 }
 
 (function () {
-  JavaExec.initialize(function () {
-    console.log("Initializing Filesystem");
-    JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', false, function () {
-      //JavaExec.printDirContent('sys/vendor');      
+  try {  
+    JavaExec.initialize(function () {
+      console.log("Initializing Filesystem");
+      JavaExec.initFileSystems('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion', false, function () {
+        //JavaExec.printDirContent('sys/vendor');      
 
-      JavaExec.reroutStdStreams();
-      JavaExec.ready = true;
-    })
-  })
+        JavaExec.reroutStdStreams();
+        JavaExec.ready = true;
+      });
+    });
+    registerLanguage('java', runJavaWorker);
+  } catch (e) {
+    registerLanguage('java', runDummy);
+  }
+
+  
 })();
