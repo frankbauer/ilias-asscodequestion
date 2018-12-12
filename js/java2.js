@@ -69,7 +69,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
     
     var mainClass = 'Unknown';
-    let regexpMainClass = /(['"])(?:[^"'\\]+?|(?!\1)["']|\\{2}|\\[\s\S])*?\1|public\s+?class\s+?([a-zA-Z_$0-9]+?)\s*?(\{|\simplements|\sextends)/gm
+    let regexpMainClass = /(['"])(?:[^"'\\]+?|(?!\1)["']|\\{2}|\\[\s\S])*?\1|public\s+?class\s+?([a-zA-Z_$0-9]+?)\s*?(\{|\simplements|\sextends)|^.*(\/\/.*$)|\/\*[\s\S]*?\*\//gm
     while (match = regexpMainClass.exec(code)) {
         if (match[2]) {
             mainClass = match[2];
