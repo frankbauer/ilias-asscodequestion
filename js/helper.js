@@ -5,6 +5,12 @@ String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
+String.prototype.replaceRec = function (pattern, replacement) {
+    var newstr = this.replace(pattern, replacement);
+    if (newstr == this)
+        return newstr;
+    return newstr.replaceRec(pattern, replacement);
+};
 
 function format_info(text){
     return '<span style="color:green">'+text+'</span>';

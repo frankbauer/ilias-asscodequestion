@@ -69,10 +69,15 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
     
     var mainClass = 'Unknown';
-    let regexpMainClass = /(['"])(?:[^"'\\]+?|(?!\1)["']|\\{2}|\\[\s\S])*?\1|public\s+?class\s+?([a-zA-Z_$0-9]+?)\s*?(\{|\simplements|\sextends)|^.*(\/\/.*$)|\/\*[\s\S]*?\*\//gm
-    while (match = regexpMainClass.exec(code)) {
-        if (match[2]) {
-            mainClass = match[2];
+    let text = code.replace(/"(?:[^"\\]+?|(?!")"|\\{2}|\\[\s\S])*?"|^.*(\/\/.*$)|\/\*[\s\S]*?\*\//gm, ''); //replace strings and comments    
+    
+    text = text.replaceRec(/(\{[^{}]*\})/gm, '[]'); //replace parentheses    
+
+    //above replaces all {} with [], so look for public class <name> []
+    let regexpMainClass = /public\s+?class\s+?([a-zA-Z_$0-9]+?)\s*?(\[|\simplements|\sextends)/gm;
+    while (match = regexpMainClass.exec(text)) {
+        if (match[1]) {
+            mainClass = match[1];
             break;
         }
     }
