@@ -1,4 +1,4 @@
-var lastCodeMirrorInstance = []
+var lastCodeMirrorInstance = [];
 var SEVERITY_ERROR = 2;
 var SEVERITY_WARNING = 1;
 String.prototype.replaceAll = function(search, replacement) {
@@ -27,7 +27,7 @@ var $executables = {};
  * @param {*} languageStyle The language name for our highlighters
  */
 function registerLanguage(name, fktRun, languageStyle=undefined) {
-    if (languageStyle===undefined) languageStyle = name
+    if (languageStyle===undefined) languageStyle = name;
     console.log("[registered new language: " + name + "]");
     $executables[name] = {
         name: name,
@@ -458,7 +458,7 @@ function runInExam(language, questionID){
     var sansoutput = '';
     var didClip = false;
     function log(text){        
-        console.log("log", text);
+        //console.log("log", text);
         output += text;
         text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         if (!didClip) {
@@ -473,7 +473,7 @@ function runInExam(language, questionID){
     function info(text){
         text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         text = format_info(text);
-        console.log("nfo", text);
+        //console.log("nfo", text);
         sansoutput += text; 
         outdiv.innerHTML += text;  
     } 
@@ -481,7 +481,7 @@ function runInExam(language, questionID){
     function err(text){
         text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
         text = format_error(text);
-        console.log("err", text);
+        //console.log("err", text);
         sansoutput += text; 
         outdiv.innerHTML += text; 
     } 
@@ -529,7 +529,7 @@ function finishedExecution(output, infoErrorOutput, questionID, outputDiv){
     let plygrounds = $("playground[data-question="+questionID+"]");    
 
     if (output !== undefined && plygrounds.length>0){  
-        console.log("output", output);      
+        //console.log("output", output);      
         //try to parse JSON
         try {
             if (output.indexOf('[')!=-1 || output.indexOf('{')!=-1) {
@@ -693,7 +693,7 @@ function selectType(select, elementID, blockNr, languageSelect=true){
         ed.setOption('theme', 'xq-light') 
         ed.setOption('theme', edTheme)
     } else {        
-        console.log(edTheme)
+        //console.log(edTheme)
         ed.setOption('theme', edTheme)
     }
     if (languageSelect) selectLanguage()
@@ -817,7 +817,7 @@ function clearDiagnostics(questionID){
     });
 }
 function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
-    console.log(questionID, error);
+    //console.log(questionID, error);
     var line = error.start.line;
     
     if (gutterSeverity[line]===undefined || gutterSeverity[line] < error.severity) {
@@ -832,7 +832,7 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
             gutterClassName = "warning-sign gutter-warning";
             break;
         default:
-        console.log("severity", gutterSeverity[line]);
+            console.error("Unknown Severity", gutterSeverity[line]);
             return;
     }
 
@@ -855,10 +855,10 @@ function processDiagnostics(error, questionID, gutterElements, gutterSeverity) {
         if (editor) {
             var first = editor.getOption('firstLineNumber');
             var last = first + block.value.split(/\r\n|\r|\n/).length - 1;
-            console.log("editor from",first,"to",last);
+            //console.log("editor from",first,"to",last);
             
             if (error.start.line+1 >= first && error.start.line+1 <= last) {
-                console.log("Adding Marker for", error);
+                //console.log("Adding Marker for", error);
                 editor.getDoc().markText(
                     {line:error.start.line-first + 1, ch:error.start.column}, 
                     {line:error.end.line-first + 1, ch:error.end.column}, 
