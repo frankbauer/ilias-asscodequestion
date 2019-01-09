@@ -390,7 +390,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$tpl->setVariable("CONTENT", $this->prepareSolutionCode($value1, $i));
 				$html .= $tpl->get();
 			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
-				$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';	
+				//$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';
+				
+				$tpl->setVariable("CONTENT", $code);
+				$html .= $tpl->get();
 			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
 				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
 				$html .= '<playground id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></playground>';	
