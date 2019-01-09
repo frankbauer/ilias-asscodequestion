@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.5
+**Version**:  1.1.6
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -264,6 +264,10 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.6
+* reduced new java log level
+* hidden code elements live inside an invisible codemirror component too. This ensures that < and > are handled correct.
+
 ### Version 1.1.5
 * new, simplified subsystem to add support fpr new runable languages
 * added new, much faster java runtime based on TeaVM-javac 

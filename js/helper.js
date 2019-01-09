@@ -280,7 +280,13 @@ function initSolutionBox(useMode, qLanguage, questionID){
             editor.setOption('theme', 'xq-light')  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
-        }          
+        } 
+        
+        //change look of hidden code blocks
+        if (block.getAttribute('data-blocktype')==3 && !inQuestionEditMode) {             
+            editor.setOption('theme', 'xq-light')  
+            $(editor.getWrapperElement()).hide();            
+        }
     })
     finishedExecutionWithOutput(undefined, questionID)
 
