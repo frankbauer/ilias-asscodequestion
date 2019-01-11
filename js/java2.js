@@ -9,7 +9,7 @@ function createTeaWorker(whenReady){
         teaworker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/worker.js');
 
         teaworker.addEventListener('message', function(e) {
-            //console.log("teaworker", e.data);
+            //console.log(e.data);
             if (e.data.command == 'ok' && e.data.id == 'didload-classlib') {
                 teaworker.postMessage({
                     command:"compile",
@@ -92,7 +92,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
     //console.log(mainClass, code);
     var myListener = function(e) {        
-        //console.log("tearunner", questionID, e.data);
+        //console.log(questionID, e.data);
         if (e.data.id == ''+questionID){
             if (e.data.command == 'phase') {
                 if (e.data.phase == 'DEPENDENCY_ANALYSIS') {
