@@ -23,13 +23,13 @@ var $rt_global = {
     }
 };
 
-self.addEventListener("message", function(event) {    
-    var request = event.data;
-    console.log(request);
+function listener(event) {    
+    let request = event.data;
+    //console.log(request);
     if (request.command == 'run') {    
         $rt_global.id = request.id;            
-        var blob = new Blob([request.code], {type: 'application/javascript'});            
-        self.importScripts(URL.createObjectURL(blob));
+        let blob = new Blob([request.code], {type: 'application/javascript'});       let URLObject =  URL.createObjectURL(blob);    
+        self.importScripts(URLObject);
         self.postMessage({ command: "run-finished-setup", id:request.id });  
         
         main();
@@ -37,7 +37,16 @@ self.addEventListener("message", function(event) {
         if ($stderrBuffer != '') self.postMessage({ command: "stderr", line: $stderrBuffer, id:request.id });
         if ($stdoutBuffer != '') self.postMessage({ command: "stdout", line: $stdoutBuffer, id:request.id }); 
         
-        self.postMessage({ command: "run-completed", id:request.id });      
+        self.postMessage({ command: "run-completed", id:request.id }); 
+
+        URLObject = undefined;
+        blob = undefined;
+        $stderrBuffer = undefined;
+        $stdoutBuffer = undefined;
+        self.removeEventListener("message", listener);     
     }
-});
+    request = undefined;
+}
+
+self.addEventListener("message", listener);
 
