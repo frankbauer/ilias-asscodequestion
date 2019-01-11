@@ -143,8 +143,12 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     }); 
                     
                     workerrun.end = function(msg){
-                        if(executionFinished) return;
-                        workerrun.terminate();
+                        //when we end it IS over, no matter how often we tried :)
+                        try {
+                            workerrun.terminate();
+                        } catch(e){}
+                        
+                        if(executionFinished) return;                        
                         executionFinished = true;
                         finishedExecutionCB(false); 
                         isRunning = false;
