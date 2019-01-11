@@ -92,7 +92,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
     //console.log(mainClass, code);
     var myListener = function(e) {        
-        //console.log(questionID, e.data);
+        //console.log('teaworker', questionID, e.data);
         if (e.data.id == ''+questionID){
             if (e.data.command == 'phase') {
                 if (e.data.phase == 'DEPENDENCY_ANALYSIS') {
