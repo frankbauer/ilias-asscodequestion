@@ -9,7 +9,7 @@ function createTeaWorker(whenReady){
         teaworker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/worker.js');
 
         teaworker.addEventListener('message', function(e) {
-            //console.log(e.data);
+            //console.log("teaworker", e.data);
             if (e.data.command == 'ok' && e.data.id == 'didload-classlib') {
                 teaworker.postMessage({
                     command:"compile",
@@ -67,6 +67,14 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
         return;
     }  
 
+    const compilerTimeout = setTimeout( function(){
+        if(!booted){
+            var time = Date.now()-start;
+            teaworker.end("TimeoutError:  Compilation took too long (>"+time+"ms) and was terminated. Trying to reset the System. Please re-run your code and call a Tutor if this Problem persists.");            
+            teaworker = undefined;
+        }
+    }, teaVMRunOverhead );
+
     
     var mainClass = 'Unknown';
     let text = code.replace(/"(?:[^"\\]+?|(?!")"|\\{2}|\\[\s\S])*?"|^.*(\/\/.*$)|\/\*[\s\S]*?\*\//gm, ''); //replace strings and comments    
@@ -84,7 +92,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
 
     //console.log(mainClass, code);
     var myListener = function(e) {        
-        //console.log(questionID, e.data);
+        //console.log("tearunner", questionID, e.data);
         if (e.data.id == ''+questionID){
             if (e.data.command == 'phase') {
                 if (e.data.phase == 'DEPENDENCY_ANALYSIS') {
@@ -111,16 +119,16 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     info_callback(msg+"\n");
                 }                
             } else if (e.data.command == 'compilation-complete') {  
-                booted = true;          
+                booted = true;       
+                let runTimeout = undefined;   
                 teaworker.removeEventListener('message', myListener);
+                try {clearTimeout(compilerTimeout);} catch(e){}
 
                 if (e.data.status == 'errors') {                    
                     finishedExecutionCB(false); 
                     isRunning = false;                    
                 } else {
-                    displayGlobalState("Executing <b>"+mainClass+"</b>");
-                    var workerrun = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/workerrun.js');
-                    workerrun.addEventListener('message', function(ee) {
+                    function runListener(ee) {
                         if (ee.data.command == 'run-finished-setup') {
 
                         } else if (ee.data.command == 'run-completed'){
@@ -133,8 +141,11 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                             log_callback(ee.data.line+"\n");
                         } else if (ee.data.command == 'stderr') {
                             err_callback(ee.data.line+"\n");
-                        }
-                    });
+                        }                        
+                    }
+                    displayGlobalState("Executing <b>"+mainClass+"</b>");
+                    let workerrun = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/workerrun.js');
+                    workerrun.addEventListener('message', runListener);
         
                     workerrun.postMessage({
                       command:'run',
@@ -143,8 +154,13 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     }); 
                     
                     workerrun.end = function(msg){
-                        if(executionFinished) return;
-                        workerrun.terminate();
+                        //when we end it IS over, no matter how often we tried :)
+                        try {
+                            workerrun.terminate();
+                            if (runTimeout) clearTimeout(runTimeout);
+                        } catch(e){}
+                        
+                        if(executionFinished) return;                        
                         executionFinished = true;
                         finishedExecutionCB(false); 
                         isRunning = false;
@@ -152,12 +168,10 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     };
 
                     var runStart = Date.now();
-                    var testTimeout = function(){    
+                    runTimeout = setTimeout( function(){    
                         var time = Date.now()-runStart;
                         workerrun.end("TimeoutError:  Execution took too long (>"+time+"ms) and was terminated. There might be an endless loop in your code.");                                                    
-                    };
-
-                    setTimeout( testTimeout, max_ms );
+                    }, max_ms );
                 }
             }
         }
@@ -175,7 +189,11 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
         mainClass:mainClass
     });
 
+    
+
     teaworker.end = function(msg){
+        try {clearTimeout(compilerTimeout);} catch(e){}
+
         if(booted) return;
         teaworker.terminate();
         finishedExecutionCB(false); 
@@ -184,13 +202,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
         if(msg) err_callback( msg + "\n");
     };
 
-    setTimeout( function(){
-        if(!booted){
-            var time = Date.now()-start;
-            teaworker.end("TimeoutError:  Compilation took too long (>"+time+"ms) and was terminated. Trying to reset the System. Please re-run your code and call a Tutor if this Problem persists.");            
-            teaworker = undefined;
-        }
-    }, teaVMRunOverhead );
+    
 }
 
 
