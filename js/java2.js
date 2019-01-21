@@ -9,7 +9,7 @@ function createTeaWorker(whenReady){
         teaworker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/worker.js');
 
         teaworker.addEventListener('message', function(e) {
-            //console.log(e.data);
+            //console.log("teastuff", e.data);
             if (e.data.command == 'ok' && e.data.id == 'didload-classlib') {
                 teaworker.postMessage({
                     command:"compile",
@@ -101,8 +101,26 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     displayGlobalState("Linking <b>"+mainClass+".java</b>");
                 } else if (e.data.phase == 'OPTIMIZATION') {
                     displayGlobalState("Optimizing <b>"+mainClass+".java</b>");
+                } else if (e.data.phase == 'RENDERING') {
+                    displayGlobalState("Creating <b>"+mainClass+".class</b>");
                 }
-            } else if (e.data.command == 'compiler-diagnostic') {
+            } else if (e.data.command == 'diagnostic') {
+                if (compileFailedCallback){
+                    compileFailedCallback({
+                        message:e.data.text,
+                        start:{line:e.data.lineNumber, column:0},
+                        end:{line:e.data.lineNumber, column:0},
+                        severity:e.data.severity=='ERROR' ? SEVERITY_ERROR : SEVERITY_WARNING
+                    });
+                } 
+
+                msg = e.data.text + "\n";
+                if (e.data.severity == 'ERROR') {
+                    err_callback(msg+"\n");
+                } else {
+                    info_callback(msg+"\n");
+                }                
+            }else if (e.data.command == 'compiler-diagnostic') {
                 if (compileFailedCallback){
                     compileFailedCallback({
                         message:e.data.message,
@@ -129,6 +147,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     isRunning = false;                    
                 } else {
                     function runListener(ee) {
+                        //console.log('tearunner', questionID, ee.data);
                         if (ee.data.command == 'run-finished-setup') {
 
                         } else if (ee.data.command == 'run-completed'){
