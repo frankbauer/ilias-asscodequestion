@@ -855,6 +855,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if ($language=='fortran') return 'f';
 		if ($language=='glsl') return 'glsl';
 		if ($language=='java') return 'java';
+		if ($language=='java2') return 'java';
 		if ($language=='javascript') return 'js';
 		if ($language=='objectivec') return 'm';
 		if ($language=='perl') return 'pl';
@@ -868,7 +869,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	function getExportFilename() {
 		if (is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
-		} else if ($this->getLanguage()=='java'){
+		} else if ($this->getLanguage()=='java' || $this->getLanguage()=='java2'){
 			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
 			$className = trim($matches[1][0]);
 			if ($className=='') $className="Unbekannt";
