@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.6
+**Version**:  1.1.7
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -264,6 +264,10 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.7
+* Added helper function `processMixedOutput` that will seperate an output string into a string and a json-object based on a seperating magic string.
+* Updated Java Compiler to latest TeaVM (0.6.0-dev-661) and JDK8 patchlevel
+
 ### Version 1.1.6
 * reduced new java log level
 * hidden code elements live inside an invisible codemirror component too. This ensures that < and > are handled correct.

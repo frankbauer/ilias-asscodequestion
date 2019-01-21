@@ -101,6 +101,8 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     displayGlobalState("Linking <b>"+mainClass+".java</b>");
                 } else if (e.data.phase == 'OPTIMIZATION') {
                     displayGlobalState("Optimizing <b>"+mainClass+".java</b>");
+                } else if (e.data.phase == 'RENDERING') {
+                    displayGlobalState("Creating <b>"+mainClass+".class</b>");
                 }
             } else if (e.data.command == 'diagnostic') {
                 if (compileFailedCallback){
@@ -145,6 +147,7 @@ function runTeaVMWorker(questionID, code, mypre, max_ms, log_callback, info_call
                     isRunning = false;                    
                 } else {
                     function runListener(ee) {
+                        //console.log('tearunner', questionID, ee.data);
                         if (ee.data.command == 'run-finished-setup') {
 
                         } else if (ee.data.command == 'run-completed'){
