@@ -796,7 +796,7 @@ function processMixedOutput(outputObject, canvasElement, magicString) {
     const idx = outputObject.indexOf(magicString);    
     if (idx >= 0) {
         const str = outputObject.substr(0, idx);
-        const json = JSON.parse(outputObject.substr(idx+9));
+        const json = JSON.parse(outputObject.substr(idx+magicString.length));
         			
         
         return {
