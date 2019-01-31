@@ -1,7 +1,7 @@
 // English Language File for assCodeQuestion Plugin
 <!-- language file start -->
 assCodeQuestion#:#Sourcecode Question
-label_value1#:#Your Sourcecode:
+label_value1#:#Your Solution:
 any_text#:##This could be your answer :)
 source_lang#:#Source Language
 code_prefix#:#Leading Sourcecode
