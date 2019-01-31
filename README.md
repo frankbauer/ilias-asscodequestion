@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.7
+**Version**:  1.1.8
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -264,6 +264,9 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.8
+* Downgraded Java Compiler to last stable TeaVM (0.6.0-dev-451) and JDK8 patchlevel
+
 ### Version 1.1.7
 * Added helper function `processMixedOutput` that will seperate an output string into a string and a json-object based on a seperating magic string.
 * Updated Java Compiler to latest TeaVM (0.6.0-dev-661) and JDK8 patchlevel
