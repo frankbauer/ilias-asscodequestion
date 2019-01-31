@@ -815,6 +815,35 @@ function processMixedOutput(outputObject, canvasElement, magicString) {
     };
 }
 
+function findUIElements(canvasElement){
+    let res = {};
+    res.questionID = canvasElement.attr('data-question');
+    res.textEdit = $("[data-blocktype=2][data-question="+res.questionID+"]");
+    res.stateBox = $("#stateBox[data-question="+res.questionID+"]");
+    res.runButton = $("#allow_run_button[data-question="+res.questionID+"]");
+    res.runContainer = $("#runContainer[data-question="+res.questionID+"]");
+    if (res.textEdit!==undefined) {
+        res.editor = editors[res.textEdit.attr('id')];
+    } else {
+        res.editor = undefined;
+    } 
+    
+    return res;
+}
+
+function hideUIElements(canvasElement){
+    let res = findUIElements(canvasElement);
+    if (res.editor===undefined){
+        console.error("Could not find a valid answer Element");
+    } else {
+        $(res.editor.getWrapperElement()).hide();
+        res.runButton.hide();
+        res.stateBox.hide();
+        if (res.runContainer) res.runContainer.hide();
+    }
+    return res;
+}
+
 function initD3(){    
     //currently we need no genereal purpose code to set up D3
 }
