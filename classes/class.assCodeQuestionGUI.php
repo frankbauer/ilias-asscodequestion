@@ -628,15 +628,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	/**
 	 * Returns the answer specific feedback for the question
-	 * 
-	 * @param integer $active_id Active ID of the user
-	 * @param integer $pass Active pass
+	 *
+	 * This method should be overwritten by the actual question.
+	 *
+	 * @todo Mark this method abstract!
+	 * @param array $userSolution ($userSolution[<value1>] = <value2>)
 	 * @return string HTML Code with the answer specific feedback
 	 * @access public
 	 */
-	function getSpecificFeedbackOutput($active_id, $pass)
+	function getSpecificFeedbackOutput($userSolution)
 	{
 		// By default no answer specific feedback is defined
+		$output = '';
 		return $this->object->prepareTextareaOutput($output, TRUE);
 	}
 	
