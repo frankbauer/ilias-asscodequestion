@@ -113,12 +113,17 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/duotone-dark.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/duotone-light.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mbo.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mdn-like.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
 			
 			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
@@ -375,9 +380,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("BLOCK_TYPE", $type);
 			$tpl->setVariable("QUESTION_ID", $questionID);				
 			$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
+			$tpl->setVariable("THEME", $this->object->getTheme());
+			$tpl->setVariable("ROTHEME", $this->object->getROTheme());
 			if ($readOnly)
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
-			else
+			else 
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
 
 		
@@ -841,17 +848,30 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			'default' => 'default',
 			'base16-dark' => 'base16-dark',
 			'base16-light' => 'base16-light',
+			'duotone-dark' => 'duotone-dark',
+			'duotone-light' => 'duotone-light',
 			'xq-light' => 'xq-light',
 			'xq-dark' => 'xq-dark',
 			'blackborard' => 'blackboard',
+			'mbo' => 'mbo',
+			'mdn-like' => 'mdn-like',
 			'midnight' => 'midnight',
 			'neo' => 'neo',
-			'solarized light' => 'solarized light'
+			'solarized light' => 'solarized light',
+			'solarized dark' => 'solarized dark',
+			'yeti' => 'yeti'
 		));
 		$selectTheme->addCustomAttribute('onchange="selectTheme()"');
-		$selectTheme->setValue('solarized light');
+		$selectTheme->setValue($this->object->getTheme());
 		$selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
 		$form->addItem($selectTheme);
+
+		$selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
+		$selectROTheme->setOptions($selectTheme->getOptions());
+		$selectROTheme->addCustomAttribute('onchange="selectTheme()"');
+		$selectROTheme->setValue($this->object->getROTheme());
+		$selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
+		$form->addItem($selectROTheme);
 
 		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
 		$item->setInfo($this->plugin->txt('cq_blocks_info'));
@@ -906,6 +926,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->setLanguage((string) $_POST["source_lang"]);
 		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
 		$this->object->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
+		$this->object->setTheme(((string) $_POST["cm_theme"]));
+		$this->object->setROTheme(((string) $_POST["cm_ro_theme"]));
 		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
 		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
 		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');

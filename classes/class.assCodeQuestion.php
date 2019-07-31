@@ -92,6 +92,22 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['maxChars'] = (int)$newValue;
 	}
 
+	function getTheme() {
+		return isset($this->additional_data['theme']) ? $this->additional_data['theme'] : 'solarized light'; 
+	}
+	
+	function setTheme($newValue) {
+		$this->additional_data['theme'] = ''.$newValue;
+	}
+
+	function getROTheme() {
+		return isset($this->additional_data['themeRO']) ? $this->additional_data['themeRO'] : 'xq-light'; 
+	}
+	
+	function setROTheme($newValue) {
+		$this->additional_data['themeRO'] = ''.$newValue;
+	}
+
 	function getIncludeThreeJS() {
 		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
 	}
