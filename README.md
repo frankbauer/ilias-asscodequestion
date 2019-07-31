@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.8
+**Version**:  1.1.9
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -264,6 +264,9 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.1.9
+* Full support for themed code boxes
+  
 ### Version 1.1.8
 * Downgraded Java Compiler to last stable TeaVM (0.6.0-dev-451) and JDK8 patchlevel
 
