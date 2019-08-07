@@ -30,6 +30,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	/* custom data we need to store fpr this question type. This array is serialized to json and stored in the db */
 	var $additional_data = array();
 
+	/* store the block-access objects. Data is allways stored in $additional_data, but the block-objects provide the Model for the data */
+	var $blocks = null;
+
 	/**
 	 * Constructor
 	 *
@@ -44,11 +47,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$author = "",
 		$owner = -1,
 		$question = ""
+		
 	)
 	{
 		// needed for excel export
 		$this->getPlugin()->loadLanguageModule();
-
+		$this->getPlugin()->includeClass("./support/codeBlock.php");
 		parent::__construct($title, $comment, $author, $owner, $question);
 	}
 
@@ -124,6 +128,16 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['includeD3'] = (bool)$newValue;
 	}
 
+	function getBlocks($forecReload=false){
+		if ($forecReload || $this->blocks == null || $this->getNumberOfBlocks()!=count($this->blocks)){
+			$this->blocks = array();
+			for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
+				$this->blocks[] = new codeBlock($i, $this);
+			}
+		}
+		return $this->blocks;
+	}
+
 	function getNumberOfBlocks() {
 		if (is_array($this->additional_data['blocks'])){
 			return count($this->additional_data['blocks']);
@@ -134,6 +148,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	function clearBlocks(){
 		$this->additional_data['blocks'] = array();
+		$this->blocks = null;
 	}
 
 	function getLinesForBlock($nr) {

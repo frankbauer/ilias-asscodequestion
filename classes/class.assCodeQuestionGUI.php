@@ -26,7 +26,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @const	string 	URL suffix to prevent caching of css files (increase with every change)
 	 * 					Note: this does not yet work with $tpl->addJavascript()
 	 */
-	const URL_SUFFIX = "?css_version=1.5.5";
+	const URL_SUFFIX = "?css_version=1.5.6";
 
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
@@ -50,6 +50,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		parent::__construct();
 		include_once "./Services/Component/classes/class.ilPlugin.php";
 		$this->plugin = ilPlugin::getPluginObject(IL_COMP_MODULE, "TestQuestionPool", "qst", "assCodeQuestion");
+		$this->plugin->includeClass("ui/codeBlockUI.php");
 		$this->plugin->includeClass("class.assCodeQuestion.php");
 		$this->object = new assCodeQuestion();
 		if ($id >= 0)
@@ -358,8 +359,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
-		}	
-
+		}			
 
 		$html = '';
 		$script = '';
@@ -588,6 +588,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mbo.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mdn-like.css" media="screen" />
+				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized-dark.css" media="screen" />
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
 				
 				
@@ -877,6 +880,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$item->setInfo($this->plugin->txt('cq_blocks_info'));
 		$form->addItem($item);
 
+		foreach ($this->object->getBlocks() as $block) {
+			
+		}
 		
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
 			$elname = 'block['.$i.']';
@@ -934,7 +940,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
-			$lns = $_POST["block_lines"][$k] + 0;
+			$lns = $_POST['block_lines_'.$k] + 0;
 			$t = $_POST['block_type_'.$k];
 			if ($_POST["source_lang"]=='glsl' && $k==0){
 				$t = 4;
@@ -963,7 +969,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getAfterParticipationSuppressionAnswerPostVars()
 	{
-		return array();
+		return array('block', 'source_lang');
 	}
 
 	/**
@@ -977,7 +983,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getAfterParticipationSuppressionQuestionPostVars()
 	{
-		return array();
+		return getAfterParticipationSuppressionAnswerPostVars();
 	}
 
 	/**
