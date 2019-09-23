@@ -31,13 +31,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
-	var $plugin = null;
+	var $plugin = NULL;
 
 
 	/**
 	 * @var assCodeQuestion	The question object
 	 */
-	var $object = null;
+	var $object = NULL;
 	
 	/**
 	* Constructor
@@ -123,8 +123,55 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mbo.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mdn-like.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+
+			$tm = $this->object->getROTheme();
+			if ($tm =='default') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='base16-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='base16-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='duotone-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='duotone-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='xq-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='xq-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='blackborard') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='mbo') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='mdn-like') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='midnight') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='neo') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='solarized light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='solarized dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='yeti') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			
+			
 			
 			
 			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
@@ -335,7 +382,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=null, $print=false)
+	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
@@ -343,9 +390,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
 		//we can not run when we have multiple instances of the same question on screen
-		if ($active_id!=null || $print) $runCode='';
+		if ($active_id!=NULL || $print) $runCode='';
 
-		if ($template == nil) {
+		if ($template == NULL) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
@@ -369,7 +416,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$code = $this->object->getContentForBlock($i);
 			if ($print) $code = $this->printableString($code);
 			$id = 'block['.$questionID.']['.$i.']';
-			if ($active_id!=null){
+			if ($active_id!=NULL){
 				$id .= '['.$active_id.']';
 			}
 			$type = $this->object->getTypeForBlock($i);
@@ -438,7 +485,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if (is_null($pass))
+		if (is_NULL($pass))
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
@@ -563,7 +610,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :null, $print);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :NULL, $print);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -639,12 +686,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	/**
 	 * Returns the answer specific feedback for the question
 	 * 
-	 * @param integer $active_id Active ID of the user
-	 * @param integer $pass Active pass
+	 * @param integer $userSolution Active pass
 	 * @return string HTML Code with the answer specific feedback
 	 * @access public
 	 */
-	function getSpecificFeedbackOutput($active_id, $pass)
+	function getSpecificFeedbackOutput($userSolution, $old=NULL)
 	{
 		// By default no answer specific feedback is defined
 		return $this->object->prepareTextareaOutput($output, TRUE);
