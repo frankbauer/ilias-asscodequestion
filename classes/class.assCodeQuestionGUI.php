@@ -31,13 +31,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
-	var $plugin = null;
+	var $plugin = NULL;
 
 
 	/**
 	 * @var assCodeQuestion	The question object
 	 */
-	var $object = null;
+	var $object = NULL;
 	
 	/**
 	* Constructor
@@ -334,7 +334,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=nil, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=null, $print=false)
+	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
@@ -342,9 +342,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
 		//we can not run when we have multiple instances of the same question on screen
-		if ($active_id!=null || $print) $runCode='';
+		if ($active_id!=NULL || $print) $runCode='';
 
-		if ($template == nil) {
+		if ($template == NULL) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
@@ -369,7 +369,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$code = $this->object->getContentForBlock($i);
 			if ($print) $code = $this->printableString($code);
 			$id = 'block['.$questionID.']['.$i.']';
-			if ($active_id!=null){
+			if ($active_id!=NULL){
 				$id .= '['.$active_id.']';
 			}
 			$type = $this->object->getTypeForBlock($i);
@@ -438,7 +438,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if (is_null($pass))
+		if (is_NULL($pass))
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
@@ -563,7 +563,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :null, $print);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :NULL, $print);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
@@ -636,12 +636,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	/**
 	 * Returns the answer specific feedback for the question
 	 * 
-	 * @param integer $active_id Active ID of the user
-	 * @param integer $pass Active pass
+	 * @param integer $userSolution Active pass
 	 * @return string HTML Code with the answer specific feedback
 	 * @access public
 	 */
-	function getSpecificFeedbackOutput($active_id, $pass)
+	function getSpecificFeedbackOutput($userSolution, $old=NULL)
 	{
 		// By default no answer specific feedback is defined
 		return $this->object->prepareTextareaOutput($output, TRUE);
