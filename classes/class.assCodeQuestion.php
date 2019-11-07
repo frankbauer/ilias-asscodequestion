@@ -788,8 +788,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 
 		if ($il52){
-			$worksheet->setCell($startrow, 0, $this->plugin->txt($this->getQuestionType()));
-			$worksheet->setCell($startrow, 1, $this->getTitle());	
+			// also see parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(0) . $startrow, $this->plugin->txt($this->getQuestionType()));
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(1) . $startrow, $this->getTitle());
 		} else {
 			$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
 			$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
@@ -799,8 +800,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// now provide a result string and write it to excel
 		// it is also possible to write multiple rows
 		if ($il52){
+			$stringEscaping = $worksheet->getStringEscaping();
+			$worksheet->setStringEscaping(false);
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, $value1);	
+			$worksheet->setCell($startrow + $i, 1, $value1);
+			$worksheet->setStringEscaping($stringEscaping);
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
 			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));

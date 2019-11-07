@@ -2,20 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.2.0
+**Version**:  1.1.10
 
-**Company**:  Computer Graphics Group Erlangen
+**Company**:  Visual Computing Erlangen (FAU)
 
-**Supports**: ILIAS 5.1 - 5.4
-
-## License
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+**Supports**: ILIAS 5.4 - 5.4
 
 ## Installation
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
@@ -252,7 +243,7 @@ Alternativley you may use the built-in setup function to prepare a default Three
     }
 
 ## Included Software
-* teaVM-javac (https://github.com/konsoletyper/teavm-javac, [plugin specific fork at https://github.com/frankbauer/teavm-javac/tree/custom-fielname])
+* teaVM-javac (https://github.com/konsoletyper/teavm-javac, [plugin specific fork with some bugfixes at https://github.com/frankbauer/teavm-javac/tree/custom-fielname])
 * highlight.js (https://highlightjs.org)
 * skulpt (http://www.skulpt.org)
 * three.js (https://threejs.org)
@@ -261,10 +252,8 @@ Alternativley you may use the built-in setup function to prepare a default Three
 * dopioJVM (http://plasma-umass.org/doppio-demo/)
 
 
-
-
 ## Version History
-### Version 1.2.0
+### Version 1.1.10
 * Support for Ilias 5.4
 
 ### Version 1.1.9
