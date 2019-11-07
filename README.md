@@ -2,11 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.8
+**Version**:  1.2.0
 
 **Company**:  Computer Graphics Group Erlangen
 
-**Supports**: ILIAS 5.1 - 5.3
+**Supports**: ILIAS 5.1 - 5.4
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -264,6 +264,12 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.2.0
+* Support for Ilias 5.4
+
+### Version 1.1.9
+* Full support for themed code boxes
+  
 ### Version 1.1.8
 * Downgraded Java Compiler to last stable TeaVM (0.6.0-dev-451) and JDK8 patchlevel
 

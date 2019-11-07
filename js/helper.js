@@ -53,16 +53,18 @@ $(document).ready(function(){
 function selectTheme() {
     const themeSelect = $('select#cm_theme');
     const edTheme = themeSelect.val();
+    const roThemeSelect = $('select#cm_ro_theme');
+    const roTheme = roThemeSelect.val();
 
     if (edTheme===undefined) return;
     $("textarea[data-question]").each(function(i, block) {  
         const ed = editors[block.id];   
         if (!ed || ed===undefined) return;
 
-        /*if ( blockIsReadOnly(block) ){
-            ed.setOption('theme', 'xq-light') 
-        } else*/ {        
-            ed.setOption('theme', edTheme)
+        if ( blockIsReadOnly(block) ){
+            ed.setOption('theme', roTheme); 
+        } else {        
+            ed.setOption('theme', edTheme);
         }
     })   
 }
@@ -198,7 +200,7 @@ function initEditor(block, questionID, useMode){
     var editor = CodeMirror.fromTextArea(block, {
         lineNumbers: blockHasProgramCode(block) || blockIsCanvas(block), 
         mode:useMode,
-        theme:"solarized light",
+        theme:block.getAttribute('data-theme'),
         tabSize: 4,
         indentUnit: 4,
         autoCloseBrackets: true,
@@ -277,14 +279,14 @@ function initSolutionBox(useMode, qLanguage, questionID){
 
         //chnage look of static code blocks
         if (block.getAttribute('data-blocktype')==1 && !inQuestionEditMode) {             
-            editor.setOption('theme', 'xq-light')  
+            editor.setOption('theme', block.getAttribute('data-ro-theme'))  
             editor.display.wrapper.style.opacity = 0.8       
             editor.display.wrapper.style.filter = "grayscale(20%)"
         } 
         
         //change look of hidden code blocks
         if (block.getAttribute('data-blocktype')==3 && !inQuestionEditMode) {             
-            editor.setOption('theme', 'xq-light')  
+            editor.setOption('theme', block.getAttribute('data-ro-theme'))  
             $(editor.getWrapperElement()).hide();            
         }
     })
@@ -692,12 +694,14 @@ function selectType(select, elementID, blockNr, languageSelect=true){
     const ed = editors[el.attr('id')]
     const themeSelect = $('select#cm_theme');
     const edTheme = themeSelect.val();
+    const roThemeSelect = $('select#cm_ro_theme');
+    const roTheme = roThemeSelect.val();
     
     el.attr('data-blocktype', select.value)
     ed.setOption('lineNumbers', blockHasProgramCode(block) || blockIsCanvas(block));    
     if ( blockIsReadOnly(block) ){
-        ed.setOption('theme', 'xq-light') 
-        ed.setOption('theme', edTheme)
+        ed.setOption('theme', roTheme) 
+        //ed.setOption('theme', edTheme)
     } else {        
         //console.log(edTheme)
         ed.setOption('theme', edTheme)
