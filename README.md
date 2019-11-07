@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.10
+**Version**:  1.2.0
 
 **Company**:  Visual Computing Erlangen (FAU)
 
@@ -253,6 +253,10 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.2.0
+* Refactoring UI Code
+  
+  
 ### Version 1.1.10
 * Support for Ilias 5.4
 
