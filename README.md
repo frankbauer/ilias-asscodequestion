@@ -4,9 +4,9 @@
 
 **Version**:  1.2.0
 
-**Company**:  Visual Computing Erlangen Nuremberg (FAU)
+**Company**:  Visual Computing Erlangen (FAU)
 
-**Supports**: ILIAS 5.1 - 5.4
+**Supports**: ILIAS 5.4 - 5.4
 
 ## Installation
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
