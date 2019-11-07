@@ -208,9 +208,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/glsl.js');
 
 			$this->tpl->didPrepare = true;
+			$this->tpl->initializedSolutionBoxes = [];
 		}		
 	
-		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
+		$sBoxID = ($qidf*$this->object->getId());
+		if (!array_key_exists($sBoxID, $this->tpl->initializedSolutionBoxes)) {
+			$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$sBoxID.'");');
+			$this->tpl->initializedSolutionBoxes[$sBoxID] = true;
+		}
 
 		if (!$this->didPrepare) {			
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
