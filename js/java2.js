@@ -6,7 +6,12 @@ function createTeaWorker(whenReady){
     if (teaworker === undefined) {
         setAllRunButtons(false);
         displayGlobalState("Initializing Runtime");
-        teaworker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/worker.js');
+        try {
+         teaworker = new Worker('./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/js/teavm/worker.js');
+        } catch (e){
+            //this should throw in the offline environment, thus we look for the worker at a different
+            teaworker = new Worker('../assCodeQuestion/js/teavm/worker.js');
+        }
 
         teaworker.addEventListener('message', function(e) {
             //console.log("teastuff", e.data);
