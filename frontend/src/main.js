@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify';
+import './plugins/codemirror';
 
 Vue.config.productionTip = false
 
@@ -25,7 +26,8 @@ allCodeBlockParents.forEach(el => {
     render: function (h) { 
       const context = {
         props: { 
-          title:data.language,
+          language:data.language,
+          id:data.question,
           blocks:data
         }
       };

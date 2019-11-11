@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-content>
-      <HelloWorld/> A{{ title }}A
+      <HelloWorld/>
     </v-content>
   </v-app>
 </template>
@@ -12,7 +12,7 @@ import HelloWorld from './components/HelloWorld';
 export default {
   name: 'App',
 
-  props: ['title'],
+  props: ['blocks'],
 
   components: {
     HelloWorld,
@@ -25,5 +25,9 @@ export default {
 </script>
 
 <style lang="sass">
-  
+  #app
+    margin-bottom: 16px
+    background-color: rgba(1,1,1,0)
+    .v-application--wrap
+      min-height: 1vh!important
 </style>
