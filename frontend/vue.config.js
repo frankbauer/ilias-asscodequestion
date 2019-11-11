@@ -1,4 +1,7 @@
 module.exports = {
-    publicPath:"/ilias/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/",
-    filenameHashing:false
+  "publicPath": "/ilias/Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/",
+  "filenameHashing": false,
+  "transpileDependencies": [
+    "vuetify"
+  ]
 }
