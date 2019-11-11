@@ -209,9 +209,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addJavascript(self::URL_PATH.'/js/glsl.js');
 
 			$this->tpl->didPrepare = true;
+			$this->tpl->initializedSolutionBoxes = [];
 		}		
 	
-		$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.($qidf*$this->object->getId()).'");');
+		$sBoxID = ($qidf*$this->object->getId());
+		if (!array_key_exists($sBoxID, $this->tpl->initializedSolutionBoxes)) {
+			$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$sBoxID.'");');
+			$this->tpl->initializedSolutionBoxes[$sBoxID] = true;
+		}
 
 		if (!$this->didPrepare) {			
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
@@ -685,14 +690,18 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	/**
 	 * Returns the answer specific feedback for the question
-	 * 
-	 * @param integer $userSolution Active pass
+	 *
+	 * This method should be overwritten by the actual question.
+	 *
+	 * @todo Mark this method abstract!
+	 * @param array $userSolution ($userSolution[<value1>] = <value2>)
 	 * @return string HTML Code with the answer specific feedback
 	 * @access public
 	 */
-	function getSpecificFeedbackOutput($userSolution, $old=NULL)
+	function getSpecificFeedbackOutput($userSolution)
 	{
 		// By default no answer specific feedback is defined
+		$output = '';
 		return $this->object->prepareTextareaOutput($output, TRUE);
 	}
 	
