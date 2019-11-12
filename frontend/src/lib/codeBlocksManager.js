@@ -21,7 +21,7 @@ class CodeBlocksManager {
             languageType : data.compiler,
             version : data.compilerVersion
         }
-        delete data.compilerVersion;
+        delete data.compilerVersion;        
 
         data.id = Number(data.id);
 
@@ -44,8 +44,8 @@ class CodeBlocksManager {
                 block.obj = new ScriptBlock(block.content);
                 block.content = '';
             } else if (block.type == 'BLOCK') {
-                block.hasCode = true;
-            }
+                block.hasCode = true;                
+            } 
 
             data.blocks.push(new Vue({
                 data:function(){return block;},

@@ -20,7 +20,7 @@ self.addEventListener('message', function (e) {
         case 'run':
             JavaExec.initialize(function () {
                 console.log("Initializing Filesystem");
-                JavaExec.initFileSystems('../', data.forceReload, function () {
+                JavaExec.initFileSystems('./', data.forceReload, function () {
                     JavaExec.reroutStdStreams();
                     JavaExec.ready = true;
                     JavaExec.compileAndRun(data.code, data.className, data.max_ms, function (stdout, stderr) {
