@@ -61,6 +61,19 @@ class ScriptBlock {
          this.pushError(e); 
       }
     }
+
+    onParseError(initialOutput, parseError){
+      if (this.obj===undefined) return;
+      try {
+        if ( this.obj.onParseError){
+          this.obj.onParseError(initialOutput, parseError);
+        } else {
+          console.error(parseError);
+        }
+      } catch(e) {
+         this.pushError(e); 
+      }
+    }
     
   };
 
