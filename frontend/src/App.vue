@@ -1,13 +1,13 @@
 <template>
   <v-app>
     <v-content>
-      <HelloWorld/>
+      <CodeBlocks :blocks="blocks.blocks" :language="blocks.language" :blockid="blocks.id" />
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import CodeBlocks from './components/CodeBlocks';
 
 export default {
   name: 'App',
@@ -15,7 +15,7 @@ export default {
   props: ['blocks'],
 
   components: {
-    HelloWorld,
+    CodeBlocks,
   },
 
   data: () => ({
