@@ -2,7 +2,7 @@ import Vue from 'vue'
 let SEVERITY_ERROR;
 
 //function runJavaScriptWorker( code, log_callback, max_ms, questionID){
-function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback,  finishedExecutionCB){
+function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback,  finishedExecutionCB){
     
     log_callback('');
 
@@ -139,8 +139,8 @@ const singleton = new Vue({
         preload() {
             
         },
-        compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
-            return runJavaScriptWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
+        compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
+            return runJavaScriptWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
         }
     },
     created(){

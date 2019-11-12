@@ -1,13 +1,7 @@
 import Vue from 'vue'
 let SEVERITY_ERROR;
-/**
- * The function pass the Python program to a worker. The worker runs the program
- * and return the standard output to the main thread.
- * @param {string} prog The Python program
- * @param {string} questionID The id of the question to read the Python program from html page
- * @param {HTML-element} mypre The HTML-element to write the output of the Python program.
- */
-function runPythonWorker(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) { 
+
+function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) { 
     // the Python program
     prog = prog.replaceAll("\t", "    ");    
     
@@ -92,8 +86,8 @@ const singleton = new Vue({
         preload() {
             
         },
-        compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
-            return runPythonWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
+        compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
+            return runPythonWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
         }
     },
     created(){

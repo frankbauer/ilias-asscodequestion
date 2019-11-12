@@ -1,7 +1,8 @@
 import Vue from 'vue'
 
-function runGLSLWorker(questionID, prog, mypre, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {
+function runGLSLWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) {
     var outputData = [];
+    callingCodeBlocks.blocks.filter(b => b.hasCode).forEach(block => outputData.push(block.content));
     /*$("[data-contains-code][data-question="+questionID+"]").each(function(i, block) {
         if (block.getAttribute('data-ignore')) return;
         if (!blockHasProgramCode(block)) return;
@@ -29,8 +30,8 @@ const singleton = new Vue({
         preload() {
             
         },
-        compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
-            return runGLSLWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
+        compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
+            return runGLSLWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
         }
     }
 })

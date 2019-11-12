@@ -7,7 +7,7 @@ import Vue from 'vue'
  */
 var javaRunOverhead = 4000;
 
-function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, forceReload=false) {    
+function runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, forceReload=false) {    
   let exp = new RegExp("public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)");
   let match = exp.exec(code);
   if (match == null) {
@@ -77,7 +77,7 @@ function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callb
           worker.postMessage({ cmd: 'kill' })
           console.log("Restarting...")
           setTimeout(function(){
-            runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecution, true);            
+            runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecution, true);            
           }, 500)
         } else {
           JavaExec.setRunButton(false)
@@ -143,10 +143,10 @@ const singleton = new Vue({
           console.error(e);
         }
       },
-      compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = false){
+      compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = false){
           if (!this.isReady) return; 
 
-          return runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
+          return runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
       }
   },
   created(){

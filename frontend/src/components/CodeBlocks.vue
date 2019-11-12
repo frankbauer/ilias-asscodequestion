@@ -276,7 +276,7 @@
                 cmp.compileAndRun(
                     this.blocks.id,
                     this.completeSource,
-                    null,
+                    this,
                     this.executionTimeout,
                     this.log.bind(this),
                     this.logInfo.bind(this),

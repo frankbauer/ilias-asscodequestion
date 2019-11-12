@@ -75,7 +75,7 @@ const singleton = new Vue({
             return false;
         },
 
-        compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true) {
+        compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true) {
             var start = Date.now();
             var executionFinished = false;
             var booted = false;
@@ -88,7 +88,7 @@ const singleton = new Vue({
             if (runCreate) {
                 if (this.createTeaWorker(function () {
                         this.isRunning = false;
-                        this.compileAndRun(questionID, code, mypre, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, false);
+                        this.compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, false);
                     }.bind(this))) {
                     return;
                 }
