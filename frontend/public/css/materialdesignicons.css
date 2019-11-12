@@ -34,6 +34,7 @@
     /* Support for IE. */
     font-feature-settings: 'liga';
   }
+  #https://github.com/google/material-design-icons/blob/master/iconfont/codepoints
   .mdi-play::before{content:"\E037"}
-  .mdi-code-error::before{content:"\E000"}
+  .mdi-code-error::before{content:"\e160"}
   .mdi-code-warning::before{content:"\E002"}

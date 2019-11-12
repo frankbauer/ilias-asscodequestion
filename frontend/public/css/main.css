@@ -26,13 +26,13 @@ codeblocks>block, codeblocks>text{
 
 .gutter-warning, .gutter-error {
     font-size:16px;
-    padding-top:2px;
+    padding-top:3px;
     padding-left:1px;
 }
 
 .gutter-error {
-    color: red;
+    color: #B71C1C;
 }
 .gutter-warning {
-    color: #b8a600;
+    color: #F9A825;
 }
