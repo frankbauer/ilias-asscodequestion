@@ -26,7 +26,6 @@
 </template>
 
 <script>
-//https://github.com/surmon-china/vue-codemirror
 import codemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/solarized.css'

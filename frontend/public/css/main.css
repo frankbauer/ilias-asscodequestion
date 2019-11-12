@@ -1,5 +1,12 @@
 #codeblocks {display:none}
 
+codeblocks>playground{
+    display:none;
+}
+codeblocks>block[data-hidden]{
+    display:none;
+}
+
 codeblocks>block, codeblocks>text{
     unicode-bidi: embed;
     font-family: monospace;
