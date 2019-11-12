@@ -100,8 +100,7 @@
                 let cl = "";
                 if (this.block.hidden) cl += "hiddenBox "
                 if (this.block.readonly) cl += "readonlyBox "
-                if (this.block.static) cl += "staticBox "
-                console.log(cl, this.block);
+                if (this.block.static) cl += "staticBox "                
                 return cl;
             },
             code() {
