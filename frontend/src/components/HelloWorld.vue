@@ -33,7 +33,6 @@ import 'codemirror/theme/solarized.css'
 
 export default {
   name: 'HelloWorld',
-  components: [codemirror],  
   data: () => ({
       question:"test_34",
       code: 'const a = 10',

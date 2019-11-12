@@ -16,6 +16,15 @@
     </noscript>
     <div id="app"></div>
     <codeblocks data-language="java" data-question="34">
+      <playground>{init: function(canvasElement) {
+              console.log("INIT");
+              console.log(document.querySelector('#app'));
+          }, //init
+  
+          update: function(outputObject, canvasElement) {
+              console.log("FOO");
+          } //update
+      }</playground>
       <block data-readonly data-static>public class Foo {</block>
       <block>public static void main(String[] args){
   System.out.println("Hello World!");  
