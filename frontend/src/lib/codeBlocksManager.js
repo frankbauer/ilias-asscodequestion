@@ -2,6 +2,7 @@ import ScriptBlock from './scriptBlock'
 import vuetify from '../plugins/vuetify';
 
 let Vue, App;
+
 class CodeBlocksManager {
     constructor(el) {
         this.element = el;
@@ -22,6 +23,7 @@ class CodeBlocksManager {
             block.readonly = block.readonly !== undefined && block.readonly != "false" && block.readonly != "0";
             block.static = block.static !== undefined && block.static != "false" && block.static != "0";
             block.hidden = block.hidden !== undefined && block.hidden != "false" && block.hidden != "0";
+            block.visibleLines = block.visiblelines === undefined ? 'auto' : block.visiblelines;
 
             if (block.type == 'PLAYGROUND') {                
                 block.obj = new ScriptBlock(block.content);
@@ -44,7 +46,7 @@ console.log(block);
                         } 
                         
                         return 'solarized light';                        
-                    },
+                    },                    
                     firstLine(){
                         if (this.id == 0) return 1;
                         return data.blocks[this.id-1].nextLine;
@@ -76,7 +78,8 @@ console.log(block);
                         language:data.language,
                         id: data.question,
                         blocks: new Vue({
-                            data: function(){ return data;}
+                            data: function(){ return data;},
+                            computed: {}
                         })
                     }
                 };
