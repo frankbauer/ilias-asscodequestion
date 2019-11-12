@@ -5,6 +5,7 @@
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
             <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" @changeOutput="onPlaygroundChangedOutput"></CodePlayground>
+            <SimpleText v-if="block.type=='TEXT'" :content="block.content" :editMode="editMode" ></SimpleText>
         </div>
         <div class="runner" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
@@ -24,6 +25,7 @@
 <script>
     import CodeBlock from '../components/CodeBlock';
     import CodePlayground from '../components/CodePlayground';
+    import SimpleText from '../components/SimpleText';
 
     /**
      * This object defines the programming languages supported for code highlighting
@@ -55,7 +57,8 @@
         name: 'CodeBlocks',
         components: {
             CodeBlock,
-            CodePlayground
+            CodePlayground,
+            SimpleText
         },
         data:function(){
             return {
