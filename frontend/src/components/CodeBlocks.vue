@@ -3,7 +3,8 @@
       {{language}}      
       <div class="block" v-for="block in blocks" :key="block.id">
           <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType" :visibleLines="block.visibleLines" :editMode="editMode"></CodeBlock>      
-      </div>          
+      </div>   
+      {{isReady}}       
   </div>
 </template>
 
@@ -47,11 +48,31 @@ export default {
         'editMode':{
             type:Boolean,
             default:false
+        }, 
+        'compiler':{
+            type:Object,
+            default:{
+                languageType:'none',
+                version:'1'
+            }
         }
     },
     computed: {
         mimeType(){
             return mimeTypesForLanguage[this.language];
+        },
+        isReady(){            
+            let cmp = this.$compilerRegistry.getCompiler(this.compiler);
+            console.log(cmp);
+            if (!cmp) return false;
+
+            return cmp.isReady;        
+        }
+    },
+    created(){
+        let cmp = this.$compilerRegistry.getCompiler(this.compiler);
+        if (cmp){
+            cmp.preload();
         }
     }
 }

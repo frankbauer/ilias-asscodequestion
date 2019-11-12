@@ -1,13 +1,31 @@
 <template>
   <v-app>
     <v-content>
-      <CodeBlocks :blocks="blocks.blocks" :language="blocks.language" :blockid="blocks.id" />
+      <CodeBlocks :blocks="blocks.blocks" :language="blocks.language" :blockid="blocks.id" :compiler="blocks.compiler"/>
     </v-content>
   </v-app>
 </template>
 
 <script>
 import CodeBlocks from './components/CodeBlocks';
+import Vue from 'vue'
+
+Vue.prototype.$compilerState = new Vue({
+    methods:{
+        hideGlobalState(){
+
+        },
+        showGlobalState(){
+
+        },
+        setAllRunButtons(what){
+            
+        },
+        displayGlobalState(message){
+
+        }
+    }
+})
 
 export default {
   name: 'App',
@@ -19,8 +37,11 @@ export default {
   },
 
   data: () => ({
-    //
+    
   }),
+  computed:{
+    
+  }
 };
 </script>
 

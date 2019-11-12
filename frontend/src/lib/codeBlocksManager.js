@@ -1,8 +1,14 @@
 import ScriptBlock from './scriptBlock'
 import vuetify from '../plugins/vuetify';
+import Vue from 'vue'
+import App from '../App.vue'
 
-let Vue, App;
+import CompilerRegistry from '../lib/CompilerRegistry'
+Vue.prototype.$compilerRegistry = CompilerRegistry;
 
+
+
+//this will handle the vue mounting on the dom
 class CodeBlocksManager {
     constructor(el) {
         this.element = el;
@@ -10,6 +16,14 @@ class CodeBlocksManager {
             ...el.dataset,
             blocks: []
         };
+
+        data.compiler = {
+            languageType : data.compiler,
+            version : data.compilerVersion
+        }
+        delete data.compilerVersion;
+
+        data.id = Number(data.id);
 
         el.querySelectorAll("*").forEach(bl => {
             let block = {
@@ -23,7 +37,7 @@ class CodeBlocksManager {
             block.readonly = block.readonly !== undefined && block.readonly != "false" && block.readonly != "0";
             block.static = block.static !== undefined && block.static != "false" && block.static != "0";
             block.hidden = block.hidden !== undefined && block.hidden != "false" && block.hidden != "0";
-            block.visibleLines = block.visiblelines === undefined ? 'auto' : block.visiblelines;
+            block.visibleLines = block.visibleLines === undefined ? 'auto' : block.visibleLines;            
 
             if (block.type == 'PLAYGROUND') {                
                 block.obj = new ScriptBlock(block.content);
@@ -33,7 +47,7 @@ class CodeBlocksManager {
                 block.hasCode = true;
             }
 
-console.log(block);
+console.log("BLOCK", block);
 
             data.blocks.push(new Vue({
                 data:function(){return block;},
@@ -64,7 +78,7 @@ console.log(block);
         })
         this.data = data;
 
-        console.log(data);
+        console.log("DATA", data);
         
     }
 
@@ -90,9 +104,7 @@ console.log(block);
 }
 
 export default {
-    find(_App, _Vue, scope) {
-        Vue = _Vue;
-        App = _App;
+    find(scope) {
         if (scope === undefined) scope = document;
         const allCodeBlockParents = scope.querySelectorAll("codeblocks");
         let result = [];
