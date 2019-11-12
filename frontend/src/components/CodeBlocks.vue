@@ -72,11 +72,11 @@
             'blockid': Number,
             'executionTimeout': {
                 type: Number,
-                default: 3000
+                default: 5000
             },
             'maxCharacters': {
                 type: Number,
-                default: 100
+                default: 1000
             },
             'editMode': {
                 type: Boolean,
