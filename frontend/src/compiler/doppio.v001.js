@@ -30,8 +30,8 @@ function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callb
           timer = null
         }
         
-        if (data.stderr && data.stderr != '') err_callback(data.stderr + "\n") ;
-        if (data.stdout && data.stdout != '') log_callback(data.stdout);
+        /*if (data.stderr && data.stderr != '') err_callback(data.stderr + "\n") ;
+        if (data.stdout && data.stdout != '') log_callback(data.stdout);*/
         
         console.log("Done", data.stdout, data.stderr, finishedExecutionCB);
         finishedExecutionCB();
@@ -56,6 +56,15 @@ function runJavaWorker(questionID, code, mypre, max_ms, log_callback, info_callb
         //console.log("showMessage", data)
         JavaExec.showMessage(data.msg)
         break
+        case 'output':
+          if (data.type=='err'){
+            err_callback(data.msg);
+          } else if (data.type=='nfo'){
+            info_callback(data.msg);
+          } else {
+            log_callback(data.msg);
+          }
+          break
 
       case 'setRunButton':
         //console.log("setRunButton", data)

@@ -432,6 +432,7 @@ var JavaExec = {
       stdoutBuffer += data.toString();
       JavaExec.combinedStream += data.toString();
       JavaExec.outputStream += data.toString();
+      JavaExec.log(data.toString());
       var newlineIdx;
       while ((newlineIdx = stdoutBuffer.indexOf("\n")) > -1) {
         console.log(stdoutBuffer.slice(0, newlineIdx));
@@ -444,6 +445,7 @@ var JavaExec = {
       stderrBuffer += data.toString();
       JavaExec.combinedStream += format_error(data.toString());
       JavaExec.errorStream += data.toString();
+      JavaExec.logError(data.toString());
       var newlineIdx;
       while ((newlineIdx = stderrBuffer.indexOf("\n")) > -1) {
         console.error(stderrBuffer.slice(0, newlineIdx));
@@ -601,5 +603,14 @@ var JavaExec = {
        
       })    
     })
+  },
+  log(msg){
+
+  },
+  logError(msg){
+
+  },
+  logInfo(msg){
+
   }
 };

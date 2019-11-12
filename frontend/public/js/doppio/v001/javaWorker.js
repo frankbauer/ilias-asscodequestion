@@ -14,6 +14,18 @@ JavaExec.setRunButton = function (enabled, info=undefined) {
     self.postMessage({ event: 'setRunButton', enabled:enabled, info:info })
 }
 
+JavaExec.log = function (msg) {
+    self.postMessage({ event: 'output', msg:msg, type:'log' })
+}
+
+JavaExec.logError = function (msg) {    
+    self.postMessage({ event: 'output', msg:msg, type:'err' })
+}
+
+JavaExec.logInfo = function (msg) {    
+    self.postMessage({ event: 'output', msg:msg, type:'nfo' })
+}
+
 self.addEventListener('message', function (e) {
     const data = e.data;
     switch (data.cmd) {
