@@ -25,11 +25,13 @@ const compilerRegistry = new Vue({
     }
 });
 
-
-
 //load all available compilers
 import JavaCompilers from '../compiler/java'
 compilerRegistry.register(JavaCompilers);
+
+import JavascriptCompilers from '../compiler/javascript'
+compilerRegistry.register(JavascriptCompilers);
+
 
 export default compilerRegistry;
 

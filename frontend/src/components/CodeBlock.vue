@@ -170,7 +170,7 @@
                                 gutterClassName = "code-warning gutter-warning";
                                 break;
                             default:
-                                console.error("Unknown Severity", gutterSeverity[line]);
+                                console.error("Unknown Severity", gutterSeverity);
                                 return;
                         }
                         element.className = "mdi mdi-" + gutterClassName;

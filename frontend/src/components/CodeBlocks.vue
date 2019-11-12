@@ -18,8 +18,6 @@
 
             <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
         </div>
-
-            <span class="mdi mdi-warning"></span>
     </div>
 </template>
 
@@ -272,6 +270,7 @@
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
 
+                this.$compilerState.setAllRunButtons(false);
                 this.resetOutput();
                 this.clearDiagnostics();
                 cmp.compileAndRun(

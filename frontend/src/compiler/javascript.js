@@ -1,12 +1,12 @@
 import Vue from 'vue'
 
 //load all versions
-import v100 from './teavm.v100'
+import v100 from './javascript.v100'
 
 export default new Vue({
     data: function () {
         return {
-            type: "java",
+            type: "javascript",
 
             //attach all version
             versions: [v100],
