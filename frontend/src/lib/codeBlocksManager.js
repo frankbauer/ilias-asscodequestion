@@ -48,14 +48,11 @@ class CodeBlocksManager {
                 block.hasCode = true;
             }
 
-console.log("BLOCK", block);
-
             data.blocks.push(new Vue({
                 data:function(){return block;},
                 computed:{
                     editorTheme(){
-                        if (this.theme) return this.theme;
-                        console.log(this);
+                        if (this.theme) return this.theme;                        
                         if (this.static || this.readonly || this.hidden) {
                             return 'xq-light';
                         } 
@@ -77,10 +74,7 @@ console.log("BLOCK", block);
                 }
             }));
         })
-        this.data = data;
-
-        console.log("DATA", data);
-        
+        this.data = data;        
     }
 
     instantiateVue(){

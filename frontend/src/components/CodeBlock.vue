@@ -3,7 +3,6 @@
     <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange">
     </codemirror>
-    <div v-for="err in block.errors">{{err.start.line}}:{{err.start.column}}  {{err.message}}</div>
     </div>
 </template>
 
@@ -128,17 +127,17 @@
         },
         watch: {
             visibleLines: function (val) {
-                console.log(this.visibleLines, val)
                 this.updateHeight();
             },
             errors: function(val){
                 if (val!==undefined){
-                    //clear Gutter
+                    //clear Gutter if list goes back to 0-elements
+                    //we do not handle a case where an error is removed!!!
                     if (val.length==0) this.clearErrorDisplay();
                 
                     const first = this.block.firstLine;
                     val.forEach(error => {
-                        if (error.id==0 || error.id===undefined) error.id = nextErrorID++;
+                        //put a squigly line as code marker 
                         this.codemirror.getDoc().markText(
                             {line:error.start.line-first, ch:error.start.column}, 
                             {line:error.end.line-first, ch:error.end.column}, 
@@ -150,6 +149,7 @@
                             }
                         );
 
+                        //read existing gutter marker or create a new one
                         let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
                         let element = info.gutterMarkers ? info.gutterMarkers['diagnostics'] : null;
                         if (element == null) {
@@ -158,6 +158,8 @@
                             element.errors = [];
                         }
 
+                        //make sure we use the proper class for the given severity.
+                        //We allways choose the maximum severity for each marking
                         let gutterSeverity = Math.max(error.severity, element.severity); 
                         let gutterClassName = '';
                         switch (gutterSeverity) {
@@ -173,6 +175,7 @@
                         }
                         element.className = "mdi mdi-" + gutterClassName;
 
+                        //Build the hint text
                         if (element.errors.indexOf(error)==-1){
                             var title = element.title;
                             title = title!='' ? (title + "\n\n" + '- ' + error.message) : ('- ' +error.message);
@@ -180,12 +183,12 @@
                             element.errors.push(error);
                         }
 
+                        //place the updated element
                         this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element)
                     });
                 } else {
                     this.clearErrorDisplay();
                 }
-                console.log("Errors Updated", val);
             }
         },
         mounted() {

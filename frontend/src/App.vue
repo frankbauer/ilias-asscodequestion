@@ -12,6 +12,15 @@ import Vue from 'vue'
 
 Vue.prototype.SEVERITY_ERROR = 2;
 Vue.prototype.SEVERITY_WARNING = 1;
+Vue.prototype.$CodeBlock = {
+  format_info:function(text){
+    return '<span style="color:green">'+text+'</span>';
+  },
+  format_error:function(text){
+    return '<span style="color:red">'+text+'</span>';
+  }
+}
+
 Vue.prototype.$compilerState = new Vue({
   data: function(){
       return {

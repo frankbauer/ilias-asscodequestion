@@ -6,12 +6,16 @@
                 :visibleLines="block.visibleLines" :editMode="editMode"></CodeBlock>
         </div>
         <div class="runner" v-if="canRun">
-            <v-btn :loading="!isReady" :disabled="!isReady" color="blue-grey darken-1" class="ma-2 white--text"
-                @click="run">
-                Run
-                <v-icon right dark>mdi-play</v-icon>
-            </v-btn>
-            <div class="globalState" v-html="$compilerState.globalStateMessage" v-if="showGlobalMessages"></div>
+            <div class="d-flex pa-2 runnerState">
+                <v-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
+                    @click="run">
+                    Run
+                    <v-icon right dark>mdi-play</v-icon>
+                </v-btn>
+                <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-if="showGlobalMessages"></div>                
+            </div>
+
+            <pre class="output" v-if="hasOutput" v-html="outputHTML"></pre>
         </div>
 
             <span class="mdi mdi-warning"></span>
@@ -53,10 +57,26 @@
         components: {
             CodeBlock
         },
+        data:function(){
+            return {
+                outputHTML:"",
+                output:"",
+                sansoutput:"",
+                didClip:false,
+            }
+        },
         props: {
             'blocks': Array,
             'language': String,
             'blockid': Number,
+            'executionTimeout': {
+                type: Number,
+                default: 3000
+            },
+            'maxCharacters': {
+                type: Number,
+                default: 100
+            },
             'editMode': {
                 type: Boolean,
                 default: false
@@ -70,6 +90,9 @@
             }
         },
         computed: {
+            hasOutput(){
+                return this.outputHTML!==undefined && this.outputHTML!=""
+            },
             mimeType() {
                 return mimeTypesForLanguage[this.language];
             },
@@ -92,6 +115,39 @@
             }
         },
         methods: {
+            resetOutput(){
+                this.output = '';
+                this.sansoutput = '';
+                this.didClip = false;
+                this.outputHTML = '';
+            },
+            log(text){
+                //console.log("log", text);
+                this.output += text;
+                text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+                if (!this.didClip) {
+                    if (this.maxCharacters>0 && this.output.length > this.maxCharacters) {
+                        this.outputHTML += this.$CodeBlock.format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');
+                        this.didClip = true;
+                    } else {
+                        this.outputHTML += text;
+                    }
+                }
+            },
+            logError(text){
+                text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+                text = this.$CodeBlock.format_error(text);
+                //console.log("err", text);
+                this.sansoutput += text; 
+                this.outputHTML += text; 
+            },
+            logInfo(text){
+                text = text.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+                text = this.$CodeBlock.format_info(text);
+                //console.log("nfo", text);
+                this.sansoutput += text; 
+                this.outputHTML += text;  
+            },
             processDiagnostics(error) {
                 const line = error.start.line;
                 this.blocks.forEach( block => {
@@ -112,29 +168,20 @@
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
 
+                this.resetOutput();
                 this.clearDiagnostics();
-                let gutterSeverity = [];
-                let gutterElements = [];
                 cmp.compileAndRun(
                     this.blocks.id,
                     this.completeSource,
                     null,
-                    3000,
-                    function (m) {
-                        console.log(m)
-                    }.bind(this),
-                    function (m) {
-                        console.log("Info:" + m)
-                    }.bind(this),
-                    function (m) {
-                        console.error(m)
-                    }.bind(this),
+                    this.executionTimeout,
+                    this.log.bind(this),
+                    this.logInfo.bind(this),
+                    this.logError.bind(this),
                     function (error) {
                         this.processDiagnostics(error);
                     }.bind(this),
                     function (success = true, overrideOutput = undefined) {
-                        console.log("Done", success, overrideOutput, cmp.isReady, cmp.isRunning)
-                        //waitdiv.innerHTML = '';  
                         if (!success) {
                             this.$compilerState.hideGlobalState();
                             this.$compilerState.setAllRunButtons(true);
@@ -168,13 +215,29 @@
             padding: 0px
             margin: 0px
     div.runner
-        button
-            display: inline-block
-            margin: 8px 0px !important
-        .globalState
-            margin-left: 10px
-            display: inline-block
-            color: gray
-            padding-left: 4px
-            padding-right: 4px
+        margin: 8px 0px !important
+        padding: 0px !important
+        .runnerState
+            margin: 0px !important
+            padding: 0px !important
+            button
+                margin: 0px!important            
+            .globalState
+                margin-left: 10px
+                color: gray
+                padding-left: 4px
+                padding-right: 4px
+                vertical-align: middle
+        .output
+            display: block
+            font-family: monospace
+            border: 1px solid #ccc
+            border-radius: 0px
+            background-color: #f5f5f5
+            margin: 0 0 10px
+            padding: 9.5px
+            line-height: 1.42857143
+            color: #333333
+            word-break: break-all
+            word-wrap: break-word
 </style>
