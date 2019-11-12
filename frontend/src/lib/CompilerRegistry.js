@@ -35,5 +35,8 @@ compilerRegistry.register(JavascriptCompilers);
 import PythonCompilers from '../compiler/python'
 compilerRegistry.register(PythonCompilers);
 
+import GLSLCompilers from '../compiler/glsl'
+compilerRegistry.register(GLSLCompilers);
+
 export default compilerRegistry;
 
