@@ -32,6 +32,8 @@ compilerRegistry.register(JavaCompilers);
 import JavascriptCompilers from '../compiler/javascript'
 compilerRegistry.register(JavascriptCompilers);
 
+import PythonCompilers from '../compiler/python'
+compilerRegistry.register(PythonCompilers);
 
 export default compilerRegistry;
 
