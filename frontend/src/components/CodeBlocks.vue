@@ -172,7 +172,7 @@
                     const first = block.firstLine;
                     const last = block.nextLine - 1;
                     
-                    if (error.start.line+1 >= first && error.start.line+1 <= last) {
+                    if (error.start.line >= first && error.start.line <= last) {
                         block.errors.push(error);                        
                     }
                 });

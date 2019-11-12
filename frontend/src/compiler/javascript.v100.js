@@ -92,8 +92,7 @@ function runJavaScriptWorker (questionID, code, mypre, max_ms, log_callback, inf
             worker.end("HackerError: Great! You invaded our System. Sadly this will lead you nowhere. Please focus on the Test.");
         }
     }
-    worker.onerror   = function(e){  
-        console.log(e);
+    worker.onerror   = function(e){          
         if(e.lineno == 1) { 
             compileFailedCallback({
                 start : { line: -1, column:-1},
