@@ -108,7 +108,11 @@ const singleton = new Vue({
   methods: {
       preload() {
         if (this.loadedlibs<3){
-          this.requestedPreload = true;
+          if (this.requestedPreload == false){
+            this.requestedPreload = true;
+            this.triggerResourceLoad();
+          }
+          
           return;
         }
         if (this.didPreload) return;
@@ -147,35 +151,38 @@ const singleton = new Vue({
           if (!this.isReady) return; 
 
           return runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
+      },
+      triggerResourceLoad(){
+        let script = document.createElement('script');
+        script.src = './js/doppio/v001/browserfs/browserfs.min.js';
+        script.onload = function () {
+          this.loadedlibs++;
+          console.log("[BrowserFS loaded]");
+          if (this.requestedPreload) this.preload();
+        }.bind(this);
+        document.head.appendChild(script);
+
+        script = document.createElement('script');
+        script.src = './js/doppio/v001/doppio/doppio.js';
+        script.onload = function () {
+          this.loadedlibs++;
+          console.log("[Doppio loaded]");
+          if (this.requestedPreload) this.preload();
+        }.bind(this);
+        document.head.appendChild(script);
+
+        script = document.createElement('script');
+        script.src = './js/doppio/v001/JavaExec.js';
+        script.onload = function () {
+          this.loadedlibs++;
+          console.log("[JavaExec loaded]");
+          if (this.requestedPreload) this.preload();
+        }.bind(this);
+        document.head.appendChild(script);
       }
   },
   created(){
-    let script = document.createElement('script');
-    script.src = './js/doppio/v001/browserfs/browserfs.min.js';
-    script.onload = function () {
-      this.loadedlibs++;
-      console.log("[BrowserFS loaded]");
-      if (this.requestedPreload) this.preload();
-    }.bind(this);
-    document.head.appendChild(script);
-
-    script = document.createElement('script');
-    script.src = './js/doppio/v001/doppio/doppio.js';
-    script.onload = function () {
-      this.loadedlibs++;
-      console.log("[Doppio loaded]");
-      if (this.requestedPreload) this.preload();
-    }.bind(this);
-    document.head.appendChild(script);
-
-    script = document.createElement('script');
-    script.src = './js/doppio/v001/JavaExec.js';
-    script.onload = function () {
-      this.loadedlibs++;
-      console.log("[JavaExec loaded]");
-      if (this.requestedPreload) this.preload();
-    }.bind(this);
-    document.head.appendChild(script);
+    
   }
 })
 export default singleton;
