@@ -3,7 +3,7 @@
         {{language}}
         <div class="block" v-for="block in blocks" :key="block.id">
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
-                :visibleLines="block.visibleLines" :editMode="editMode"></CodeBlock>
+                :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
             <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" @changeOutput="onPlaygroundChangedOutput"></CodePlayground>
         </div>
         <div class="runner" v-if="canRun">

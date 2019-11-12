@@ -193,6 +193,23 @@
         },
         mounted() {
             this.updateHeight();
+
+            const buildIt = function(){
+                if (this.editMode) {
+                    this.$emit("build");
+                }
+            }.bind(this);
+
+            this.codemirror.addKeyMap({
+                "Cmd-B": function(cMirror) { buildIt() },
+                 "Ctrl-B": function(cMirror) { buildIt() }
+            });    
+
+            this.codemirror.addKeyMap({
+                "Tab": function(cMirror) {
+                    cMirror.execCommand("insertSoftTab");              
+                }
+            });
         }
     }
 </script>
