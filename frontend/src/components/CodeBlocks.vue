@@ -14,10 +14,14 @@
                     Run
                     <v-icon right dark>mdi-play</v-icon>
                 </v-btn>
-                <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-if="showGlobalMessages"></div>                
+                
+                <v-fade-transition>
+                    <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-show="showGlobalMessages"></div>        
+                </v-fade-transition>  
             </div>
-
-            <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
+            <v-expand-transition>
+                <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
+            </v-expand-transition>
         </div>
     </div>
 </template>
