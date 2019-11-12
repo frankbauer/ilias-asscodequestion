@@ -13,3 +13,26 @@ codeblocks>block, codeblocks>text{
     white-space: pre;
     color:silver;
 }
+
+.red-wave {
+    background: url("red-wave.png") repeat-x;
+    background-position-y: bottom;
+}
+
+.yellow-wave {
+    background: url("yellow-wave.png") repeat-x;
+    background-position-y: bottom;
+}
+
+.gutter-warning, .gutter-error {
+    font-size:16px;
+    padding-top:2px;
+    padding-left:1px;
+}
+
+.gutter-error {
+    color: red;
+}
+.gutter-warning {
+    color: #b8a600;
+}

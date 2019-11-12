@@ -31,7 +31,8 @@ class CodeBlocksManager {
                 hasCode: false,
                 type: bl.tagName,
                 content: bl.textContent,
-                id: data.blocks.length
+                id: data.blocks.length,
+                errors:[]
             }
 
             block.readonly = block.readonly !== undefined && block.readonly != "false" && block.readonly != "0";

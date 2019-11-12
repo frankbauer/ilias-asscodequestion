@@ -1,7 +1,10 @@
 <template>
+<div>
     <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange">
     </codemirror>
+    <div v-for="err in block.errors">{{err.start.line}}:{{err.start.column}}  {{err.message}}</div>
+    </div>
 </template>
 
 <script>
@@ -35,6 +38,8 @@
     //plugins
     import 'codemirror/addon/edit/closebrackets.js'
 
+    let nextErrorID = 1;
+
     export default {
         name: 'CodeBlock',
         props: {
@@ -65,6 +70,12 @@
             }
         },
         methods: {
+            clearErrorDisplay(){
+                this.codemirror.getDoc().clearGutter('diagnostics');
+                let allMarks = this.codemirror.getDoc().getAllMarks();
+                allMarks.forEach(e => e.clear())
+                
+            },
             onCodeReady(editor) {
 
             },
@@ -83,6 +94,9 @@
             }
         },
         computed: {
+            errors() {
+                return this.block.errors;
+            },
             boxClass() {
                 let cl = "";
                 if (this.hidden) cl += "hiddenBox "
@@ -116,6 +130,62 @@
             visibleLines: function (val) {
                 console.log(this.visibleLines, val)
                 this.updateHeight();
+            },
+            errors: function(val){
+                if (val!==undefined){
+                    //clear Gutter
+                    if (val.length==0) this.clearErrorDisplay();
+                
+                    const first = this.block.firstLine;
+                    val.forEach(error => {
+                        if (error.id==0 || error.id===undefined) error.id = nextErrorID++;
+                        this.codemirror.getDoc().markText(
+                            {line:error.start.line-first, ch:error.start.column}, 
+                            {line:error.end.line-first, ch:error.end.column}, 
+                            {
+                                className:'red-wave',
+                                inclusiveLeft:true,
+                                inclusiveRight:true,
+                                title:error.message                
+                            }
+                        );
+
+                        let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
+                        let element = info.gutterMarkers ? info.gutterMarkers['diagnostics'] : null;
+                        if (element == null) {
+                            element = document.createElement("span");
+                            element.severity = error.severity;
+                            element.errors = [];
+                        }
+
+                        let gutterSeverity = Math.max(error.severity, element.severity); 
+                        let gutterClassName = '';
+                        switch (gutterSeverity) {
+                            case this.SEVERITY_ERROR:
+                                gutterClassName = "code-error gutter-error";
+                                break;
+                            case this.SEVERITY_WARNING:
+                                gutterClassName = "code-warning gutter-warning";
+                                break;
+                            default:
+                                console.error("Unknown Severity", gutterSeverity[line]);
+                                return;
+                        }
+                        element.className = "mdi mdi-" + gutterClassName;
+
+                        if (element.errors.indexOf(error)==-1){
+                            var title = element.title;
+                            title = title!='' ? (title + "\n\n" + '- ' + error.message) : ('- ' +error.message);
+                            element.title = title;  
+                            element.errors.push(error);
+                        }
+
+                        this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element)
+                    });
+                } else {
+                    this.clearErrorDisplay();
+                }
+                console.log("Errors Updated", val);
             }
         },
         mounted() {

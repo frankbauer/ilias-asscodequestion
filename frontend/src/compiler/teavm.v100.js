@@ -153,7 +153,7 @@ const singleton = new Vue({
                             });
                         }
 
-                        msg = e.data.text + "\n";
+                        let msg = e.data.text + "\n";
                         if (e.data.severity == 'ERROR') {
                             err_callback(msg + "\n");
                         } else {
@@ -175,7 +175,7 @@ const singleton = new Vue({
                             });
                         }
 
-                        msg = e.data.humanReadable + "\n";
+                        let msg = e.data.humanReadable + "\n";
                         if (e.data.kind == 'ERROR') {
                             err_callback(msg + "\n");
                         } else {

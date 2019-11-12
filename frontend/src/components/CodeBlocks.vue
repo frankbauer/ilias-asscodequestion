@@ -5,14 +5,16 @@
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode"></CodeBlock>
         </div>
-        <div class="runner">
+        <div class="runner" v-if="canRun">
             <v-btn :loading="!isReady" :disabled="!isReady" color="blue-grey darken-1" class="ma-2 white--text"
-                @click="run" v-if="canRun">
+                @click="run">
                 Run
                 <v-icon right dark>mdi-play</v-icon>
             </v-btn>
             <div class="globalState" v-html="$compilerState.globalStateMessage" v-if="showGlobalMessages"></div>
         </div>
+
+            <span class="mdi mdi-warning"></span>
     </div>
 </template>
 
@@ -90,10 +92,29 @@
             }
         },
         methods: {
+            processDiagnostics(error) {
+                const line = error.start.line;
+                this.blocks.forEach( block => {
+                    if (!block.hasCode) return;                    
+                    
+                    const first = block.firstLine;
+                    const last = block.nextLine - 1;
+                    
+                    if (error.start.line+1 >= first && error.start.line+1 <= last) {
+                        block.errors.push(error);                        
+                    }
+                });
+            },
+            clearDiagnostics(){
+                this.blocks.forEach( block => block.errors = []);                
+            },
             run() {
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
-                console.log("RUNNING", this.completeSource);
+
+                this.clearDiagnostics();
+                let gutterSeverity = [];
+                let gutterElements = [];
                 cmp.compileAndRun(
                     this.blocks.id,
                     this.completeSource,
@@ -101,16 +122,16 @@
                     3000,
                     function (m) {
                         console.log(m)
-                    },
+                    }.bind(this),
                     function (m) {
                         console.log("Info:" + m)
-                    },
+                    }.bind(this),
                     function (m) {
                         console.error(m)
-                    },
+                    }.bind(this),
                     function (error) {
-                        console.error("Error", error);
-                    },
+                        this.processDiagnostics(error);
+                    }.bind(this),
                     function (success = true, overrideOutput = undefined) {
                         console.log("Done", success, overrideOutput, cmp.isReady, cmp.isRunning)
                         //waitdiv.innerHTML = '';  
@@ -122,7 +143,7 @@
                         //var res = finishedExecution(overrideOutput?overrideOutput:output, sansoutput, questionID, outdiv);
                         this.$compilerState.hideGlobalState();
                         this.$compilerState.setAllRunButtons(true);
-                        return res;
+                        //return res;
                     }.bind(this)
                 )
             }
