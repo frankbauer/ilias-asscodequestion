@@ -98,9 +98,10 @@
             },
             boxClass() {
                 let cl = "";
-                if (this.hidden) cl += "hiddenBox "
-                if (this.readonly) cl += "readonlyBox "
-                if (this.static) cl += "staticBox "
+                if (this.block.hidden) cl += "hiddenBox "
+                if (this.block.readonly) cl += "readonlyBox "
+                if (this.block.static) cl += "staticBox "
+                console.log(cl, this.block);
                 return cl;
             },
             code() {
@@ -214,9 +215,9 @@
     }
 </script>
 
-<style lang="sass" scoped>
+<style scoped lang="sass">
     .hiddenBox 
-        display:none 
+        display: none !important
     .staticBox 
         opacity: 0.8 
         filter: grayscale(20%)
