@@ -8,7 +8,8 @@
     <title>frontend</title>
     <link rel=stylesheet href="<%= BASE_URL %>css/materialdesignicons.css"> 
     <link rel=stylesheet href="<%= BASE_URL %>css/roboto.css">  
-    <link rel=stylesheet href="<%= BASE_URL %>css/main.css">     
+    <link rel=stylesheet href="<%= BASE_URL %>css/main.css">  
+    <script src="<%= BASE_URL %>js/jquery.min.js" type="text/javascript"></script>
   </head>
   <body>
     <noscript>
@@ -17,18 +18,23 @@
     <div id="app"></div>
     <codeblocks data-compiler="java" data-compiler-version="100" data-id="34">
       <playground>{init: function(canvasElement) {
-              console.log("INIT");
+              console.log("INIT", canvasElement);
+              canvasElement.addClass('hiddenBlock');
               console.log(document.querySelector('#app'));
           }, //init
   
-          update: function(outputObject, canvasElement) {
-              console.log("FOO");
+          update: function(text, json, canvasElement, outputElement) {
+              canvasElement.removeClass('hiddenBlock');
+              console.log("FOO", text, json);
+              return "New Text is here\n\n";
           } //update
       }</playground>
       <block data-readonly data-static>public class Foo {</block>
       <block data-visible-lines="10">public static void main(String[] args){
   int a;System.out.println("Hello World!");
-  System.out.println("Hello World!");
+  System.err.println("Hello World!");
+  System.out.print("\n\n&lt;JSON&gt;\n");
+  System.out.println("[1, 2, 3]");
 }</block>
 
       <block data-readonly data-static>}</block>  

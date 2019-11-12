@@ -42,7 +42,6 @@ class CodeBlocksManager {
 
             if (block.type == 'PLAYGROUND') {                
                 block.obj = new ScriptBlock(block.content);
-                block.obj.init();
                 block.content = '';
             } else if (block.type == 'BLOCK') {
                 block.hasCode = true;

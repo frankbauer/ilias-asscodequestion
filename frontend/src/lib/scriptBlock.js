@@ -44,7 +44,7 @@ class ScriptBlock {
       this.err.push({line:line, column:column, msg:e.message});
     }
 
-    init(canvasElement){
+    init(canvasElement, outputElement){
       if (this.obj===undefined) return;
       try {
         this.obj.init(canvasElement);
@@ -54,12 +54,24 @@ class ScriptBlock {
     }
 
     update(outputObject, canvasElement){
-      if (this.obj===undefined) return;
+      if (this.obj===undefined) return outputObject.initialOutput;
       try {
-        this.obj.update(outputObject, canvasElement);
+        if (this.obj.update){  
+          //console.log(this.obj.update.length, outputObject, this.obj);
+          //this is the old behaviour  
+          if (this.obj.update.length == 2){              
+            if (outputObject.processedOutput.type=='json')
+              return this.obj.update(outputObject.processedOutput.json, canvasElement);
+            else
+              return this.obj.update(outputObject.initialOutput, canvasElement);
+          } else {
+            return this.obj.update(outputObject.processedOutput.text, outputObject.processedOutput.json, canvasElement, outputObject.outputElement);
+          }
+        }
       } catch(e) {
          this.pushError(e); 
       }
+      return outputObject.initialOutput;
     }
 
     onParseError(initialOutput, parseError){

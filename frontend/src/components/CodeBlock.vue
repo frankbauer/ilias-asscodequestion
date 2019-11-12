@@ -151,7 +151,7 @@
 
                         //read existing gutter marker or create a new one
                         let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
-                        let element = info.gutterMarkers ? info.gutterMarkers['diagnostics'] : null;
+                        let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'] : null;
                         if (element == null) {
                             element = document.createElement("span");
                             element.severity = error.severity;
