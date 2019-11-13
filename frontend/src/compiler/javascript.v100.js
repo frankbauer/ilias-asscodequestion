@@ -1,5 +1,4 @@
 import Vue from 'vue'
-let SEVERITY_ERROR;
 
 //function runJavaScriptWorker( code, log_callback, max_ms, questionID){
 function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback,  finishedExecutionCB){
@@ -98,7 +97,7 @@ function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_c
                 start : { line: -1, column:-1},
                 end : { line: -1, column:-1},
                 message: e.message,
-                severity: SEVERITY_ERROR
+                severity: Vue.$SEVERITY_ERROR
             });
             worker.end("Error: "+e.message);
         } else if(e.lineno >= lines+1)  {
@@ -106,7 +105,7 @@ function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_c
                 start : { line: lines+1, column:0},
                 end : { line: lines+1, column:0},
                 message: e.message,
-                severity: SEVERITY_ERROR
+                severity: Vue.$SEVERITY_ERROR
             });
             worker.end("EndOfFile: "+ e.message );
         } else {
@@ -114,7 +113,7 @@ function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_c
                 start : { line: (e.lineno-2), column:e.colno-1},
                 end : { line: (e.lineno-2), column:e.colno},
                 message: e.message,
-                severity: SEVERITY_ERROR
+                severity: Vue.$SEVERITY_ERROR
             });
             worker.end('Line '+(e.lineno-2)+": "+e.message);
         }        
@@ -142,9 +141,6 @@ const singleton = new Vue({
         compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
             return runJavaScriptWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
         }
-    },
-    created(){
-        SEVERITY_ERROR = this.SEVERITY_ERROR;
     }
 })
 export default singleton;

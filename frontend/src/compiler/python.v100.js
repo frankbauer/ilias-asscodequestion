@@ -1,6 +1,5 @@
 import Vue from 'vue'
-let SEVERITY_ERROR;
-console.log(Vue.$CodeBlock)
+
 
 function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) { 
     // the Python program
@@ -60,7 +59,7 @@ function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCal
                     start : { line: err.args.v[3][0][0]-1, column:err.args.v[3][0][0]-1-1},
                     end : { line: err.args.v[3][1][0]-1-1, column:err.args.v[3][1][0]-1-1},
                     message: err.args.v[0].v + ": " + err.args.v[3][2],
-                    severity: SEVERITY_ERROR
+                    severity: Vue.$SEVERITY_ERROR
                 });
             }
             worker.end("ERROR: " + e.data[1]);
@@ -90,9 +89,6 @@ const singleton = new Vue({
         compileAndRun(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate = true){
             return runPythonWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
         }
-    },
-    created(){
-        SEVERITY_ERROR = this.SEVERITY_ERROR;
     }
 })
 export default singleton;
