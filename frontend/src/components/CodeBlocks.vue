@@ -12,7 +12,7 @@
                 <v-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
                     @click="run">
                     Run
-                    <v-icon right dark>mdi-play</v-icon>
+                    <v-icon right dark>mdi-play-button</v-icon>
                 </v-btn>
                 
                 <v-fade-transition>
