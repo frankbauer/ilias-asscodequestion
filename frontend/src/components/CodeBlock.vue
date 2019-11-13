@@ -32,7 +32,7 @@
     import 'codemirror/mode/python/python.js'
     import 'codemirror/mode/r/r.js'
     import 'codemirror/mode/ruby/ruby.js'
-    //import 'codemirror/mode/glsl/glsl.js'
+    import '../lib/glsl/glsl'
 
     //plugins
     import 'codemirror/addon/edit/closebrackets.js'
