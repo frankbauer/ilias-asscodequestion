@@ -1,5 +1,5 @@
 <template>
-    <div class="codeblocks">
+    <div :class="containerClass">
         {{editMode}}
         <div class="block" v-for="block in blocks" :key="block.id">
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
@@ -99,6 +99,11 @@
             },
             outputElement(){
                 return this.$refs.output;           
+            },
+            containerClass() {
+                let cl = "codeblocks";
+                if (this.editMode) cl += " editmode";
+                return cl;
             }
         },
         methods: {
@@ -240,13 +245,14 @@
     }
 </script>
 
-<style scoped lang="sass">
-    div .codeblocks        
+<style lang="sass">   
+    div.codeblocks.editmode
         border: 1px dashed silver
-        border-radius: 5px
+        border-radius: 5px        
+        background-color: white 
+    div.codeblocks            
         margin: 4px
-        padding: 8px
-        background-color: white
+        padding: 8px        
         .block
             padding: 0px
             margin: 0px
