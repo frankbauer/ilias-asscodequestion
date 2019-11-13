@@ -158,27 +158,30 @@ const singleton = new Vue({
         script.onload = function () {
           this.loadedlibs++;
           console.log("[BrowserFS loaded]");
-          if (this.requestedPreload) this.preload();
+          
+
+          let script = document.createElement('script');
+          script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/doppio/doppio.js';
+          script.onload = function () {
+            this.loadedlibs++;
+            console.log("[Doppio loaded]");
+            
+            let script = document.createElement('script');
+            script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/JavaExec.js';
+            script.onload = function () {
+              this.loadedlibs++;
+              console.log("[JavaExec loaded]");
+              if (this.requestedPreload) this.preload();
+            }.bind(this);
+            document.head.appendChild(script);
+          }.bind(this);
+          document.head.appendChild(script);
         }.bind(this);
         document.head.appendChild(script);
 
-        script = document.createElement('script');
-        script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/doppio/doppio.js';
-        script.onload = function () {
-          this.loadedlibs++;
-          console.log("[Doppio loaded]");
-          if (this.requestedPreload) this.preload();
-        }.bind(this);
-        document.head.appendChild(script);
+        
 
-        script = document.createElement('script');
-        script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/JavaExec.js';
-        script.onload = function () {
-          this.loadedlibs++;
-          console.log("[JavaExec loaded]");
-          if (this.requestedPreload) this.preload();
-        }.bind(this);
-        document.head.appendChild(script);
+        
       }
   },
   created(){
