@@ -17,7 +17,7 @@ function runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback
 
   let className = match[1];
 
-  let worker = new Worker('js/doppio/v001/javaWorker.js');
+  let worker = new Worker(Vue.$CodeBlock.baseurl+'js/doppio/v001/javaWorker.js');
   let timer = null
 
   worker.addEventListener('message', function (e) {
@@ -135,7 +135,7 @@ const singleton = new Vue({
           const self = this;
           JavaExec.initialize(function () {
             console.log("Initializing Filesystem");
-            JavaExec.initFileSystems('./js/doppio/v001/', false, function () {
+            JavaExec.initFileSystems(Vue.$CodeBlock.baseurl+'js/doppio/v001/', false, function () {
               //JavaExec.printDirContent('sys/vendor');      
       
               JavaExec.reroutStdStreams();
@@ -154,7 +154,7 @@ const singleton = new Vue({
       },
       triggerResourceLoad(){
         let script = document.createElement('script');
-        script.src = './js/doppio/v001/browserfs/browserfs.min.js';
+        script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/browserfs/browserfs.min.js';
         script.onload = function () {
           this.loadedlibs++;
           console.log("[BrowserFS loaded]");
@@ -163,7 +163,7 @@ const singleton = new Vue({
         document.head.appendChild(script);
 
         script = document.createElement('script');
-        script.src = './js/doppio/v001/doppio/doppio.js';
+        script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/doppio/doppio.js';
         script.onload = function () {
           this.loadedlibs++;
           console.log("[Doppio loaded]");
@@ -172,7 +172,7 @@ const singleton = new Vue({
         document.head.appendChild(script);
 
         script = document.createElement('script');
-        script.src = './js/doppio/v001/JavaExec.js';
+        script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/JavaExec.js';
         script.onload = function () {
           this.loadedlibs++;
           console.log("[JavaExec loaded]");

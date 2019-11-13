@@ -34,7 +34,7 @@ const singleton = new Vue({
                 this.$compilerState.setAllRunButtons(false);
                 this.$compilerState.displayGlobalState("Initializing Runtime");
                 try {
-                    this.teaworker = new Worker(`js/teavm/v${this.version}/worker.js`);
+                    this.teaworker = new Worker(`${this.$CodeBlock.baseurl}js/teavm/v${this.version}/worker.js`);
                 } catch (e) {
                     //this should throw in the offline environment, thus we look for the worker at a different
                     this.teaworker = new Worker('../assCodeQuestion/js/teavm/worker.js');
@@ -210,7 +210,7 @@ const singleton = new Vue({
                                 }
                             }
                             this.$compilerState.displayGlobalState("Executing <b>" + mainClass + "</b>");
-                            let workerrun = new Worker(`js/teavm/v${this.version}/workerrun.js`);
+                            let workerrun = new Worker(`${this.$CodeBlock.baseurl}js/teavm/v${this.version}/workerrun.js`);
                             workerrun.addEventListener('message', runListener.bind(this));
 
                             workerrun.postMessage({

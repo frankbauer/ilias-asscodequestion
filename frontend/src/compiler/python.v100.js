@@ -1,5 +1,6 @@
 import Vue from 'vue'
 let SEVERITY_ERROR;
+console.log(Vue.$CodeBlock)
 
 function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCallback, infoCallback, errCallback, compileFailedCallback, finishCallback) { 
     // the Python program
@@ -10,7 +11,7 @@ function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCal
         return;
     }
 
-    var worker = new Worker('js/python/v100/pyWorker.js');
+    var worker = new Worker(Vue.$CodeBlock.baseurl+'js/python/v100/pyWorker.js');
     
     // construct message for worker
     var pyInp = []; // not used jet
