@@ -1,6 +1,6 @@
 <template>
     <div class="codeblocks">
-        {{language}}
+        {{editMode}}
         <div class="block" v-for="block in blocks" :key="block.id">
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
@@ -31,9 +31,6 @@
     import CodePlayground from '../components/CodePlayground';
     import SimpleText from '../components/SimpleText';
 
-    
-
-
     export default {
         name: 'CodeBlocks',
         components: {
@@ -62,10 +59,6 @@
                 type: Number,
                 default: 1000
             },
-            'editMode': {
-                type: Boolean,
-                default: false
-            },
             'compiler': {
                 type: Object,
                 default: {
@@ -75,6 +68,9 @@
             }
         },
         computed: {
+            editMode() {
+                return false;
+            },
             hasOutput(){
                 return this.outputHTML!==undefined && this.outputHTML!=""
             },

@@ -2,6 +2,7 @@ import ScriptBlock from './scriptBlock'
 import vuetify from '../plugins/vuetify';
 import Vue from 'vue'
 import App from '../App.vue'
+import AppEditor from '../AppEditor.vue'
 
 import CompilerRegistry from '../lib/CompilerRegistry'
 Vue.prototype.$compilerRegistry = CompilerRegistry;
@@ -14,6 +15,7 @@ class CodeBlocksManager {
         this.element = el;
         let data = {
             ...el.dataset,
+            editMode: el.tagName == 'CODEBLOCKSEDITOR',
             blocks: []
         };
 
@@ -91,7 +93,7 @@ class CodeBlocksManager {
                         })
                     }
                 };
-                return h(App, context)
+                return h(data.editMode?AppEditor:App, context)
             },
         }).$mount(this.element)
     }
@@ -100,7 +102,7 @@ class CodeBlocksManager {
 export default {
     find(scope) {
         if (scope === undefined) scope = document;
-        const allCodeBlockParents = scope.querySelectorAll("codeblocks");
+        const allCodeBlockParents = scope.querySelectorAll("codeblocks, codeblockseditor");
         let result = [];
         allCodeBlockParents.forEach(el => {
             result.push(new CodeBlocksManager(el));
