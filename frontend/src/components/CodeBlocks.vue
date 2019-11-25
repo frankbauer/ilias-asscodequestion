@@ -39,6 +39,7 @@
         },
         data:function(){
             return {
+                didInitialize: false,
                 outputHTML:"",
                 output:"",
                 sansoutput:"",
@@ -80,7 +81,7 @@
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
 
-                return cmp.isReady && !cmp.isRunning && !this.$compilerState.runButtonForceHide;
+                return this.didInitialize && cmp.isReady && !cmp.isRunning && !this.$compilerState.runButtonForceHide;
             },
             canRun() {
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
@@ -240,6 +241,7 @@
             if (cmp) {
                 cmp.preload();
             }
+            this.didInitialize = true;
         }
     }
 </script>

@@ -10,7 +10,7 @@ Vue.prototype.$compilerState = new Vue({
         return {
           globalStateHidden:true,
           globalStateMessage:"",
-          runButtonForceHide:true,
+          runButtonForceHide:false,
         }
       },
       methods:{

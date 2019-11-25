@@ -19,6 +19,7 @@ const singleton = new Vue({
         preload() {
             if (this.didPreload) return;
             this.didPreload = true;
+            this.$compilerState.setAllRunButtons(false);
 
             console.log(`[Preloading TeaVM ${this.version} for Java]`);
             this.isRunning = true;
