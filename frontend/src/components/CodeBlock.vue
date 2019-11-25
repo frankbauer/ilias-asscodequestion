@@ -102,7 +102,7 @@
             },
             boxClass() {
                 let cl = "";
-                if (this.block.hidden) cl += "hiddenBox "
+                if (this.block.hidden && !this.editMode) cl += "hiddenBox "
                 if (this.block.readonly) cl += "readonlyBox "
                 if (this.block.static) cl += "staticBox "                
                 return cl;
