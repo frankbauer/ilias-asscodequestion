@@ -1,8 +1,9 @@
 <template>
-<div>
-    <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
+    <div>
+        <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange">
-    </codemirror>
+        </codemirror>
+        
     </div>
 </template>
 
@@ -37,7 +38,10 @@
     //plugins
     import 'codemirror/addon/edit/closebrackets.js'
 
-    let nextErrorID = 1;
+    //helper to create tooltips at runtime
+    import Vue from 'vue'
+    import ErrorTip from './ErrorTip.vue'
+    const ErrorTipCtor = Vue.extend(ErrorTip)
 
     export default {
         name: 'CodeBlock',
@@ -151,40 +155,31 @@
 
                         //read existing gutter marker or create a new one
                         let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
-                        let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'] : null;
+                        let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'].$component : null;
                         if (element == null) {
                             element = document.createElement("span");
-                            element.severity = error.severity;
-                            element.errors = [];
+
+                            //place the updated element
+                            this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element);
+
+                            element.$component = new ErrorTipCtor({
+                                propsData: {
+                                    errors: [],
+                                    severity: error.severity 
+                                }
+                            }).$mount(element);
+
+                            element = element.$component;
                         }
 
                         //make sure we use the proper class for the given severity.
                         //We allways choose the maximum severity for each marking
-                        let gutterSeverity = Math.max(error.severity, element.severity); 
-                        let gutterClassName = '';
-                        switch (gutterSeverity) {
-                            case this.SEVERITY_ERROR:
-                                gutterClassName = "code-error gutter-error";
-                                break;
-                            case this.SEVERITY_WARNING:
-                                gutterClassName = "code-warning gutter-warning";
-                                break;
-                            default:
-                                console.error("Unknown Severity", gutterSeverity);
-                                return;
-                        }
-                        element.className = "mdi mdi-" + gutterClassName;
+                        element.severity = Math.max(error.severity, element.severity); 
 
                         //Build the hint text
                         if (element.errors.indexOf(error)==-1){
-                            var title = element.title;
-                            title = title!='' ? (title + "\n\n" + '- ' + error.message) : ('- ' +error.message);
-                            element.title = title;  
                             element.errors.push(error);
-                        }
-
-                        //place the updated element
-                        this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element)
+                        }                        
                     });
                 } else {
                     this.clearErrorDisplay();

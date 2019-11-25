@@ -1,0 +1,52 @@
+<template>
+    <v-tooltip top>
+        <template v-slot:activator="{ on }">
+            <v-icon v-on="on" :class="`mdi ${severityClass}`">{{severityIcon}}</v-icon>            
+        </template>
+        <div>
+            <ul class="tiplist">
+                <li v-for="error in errors" v-bind:key="error.message">
+                    <v-icon class="pr-3 tipicon">{{ iconForSeverity(error.severity) }}</v-icon>
+                    <pre class="tipper">{{ error.message }}</pre>
+                </li>
+            </ul>
+        </div>
+    </v-tooltip>
+</template>
+
+<script>
+
+export default {
+    props: ['errors', 'severity'],
+    computed: {
+        severityClass() { return this.classForSeverity(this.severity); },
+        severityIcon() { return this.iconForSeverity(this.severity); }
+    },
+    methods:{
+        classForSeverity(s){
+            if (s == this.SEVERITY_ERROR) return "gutter-error";
+            return "gutter-warning";
+        },
+        iconForSeverity(s){
+            if (s == this.SEVERITY_ERROR) return "mdi-code-error";
+            return "mdi-code-warning"
+        }
+    }
+}
+</script>
+
+<style lang="sass">
+    .tiplist
+        list-style-type: none
+        padding-left: 0px !important
+        li
+            padding: 0px 0px 10px 0px
+            margin: 0px
+            .tipicon 
+                display: inline
+                color: white !important
+                vertical-align: top
+            .tipper
+                display: inline-block
+                vertical-align: top
+</style>

@@ -25,14 +25,14 @@ codeblocks>block, codeblocks>text{
 }
 
 .gutter-warning, .gutter-error {
-    font-size:16px;
-    padding-top:3px;
-    padding-left:1px;
+    font-size:16px!important;
+    padding-top:-2px!important;
+    padding-left:1px!important;
 }
 
 .gutter-error {
-    color: #B71C1C;
+    color: #B71C1C !important;
 }
 .gutter-warning {
-    color: #F9A825;
+    color: #F9A825 !important;
 }

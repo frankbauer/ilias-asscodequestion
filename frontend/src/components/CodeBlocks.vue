@@ -1,6 +1,5 @@
 <template>
-    <div :class="containerClass">
-        {{editMode}}
+    <div :class="`codeblocks ${addonClass}`">        
         <div class="block" v-for="block in blocks" :key="block.id">
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
@@ -100,9 +99,9 @@
             outputElement(){
                 return this.$refs.output;           
             },
-            containerClass() {
-                let cl = "codeblocks";
-                if (this.editMode) cl += " editmode";
+            addonClass() {
+                let cl = "";
+                if (this.editMode) cl += "editmode ";
                 return cl;
             }
         },
