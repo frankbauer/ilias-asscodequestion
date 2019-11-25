@@ -1,7 +1,7 @@
 <template>
     <div>
         <div ref="playgroundContainer" class="playground">{{finalOutputObject.initialOutput}}</div>
-        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode"></codemirror>
+        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode" class="playgroundedit py-3"></codemirror>
     </div>
 </template>
 
@@ -96,6 +96,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.playgroundedit
+    border-radius: 5px
 .hiddenBlock
     display: none !important
 

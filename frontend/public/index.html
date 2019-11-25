@@ -24,8 +24,17 @@
             console.log(document.querySelector('#app'));
         }, //init
 
+        getRandomColor() {
+          var letters = '0123456789ABCDEF';
+          var color = '#';
+          for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        },
         update: function(text, json, canvasElement, outputElement) {
             canvasElement.removeClass('hiddenBlock');
+            canvasElement.css('background-color', this.getRandomColor());
             console.log("FOO", text, json);
             return "New Text is here\n\n";
         } //update
