@@ -236,7 +236,7 @@
                 )
             }
         },
-        created() {
+        mounted() {
             let cmp = this.$compilerRegistry.getCompiler(this.compiler);
             if (cmp) {
                 cmp.preload();
