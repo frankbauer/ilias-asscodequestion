@@ -39,9 +39,11 @@ export default {
     .tiplist
         list-style-type: none
         padding-left: 0px !important
+        li:first-of-type
+            padding: 0px 0px 0px 0px
         li
-            padding: 0px 0px 10px 0px
-            margin: 0px
+            padding: 10px 0px 0px 0px
+            margin: 0px 0px 0px 0px
             .tipicon 
                 display: inline
                 color: white !important
