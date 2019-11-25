@@ -51,16 +51,23 @@ function runPythonWorker(questionID, prog, callingCodeBlocks, maxRuntime, logCal
             infoCallback("Info: Execution finished in : " + (Date.now() - start) + " ms");
             worker.end();
         }else if (e.data[0] ==='err'){  
-            const err = JSON.parse(e.data[2]);  
-            console.error(err, err.args.v.length);
-            if (err && err.args && err.args.v && err.args.v.length>=4){
-                console.log("what")
+            const err = JSON.parse(e.data[2]);              
+            if (err && err.lineno!==undefined && err.colno!==undefined){                
                 compileFailedCallback({
-                    start : { line: err.args.v[3][0][0]-1, column:err.args.v[3][0][0]-1-1},
-                    end : { line: err.args.v[3][1][0]-1-1, column:err.args.v[3][1][0]-1-1},
-                    message: err.args.v[0].v + ": " + err.args.v[3][2],
+                    start : { line: err.lineno-1, column:err.colno},
+                    end : { line: err.lineno-1, column:err.colno+1},
+                    message: err.message,
                     severity: Vue.$SEVERITY_ERROR
                 });
+            } else {
+                if (err && err.lineno!==undefined){
+                    compileFailedCallback({
+                        start : { line: err.lineno-1, column:0},
+                        end : { line: err.lineno-1, column:0},
+                        message: err.message,
+                        severity: Vue.$SEVERITY_ERROR
+                    });
+                }
             }
             worker.end("ERROR: " + e.data[1]);
         } else {       

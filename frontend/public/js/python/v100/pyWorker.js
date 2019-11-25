@@ -142,8 +142,18 @@ self.onmessage = function(e) {
                     postMessage(['finished',messageData]);
                 },
                 function(err) {
+                    const args = Sk.ffi.remapToJs(err.args);
+                    let errObj = { message : err.toString()};
+                    if (args.length>0) errObj.message = args[0];
+
+                    if (err.traceback.length>0){
+                        errObj.lineno = err.traceback[0].lineno;
+                        errObj.colno = err.traceback[0].colno;
+                    }
+                    // console.log(err.toString(), args)
+                    // err.traceback.forEach( e => console.log(e))
                     // there were some error
-                    postMessage(['err',err.toString(), JSON.stringify(err)]);
+                    postMessage(['err',err.toString(), JSON.stringify(errObj)]);
             });
         }
     }
