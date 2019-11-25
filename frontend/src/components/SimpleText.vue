@@ -1,20 +1,30 @@
 <template>
-  <div v-html="content"></div>
+    <div>
+        <div v-if="!editMode" v-html="value"></div>
+        <TipTap :value="value" @input="updatedContent" class="editor my-3" />
+    </div>
 </template>
 
 <script>
+import TipTap from './TipTap'
 export default {
     name:"simpletext",
+    components:{TipTap},
     props:{
-        content:"",
+        value:"",
         'editMode': {
             type: Boolean,
             default: false
+        }
+    },
+    methods:{
+        updatedContent(v){
+            this.$emit('input', v);
         }
     }
 }
 </script>
 
 <style lang="sass" scoped>
-
+    
 </style>

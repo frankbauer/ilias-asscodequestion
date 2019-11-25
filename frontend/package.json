@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "tiptap-vuetify": "^2.8.0",
     "vue": "^2.6.10",
     "vue-codemirror": "^4.0.5",
     "vuetify": "^2.1.0"

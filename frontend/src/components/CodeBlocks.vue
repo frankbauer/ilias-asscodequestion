@@ -4,7 +4,7 @@
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
             <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" @changeOutput="onPlaygroundChangedOutput"></CodePlayground>
-            <SimpleText v-if="block.type=='TEXT'" :content="block.content" :editMode="editMode" ></SimpleText>
+            <SimpleText v-if="block.type=='TEXT'" v-model="block.content" :editMode="editMode" ></SimpleText>
         </div>
         <div class="runner" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
