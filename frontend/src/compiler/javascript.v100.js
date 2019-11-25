@@ -100,10 +100,10 @@ function runJavaScriptWorker (questionID, code, callingCodeBlocks, max_ms, log_c
                 severity: Vue.$SEVERITY_ERROR
             });
             worker.end("Error: "+e.message);
-        } else if(e.lineno >= lines+1)  {
+        } else if(e.lineno >= lines+2)  {
             compileFailedCallback({
-                start : { line: lines+1, column:0},
-                end : { line: lines+1, column:0},
+                start : { line: lines+2, column:0},
+                end : { line: lines+2, column:0},
                 message: e.message,
                 severity: Vue.$SEVERITY_ERROR
             });
