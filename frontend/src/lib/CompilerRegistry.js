@@ -12,7 +12,11 @@ const compilerRegistry = new Vue({
     },
     methods: {
         register(compilers){
-            this.compilers[compilers.type] = compilers;
+            if (Array.isArray(compilers)){
+                compilers.forEach(c => this.compilers[c.type] = c)
+            } else {
+                this.compilers[compilers.type] = compilers;
+            }
         },
         getCompiler(compilerInfo){
             let cmps = this.compilers[compilerInfo.languageType]            
