@@ -1,9 +1,16 @@
 <template>
-  <div ref="playgroundContainer" class="playground">{{finalOutputObject.initialOutput}}</div>
+    <div>
+        <div ref="playgroundContainer" class="playground">{{finalOutputObject.initialOutput}}</div>
+        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode"></codemirror>
+    </div>
 </template>
 
 <script>
+import codemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+
 export default {
+    components:[codemirror],
     name:"codePlayground",
     props:{
         finalOutputObject:{
@@ -21,11 +28,34 @@ export default {
         'editMode': {
             type: Boolean,
             default: false
+        },
+        'visibleLines': {
+                type: String,
+                default: 'auto'
+        },
+        'theme': {
+            type: String,
+            default: 'base16-dark'
         }
     },
     computed:{
         canvas(){
             return this.$refs.playgroundContainer;           
+        },
+        options(){
+            return {
+                    // codemirror options
+                    mode: this.$CodeBlock.mimeType('javascript'),
+                    theme: this.theme,
+                    lineNumbers: true,
+                    line: true,
+                    tabSize: 4,
+                    indentUnit: 4,
+                    autoCloseBrackets: true,
+                    readOnly: !this.editMode,
+                    firstLineNumber: 1,
+                    gutters: ["diagnostics", "CodeMirror-linenumbers"]
+                }
         }
     },
     mounted(){

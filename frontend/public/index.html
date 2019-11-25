@@ -18,6 +18,18 @@
     </noscript>
     <div id="app"></div>
     <codeblockseditor data-compiler="python3" data-compiler-version="101" data-id="35">
+        <playground>{init: function(canvasElement) {
+            console.log("INIT", canvasElement);
+            canvasElement.addClass('hiddenBlock');
+            console.log(document.querySelector('#app'));
+        }, //init
+
+        update: function(text, json, canvasElement, outputElement) {
+            canvasElement.removeClass('hiddenBlock');
+            console.log("FOO", text, json);
+            return "New Text is here\n\n";
+        } //update
+    }</playground>
       <block>print(round(16.5))</block>
       <block data-readonly data-static>for i in range(3, 5):
     print(i)
