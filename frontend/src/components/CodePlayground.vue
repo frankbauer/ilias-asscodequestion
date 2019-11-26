@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div ref="playgroundContainer" class="playground">{{finalOutputObject.initialOutput}}</div>
+        {{originalMode}}
+        <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" @canvas-change="onCanvasChange" />
         <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode" class="playgroundedit py-3"></codemirror>
     </div>
 </template>
@@ -9,9 +10,14 @@
 import codemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 
+//helper to reset the canvas area if needed
+import Vue from 'vue'
+import PlaygroundCanvas from './PlaygroundCanvas'
+const PlaygroundCanvasCtor = Vue.extend(PlaygroundCanvas)
+
 export default {
-    components:[codemirror],
     name:"codePlayground",
+    components:{PlaygroundCanvas},
     props:{
         finalOutputObject:{
             type:Object,
@@ -36,12 +42,16 @@ export default {
         'theme': {
             type: String,
             default: 'base16-dark'
+        },
+        'eventHub': {
+            type: Object,
+            required: true            
         }
     },
     computed:{
-        canvas(){
-            return this.$refs.playgroundContainer;           
-        },
+        originalMode(){
+            return this.block.obj.requestsOriginalVersion();
+        },        
         options(){
             return {
                     // codemirror options
@@ -58,12 +68,41 @@ export default {
                 }
         }
     },
-    mounted(){
-        if (this.block.obj){
-            this.block.obj.init($(this.canvas));
+    created(){
+        this.eventHub.$on('before-run', this.resetBeforeRun)        
+    },
+    beforeDestroy() {
+        this.eventHub.$off('before-run', this.resetBeforeRun)
+    },
+    data:function(){
+        return {
+            isPreparingRun:false,
+            lastRun:0,
+            runCount:0,
+            canvas:undefined
         }
     },
-    watch:{
+    methods:{
+        resetBeforeRun(){
+            if (this.block && this.block.obj){
+                if (this.block.obj.shouldAutoReset()) {
+                    //console.log("Will Re-Initiualize", this.canvas, $(this.canvas).css('background-color'));                           
+                    this.lastRun = new Date()
+                    this.runCount++;                                   
+                } else {
+                   this.$nextTick(function () {
+                        //console.log("Will Reset", this.canvas, $(this.canvas).css('background-color'));   
+                        this.block.obj.reset($(this.canvas));
+                    }.bind(this))  
+                }
+            }
+        },
+        onCanvasChange(can){
+            this.canvas = can
+            //console.log("Changed Canvas", can, $(can).css('background-color'));    
+        }
+    },
+    watch:{        
         finalOutputObject: function (val) {            
             const initialOutput = val.output;
 
@@ -74,10 +113,14 @@ export default {
                         block.obj.onParseError(initialOutput, val.parseError)                    
                     }
 
-                    const result = this.block.obj.update(val, $(this.canvas));       
-                    if (result !== undefined){
-                        this.$emit('changeOutput', result);
-                    }
+                    this.$nextTick(function () {
+                        //console.log("Will Update", this.canvas, $(this.canvas).css('background-color'));
+                                        
+                        const result = this.block.obj.update(val, $(this.canvas));       
+                        if (result !== undefined){
+                            this.$emit('changeOutput', result);
+                        }
+                    }.bind(this))    
                 } catch (e) {
                     console.error(e);
                 }

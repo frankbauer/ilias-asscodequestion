@@ -63,6 +63,20 @@ class ScriptBlock {
       }
     }
 
+    reset(canvasElement){
+      if (this.obj.reset && !this.requestsOriginalVersion()){
+        this.obj.reset(canvasElement);
+      }
+    }
+
+    /**
+     * You can force the system to recreate the canvas DOM-Element before each run. This will remove 
+     * the object from the DOM and recreate it from scratch. After recreation your init-method
+     * is called on the new object.
+     * If the version of the playground-block is undefined or 100, or if the passed source-code does 
+     * not define a shouldAutoReset method, this call will return false
+     * @return true if you want to reset the BEFOR each run. 
+     */
     shouldAutoReset(){
       if (this.obj.shouldAutoReset && !this.requestsOriginalVersion()){
         return this.obj.shouldAutoReset();
