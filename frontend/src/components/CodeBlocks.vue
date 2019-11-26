@@ -140,14 +140,7 @@
             blockById(id){
                 return this.blocks.find( block => block.id == id);
             },
-            onTypeChange(nfo){
-                let bl = this.blockById(nfo.id);
-                console.log(nfo, bl);
-                bl.type = nfo.type;
-                bl.hidden = nfo.hidden;
-                bl.static = nfo.static;
-                bl.hasCode = nfo.hasCode;
-            },
+            onTypeChange(nfo){ },
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 console.log("NewOutput", newOutput)
