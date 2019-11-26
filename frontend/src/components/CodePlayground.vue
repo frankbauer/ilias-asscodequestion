@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{originalMode}}
         <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" @canvas-change="onCanvasChange" />
         <CodeBlock :block="block" :theme="options.theme" :mode="options.mode"
                 visibleLines="10" :editMode="this.editMode" />

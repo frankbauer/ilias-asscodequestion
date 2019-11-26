@@ -1,12 +1,37 @@
 <template>
     <div :class="`codeblocks ${addonClass}`">        
-        <div class="block" v-for="block in blocks" :key="block.id">
-            <!-- check if v-is is the better alternative here -->
-            <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
-                :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
-            <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" :theme="block.editorTheme" @changeOutput="onPlaygroundChangedOutput" :eventHub="eventHub"></CodePlayground>
-            <SimpleText v-if="block.type=='TEXT'" v-model="block.content" :editMode="editMode" ></SimpleText>
-        </div>
+        <CodeBlockContainer 
+            :block="block" 
+            :editMode="editMode" 
+            class="block" 
+            v-for="block in blocks" 
+            :key="block.id"
+            @type-change="onTypeChange">              
+
+                <CodeBlock 
+                    v-if="block.hasCode" 
+                    :block="block" 
+                    :theme="block.editorTheme" 
+                    :mode="mimeType"
+                    :visibleLines="block.visibleLines" 
+                    :editMode="editMode" 
+                    @build="run" />
+
+                <CodePlayground 
+                    v-else-if="block.type=='PLAYGROUND'" 
+                    :block="block" 
+                    :editMode="editMode" 
+                    :finalOutputObject="finalOutputObject" 
+                    :theme="block.editorTheme" 
+                    @changeOutput="onPlaygroundChangedOutput" 
+                    :eventHub="eventHub" />
+
+                <SimpleText 
+                    v-else-if="block.type=='TEXT'" 
+                    v-model="block.content" 
+                    :editMode="editMode" />
+        </CodeBlockContainer>
+        
         <div class="runner" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
                 <v-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
@@ -28,6 +53,7 @@
 
 <script>
     import Vue from 'vue'
+    import CodeBlockContainer from './CodeBlockContainer';
     import CodeBlock from '../components/CodeBlock';
     import CodePlayground from '../components/CodePlayground';
     import SimpleText from '../components/SimpleText';
@@ -35,6 +61,7 @@
     export default {
         name: 'CodeBlocks',
         components: {
+            CodeBlockContainer,
             CodeBlock,
             CodePlayground,
             SimpleText
@@ -110,6 +137,17 @@
             }
         },
         methods: {
+            blockById(id){
+                return this.blocks.find( block => block.id == id);
+            },
+            onTypeChange(nfo){
+                let bl = this.blockById(nfo.id);
+                console.log(nfo, bl);
+                bl.type = nfo.type;
+                bl.hidden = nfo.hidden;
+                bl.static = nfo.static;
+                bl.hasCode = nfo.hasCode;
+            },
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 console.log("NewOutput", newOutput)
@@ -118,8 +156,7 @@
                     this.outputHTML = this.output;
                     this.outputHTML += this.sansoutput;
                 }
-            },
-
+            },            
 
             resetOutput(){
                 this.output = '';

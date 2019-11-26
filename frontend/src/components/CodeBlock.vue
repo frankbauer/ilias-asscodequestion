@@ -93,7 +93,7 @@
                 if (this.visibleLines === 'auto') {
                     this.codemirror.setSize('height', 'auto');
                 } else {
-                    this.codemirror.setSize(null, Math.round(20 * Math.max(1, this.visibleLines)) + 9);
+                    this.codemirror.setSize(null, Math.round(20 * Math.max(2, this.visibleLines)) + 9);
                 }
             },
             updateDiagnosticDisplay(){
