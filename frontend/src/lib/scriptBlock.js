@@ -28,9 +28,10 @@ const jsErrorParser = function(e){
 Vue.prototype.$jsErrorParser = jsErrorParser;
 
 class ScriptBlock {
-    constructor(script){
+    constructor(script, version){
         this.err = []
         this.src = script;
+        this.version = version;
         this.obj = undefined;
         this.fkt = undefined;
         try {
@@ -39,6 +40,10 @@ class ScriptBlock {
         } catch (e){
           this.pushError(e);
         }
+    }
+
+    requestsOriginalVersion(){
+      return this.version=='100' || this.version=='' || this.version===undefined;
     }
     
     rebuild() {
@@ -58,13 +63,21 @@ class ScriptBlock {
       }
     }
 
+    shouldAutoReset(){
+      if (this.obj.shouldAutoReset && !this.requestsOriginalVersion()){
+        return this.obj.shouldAutoReset();
+      } else {
+        return false;
+      }
+    }
+
     update(outputObject, canvasElement){
       if (this.obj===undefined) return outputObject.initialOutput;
       try {
         if (this.obj.update){  
           //console.log(this.obj.update.length, outputObject, this.obj);
           //this is the old behaviour  
-          if (this.obj.update.length == 2){              
+          if (this.obj.update.length == 2 || this.requestsOriginalVersion()){              
             if (outputObject.processedOutput.type=='json')
               return this.obj.update(outputObject.processedOutput.json, canvasElement);
             else

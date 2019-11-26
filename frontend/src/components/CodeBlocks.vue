@@ -1,9 +1,10 @@
 <template>
     <div :class="`codeblocks ${addonClass}`">        
         <div class="block" v-for="block in blocks" :key="block.id">
+            <!-- check if v-is is the better alternative here -->
             <CodeBlock v-if="block.hasCode" :block="block" :theme="block.editorTheme" :mode="mimeType"
                 :visibleLines="block.visibleLines" :editMode="editMode" @build="run"></CodeBlock>
-            <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" :theme="block.editorTheme" @changeOutput="onPlaygroundChangedOutput"></CodePlayground>
+            <CodePlayground v-if="block.type=='PLAYGROUND'" :block="block" :editMode="editMode" :finalOutputObject="finalOutputObject" :theme="block.editorTheme" @changeOutput="onPlaygroundChangedOutput" :eventHub="eventHub"></CodePlayground>
             <SimpleText v-if="block.type=='TEXT'" v-model="block.content" :editMode="editMode" ></SimpleText>
         </div>
         <div class="runner" v-if="canRun">
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+    import Vue from 'vue'
     import CodeBlock from '../components/CodeBlock';
     import CodePlayground from '../components/CodePlayground';
     import SimpleText from '../components/SimpleText';
@@ -44,7 +46,8 @@
                 output:"",
                 sansoutput:"",
                 didClip:false,
-                finalOutputObject:{ output:"", sansoutput:"", parseError:undefined }
+                finalOutputObject:{ output:"", sansoutput:"", parseError:undefined },
+                eventHub:new Vue()
             }
         },
         props: {
@@ -95,7 +98,7 @@
                 return !this.$compilerState.globalStateHidden;
             },
             playgrounds() {
-                return this.blocks.filter(b=> b.type=='PLAYGROUND');
+                return this.blocks.filter(b => b.type=='PLAYGROUND');
             },
             outputElement(){
                 return this.$refs.output;           
@@ -122,7 +125,7 @@
                 this.output = '';
                 this.sansoutput = '';
                 this.didClip = false;
-                this.outputHTML = '';
+                this.outputHTML = '';                                 
             },
 
 
@@ -210,7 +213,8 @@
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
 
-                this.$compilerState.setAllRunButtons(false);
+                this.$compilerState.setAllRunButtons(false);  
+                this.eventHub.$emit('before-run', {  })              
                 this.resetOutput();
                 this.clearDiagnostics();
                 cmp.compileAndRun(
