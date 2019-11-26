@@ -30,24 +30,31 @@ Vue.prototype.$jsErrorParser = jsErrorParser;
 class ScriptBlock {
     constructor(script, version){
         this.err = []
-        this.src = script;
+        this.src = undefined;
         this.version = version;
         this.obj = undefined;
         this.fkt = undefined;
-        try {
-          this.fkt = new Function('"use strict"; return ' + script);    
-          this.obj = this.fkt();
-        } catch (e){
-          this.pushError(e);
-        }
+        this.rebuild(script);
     }
 
     requestsOriginalVersion(){
       return this.version=='100' || this.version=='' || this.version===undefined;
     }
     
-    rebuild() {
-      this.obj = this.fkt();
+    rebuild(code) {
+      if (code!==undefined){
+        try {
+          //console.log("REBUILDING");
+          this.src = code
+          this.fkt = new Function('"use strict"; return ' + code);    
+          this.obj = this.fkt();
+        } catch (e){
+          console.error(e);
+          this.pushError(e);
+        }
+      } else {
+        this.obj = this.fkt();      
+      }
     }
 
     pushError(e){      

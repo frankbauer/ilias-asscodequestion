@@ -2,7 +2,7 @@
     <div>
         {{originalMode}}
         <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" @canvas-change="onCanvasChange" />
-        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode" class="playgroundedit py-3"></codemirror>
+        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode" class="playgroundedit py-3" @input="onCodeChange"></codemirror>        
     </div>
 </template>
 
@@ -79,11 +79,16 @@ export default {
             isPreparingRun:false,
             lastRun:0,
             runCount:0,
-            canvas:undefined
+            canvas:undefined,
+            needsCodeRebuild:false            
         }
     },
     methods:{
         resetBeforeRun(){
+            if (this.editMode && this.needsCodeRebuild){
+                //console.log("Code", this.block.content);
+                this.block.obj.rebuild(this.block.content);
+            }
             if (this.block && this.block.obj){
                 if (this.block.obj.shouldAutoReset()) {
                     //console.log("Will Re-Initiualize", this.canvas, $(this.canvas).css('background-color'));                           
@@ -100,6 +105,12 @@ export default {
         onCanvasChange(can){
             this.canvas = can
             //console.log("Changed Canvas", can, $(can).css('background-color'));    
+        },
+        onCodeChange(newCode){
+            if (this.editMode){
+                this.block.content = newCode;
+                this.needsCodeRebuild = true;
+            }
         }
     },
     watch:{        

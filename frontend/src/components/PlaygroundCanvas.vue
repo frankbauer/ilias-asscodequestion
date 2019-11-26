@@ -19,7 +19,7 @@ export default {
     mounted(){
         //console.log("MOUNTED");
         if (this.obj){
-            console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));    
+            //console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));    
             this.obj.init($(this.canvas));
         }
         this.$emit('canvas-change', this.canvas);

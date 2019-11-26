@@ -32,6 +32,7 @@
           }
           return color;
         },
+        shouldAutoReset: function(){return true;},
         update: function(text, json, canvasElement, outputElement) {
             canvasElement.removeClass('hiddenBlock');
             canvasElement.css('background-color', this.getRandomColor());
