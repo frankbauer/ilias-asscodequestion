@@ -95,7 +95,6 @@ export default {
         updateErrors(){
             this.block.errors = [];
             this.block.obj.err.forEach(e => {
-                console.log(e, e.line, e.column);
                 let err = {
                     start : { line: e.line, column:e.column},
                     end : { line: e.line, column:e.column+1},
@@ -109,7 +108,6 @@ export default {
                     err.start = {line:e.line, column:1}
                     err.end = {line:e.line, column:2}
                 }
-                console.log("E", err)
                 this.block.errors.push(err); 
             })
             
@@ -145,6 +143,7 @@ export default {
         },
         onCanvasChange(can){
             this.canvas = can
+            if (this.editMode) this.updateErrors();
             //console.log("Changed Canvas", can, $(can).css('background-color'));    
         },
         onCodeChange(newCode){

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 const jsErrorParser = function(e){
+  console.error(e);
   let line, column;
   if (e.line) line = e.line;
   else if (e.lineNumber) line = e.lineNumber;
@@ -14,7 +15,7 @@ const jsErrorParser = function(e){
       let m;            
       if ((m = regex.exec(lines[1])) !== null) {
         line = Number(m[1])-1;
-        column = Number(m[2]);
+        column = Number(m[2])-1;
       }            
     }
   }   

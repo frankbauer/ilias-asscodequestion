@@ -74,13 +74,14 @@
         },
         methods: {
             clearErrorDisplay(){
-                this.codemirror.getDoc().clearGutter('diagnostics');
                 let allMarks = this.codemirror.getDoc().getAllMarks();
-                allMarks.forEach(e => e.clear())
-                
+                //console.log("marks", this.block.type, allMarks)
+                allMarks.forEach(e => e.clear())                
+
+                this.codemirror.getDoc().clearGutter('diagnostics');                
             },
             onCodeReady(editor) {
-
+                this.updateDiagnosticDisplay();
             },
             onCodeFocus(editor) {
 
@@ -94,6 +95,59 @@
                 } else {
                     this.codemirror.setSize(null, Math.round(20 * Math.max(1, this.visibleLines)) + 9);
                 }
+            },
+            updateDiagnosticDisplay(){
+                const val = this.errors;
+                if (val!==undefined){
+                    this.clearErrorDisplay();                        
+                    
+                    const first = this.block.firstLine;
+                    val.forEach(error => {
+                        //console.log("squiggle", this.block.type);
+                        //put a squigly line as code marker 
+                        this.codemirror.getDoc().markText(
+                            {line:error.start.line-first, ch:error.start.column}, 
+                            {line:error.end.line-first, ch:error.end.column}, 
+                            {
+                                className:'red-wave',
+                                inclusiveLeft:true,
+                                inclusiveRight:true,
+                                title:error.message                
+                            }
+                        );
+
+                        //read existing gutter marker or create a new one
+                        let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
+                        let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'].$component : null;
+                        if (element == null) {
+                            //console.log("Gutter", this.block.type, error.start.line, error.message, first);
+                            element = document.createElement("span");
+
+                            //place the updated element
+                            this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element);
+
+                            element.$component = new ErrorTipCtor({
+                                propsData: {
+                                    errors: [],
+                                    severity: error.severity 
+                                }
+                            }).$mount(element);
+
+                            element = element.$component;
+                        }
+
+                        //make sure we use the proper class for the given severity.
+                        //We allways choose the maximum severity for each marking
+                        element.severity = Math.max(error.severity, element.severity); 
+
+                        //Build the hint text
+                        if (element.errors.indexOf(error)==-1){
+                            element.errors.push(error);
+                        }                       
+                    });
+                } else {
+                    this.clearErrorDisplay();
+                }            
             }
         },
         computed: {
@@ -134,56 +188,7 @@
                 this.updateHeight();
             },
             errors: function(val){
-                if (val!==undefined){
-                    //clear Gutter if list goes back to 0-elements
-                    //we do not handle a case where an error is removed!!!
-                    if (val.length==0) this.clearErrorDisplay();
-                
-                    const first = this.block.firstLine;
-                    val.forEach(error => {
-                        //put a squigly line as code marker 
-                        this.codemirror.getDoc().markText(
-                            {line:error.start.line-first, ch:error.start.column}, 
-                            {line:error.end.line-first, ch:error.end.column}, 
-                            {
-                                className:'red-wave',
-                                inclusiveLeft:true,
-                                inclusiveRight:true,
-                                title:error.message                
-                            }
-                        );
-
-                        //read existing gutter marker or create a new one
-                        let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
-                        let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'].$component : null;
-                        if (element == null) {
-                            element = document.createElement("span");
-
-                            //place the updated element
-                            this.codemirror.getDoc().setGutterMarker(error.start.line-first, "diagnostics", element);
-
-                            element.$component = new ErrorTipCtor({
-                                propsData: {
-                                    errors: [],
-                                    severity: error.severity 
-                                }
-                            }).$mount(element);
-
-                            element = element.$component;
-                        }
-
-                        //make sure we use the proper class for the given severity.
-                        //We allways choose the maximum severity for each marking
-                        element.severity = Math.max(error.severity, element.severity); 
-
-                        //Build the hint text
-                        if (element.errors.indexOf(error)==-1){
-                            element.errors.push(error);
-                        }                        
-                    });
-                } else {
-                    this.clearErrorDisplay();
-                }
+                this.updateDiagnosticDisplay();
             }
         },
         mounted() {
@@ -204,7 +209,7 @@
                 "Tab": function(cMirror) {
                     cMirror.execCommand("insertSoftTab");              
                 }
-            });
+            });            
         }
     }
 </script>
