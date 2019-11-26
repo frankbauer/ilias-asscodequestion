@@ -41,3 +41,5 @@
   .mdi-play-button::before{content:"\E037"}
   .mdi-code-error::before{content:"\e160"}
   .mdi-code-warning::before{content:"\E002"}
+  .mdi-chevron-up::before{content:"\e316"}
+  .mdi-chevron-down::before{content:"\e313"}

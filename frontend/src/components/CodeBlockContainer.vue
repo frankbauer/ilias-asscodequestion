@@ -2,18 +2,41 @@
   <div class="block">
     <v-card v-if="editMode" class="mx-0 my-3 pa-0" >
         <div :class="colorClass" style="height:4px" />
-        <v-card-title >
-            <v-select
-                :items="types"
-                v-model="type"
-                outlined
-                label="Block Type"
-                dense
-            />
-        </v-card-title>        
-        <v-card-text class="my-0 pt-1 pb-0">
-            <slot></slot>
-        </v-card-text>
+        <v-card-title class="mb-0 pb-0">
+            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
+                <v-row class="ma-0 pa-0" no-gutters>
+                    <v-col cols="3"  class="ma-0 pa-0">
+                        <v-select
+                            :items="types"
+                            v-model="type"
+                            outlined
+                            label="Block Type"
+                            dense
+                        />
+                    </v-col>
+                   <v-spacer></v-spacer>
+                    <v-col cols="1" class="ma-0 pa-0 text-right">
+                        <v-btn 
+                            :fab="!expanded"
+                            :text="expanded"
+                            :icon="expanded"
+                            color="primary" 
+                            small 
+                            v-blur
+                            @click="toggleExpanded">
+                                <v-icon size="24">
+                                    {{ expanded?'mdi-chevron-up':'mdi-chevron-down'}}
+                                </v-icon>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-card-title>   
+        <v-expand-transition>     
+            <v-card-text class="my-0 pt-1 pb-0" v-show="expanded">                                     
+                <slot ></slot>            
+            </v-card-text>
+        </v-expand-transition>
         <div :class="colorClass" style="height:4px"></div>
       </v-card>
       <div v-else class="ma-0 pa-0">
@@ -26,6 +49,7 @@
 export default {
     data:function(){
         return {
+            expanded:true,
             types:[
                 {
                     text:'Visualization Canvas',
@@ -53,6 +77,11 @@ export default {
         editMode:{
             type:Boolean,
             default:false
+        }
+    },
+    methods:{
+        toggleExpanded(){
+            this.expanded = !this.expanded;
         }
     },
     computed:{
