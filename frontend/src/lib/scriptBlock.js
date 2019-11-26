@@ -1,4 +1,5 @@
 import Vue from 'vue'
+
 const jsErrorParser = function(e){
   console.error(e);
   let line, column;

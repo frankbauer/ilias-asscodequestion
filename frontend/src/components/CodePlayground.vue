@@ -102,11 +102,11 @@ export default {
                     severity: Vue.$SEVERITY_ERROR
                 };
                 if (e.line===undefined){
-                    err.start = {line:1, column:1}
-                    err.end = {line:1, column:2}
+                    err.start = {line:1, column:-1}
+                    err.end = {line:1, column:-1}
                 } else if (e.column===undefined){
-                    err.start = {line:e.line, column:1}
-                    err.end = {line:e.line, column:2}
+                    err.start = {line:e.line, column:-1}
+                    err.end = {line:e.line, column:-1}
                 }
                 this.block.errors.push(err); 
             })

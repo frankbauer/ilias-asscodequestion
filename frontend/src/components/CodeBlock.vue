@@ -103,24 +103,26 @@
                     
                     const first = this.block.firstLine;
                     val.forEach(error => {
-                        //console.log("squiggle", this.block.type);
-                        //put a squigly line as code marker 
-                        this.codemirror.getDoc().markText(
-                            {line:error.start.line-first, ch:error.start.column}, 
-                            {line:error.end.line-first, ch:error.end.column}, 
-                            {
-                                className:'red-wave',
-                                inclusiveLeft:true,
-                                inclusiveRight:true,
-                                title:error.message                
-                            }
-                        );
+                        if (error.start.column>=0){
+                            console.log("squiggle", this.block.type);
+                            //put a squigly line as code marker 
+                            this.codemirror.getDoc().markText(
+                                {line:error.start.line-first, ch:error.start.column}, 
+                                {line:error.end.line-first, ch:error.end.column}, 
+                                {
+                                    className:'red-wave',
+                                    inclusiveLeft:true,
+                                    inclusiveRight:true,
+                                    title:error.message                
+                                }
+                            );
+                        }
 
                         //read existing gutter marker or create a new one
                         let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
                         let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'].$component : null;
                         if (element == null) {
-                            //console.log("Gutter", this.block.type, error.start.line, error.message, first);
+                            console.log("Gutter", this.block.type, error.start.line, error.message, first);
                             element = document.createElement("span");
 
                             //place the updated element
