@@ -178,7 +178,8 @@
 
 
             clearDiagnostics(){
-                this.blocks.forEach( block => block.errors = []);                
+                this.blocks.forEach( block => block.errors = []);  
+                this.eventHub.$emit('render-diagnostics', {  })                            
             },    
             
             

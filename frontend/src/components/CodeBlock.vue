@@ -62,7 +62,7 @@
                 required: true,
                 type: Object,
                 validator: function (b) {
-                    if (b.content === undefined || !b.hasCode) return false;
+                    if (b.content === undefined) return false;
                     if (b.firstLine === undefined) return false;
                     return true;
                 }

@@ -44,12 +44,12 @@ class ScriptBlock {
     rebuild(code) {
       if (code!==undefined){
         try {
+          this.err = []
           //console.log("REBUILDING");
           this.src = code
           this.fkt = new Function('"use strict"; return ' + code);    
           this.obj = this.fkt();
         } catch (e){
-          console.error(e);
           this.pushError(e);
         }
       } else {
@@ -71,7 +71,7 @@ class ScriptBlock {
     }
 
     reset(canvasElement){
-      if (this.obj.reset && !this.requestsOriginalVersion()){
+      if (this.obj && this.obj.reset && !this.requestsOriginalVersion()){
         this.obj.reset(canvasElement);
       }
     }
@@ -85,7 +85,7 @@ class ScriptBlock {
      * @return true if you want to reset the BEFOR each run. 
      */
     shouldAutoReset(){
-      if (this.obj.shouldAutoReset && !this.requestsOriginalVersion()){
+      if (this.obj && this.obj.shouldAutoReset && !this.requestsOriginalVersion()){
         return this.obj.shouldAutoReset();
       } else {
         return false;

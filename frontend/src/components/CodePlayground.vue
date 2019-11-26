@@ -2,7 +2,8 @@
     <div>
         {{originalMode}}
         <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" @canvas-change="onCanvasChange" />
-        <codemirror ref="codeBox" :value="block.content"  :options="options" v-if="editMode" class="playgroundedit py-3" @input="onCodeChange"></codemirror>        
+        <CodeBlock :block="block" :theme="options.theme" :mode="options.mode"
+                visibleLines="10" :editMode="this.editMode" />
     </div>
 </template>
 
@@ -15,9 +16,10 @@ import Vue from 'vue'
 import PlaygroundCanvas from './PlaygroundCanvas'
 const PlaygroundCanvasCtor = Vue.extend(PlaygroundCanvas)
 
+import CodeBlock from './CodeBlock'
 export default {
     name:"codePlayground",
-    components:{PlaygroundCanvas},
+    components:{PlaygroundCanvas, CodeBlock},
     props:{
         finalOutputObject:{
             type:Object,
@@ -70,9 +72,15 @@ export default {
     },
     created(){
         this.eventHub.$on('before-run', this.resetBeforeRun)        
+        this.eventHub.$on('render-diagnostics', this.updateErrors)        
+    },
+    mounted(){
+        const hasErrors = this.block && this.block.obj && this.block.obj.err.length > 0  ;
+        if (hasErrors) this.updateErrors();  
     },
     beforeDestroy() {
-        this.eventHub.$off('before-run', this.resetBeforeRun)
+        this.eventHub.$off('before-run', this.resetBeforeRun) 
+        this.eventHub.$off('render-diagnostics', this.updateErrors) 
     },
     data:function(){
         return {
@@ -84,13 +92,44 @@ export default {
         }
     },
     methods:{
+        updateErrors(){
+            this.block.errors = [];
+            this.block.obj.err.forEach(e => {
+                console.log(e, e.line, e.column);
+                let err = {
+                    start : { line: e.line, column:e.column},
+                    end : { line: e.line, column:e.column+1},
+                    message: e.msg,
+                    severity: Vue.$SEVERITY_ERROR
+                };
+                if (e.line===undefined){
+                    err.start = {line:1, column:1}
+                    err.end = {line:1, column:2}
+                } else if (e.column===undefined){
+                    err.start = {line:e.line, column:1}
+                    err.end = {line:e.line, column:2}
+                }
+                console.log("E", err)
+                this.block.errors.push(err); 
+            })
+            
+
+            if (this.block.obj.err.length > 0 && this.editMode) {
+                this.needsCodeRebuild = true;
+                return true;
+            } else {
+                return false;
+            }
+        },
         resetBeforeRun(){
             if (this.editMode && this.needsCodeRebuild){
                 //console.log("Code", this.block.content);
                 this.block.obj.rebuild(this.block.content);
+                
+                if (this.updateErrors()) return;
             }
             if (this.block && this.block.obj){
-                if (this.block.obj.shouldAutoReset()) {
+                if (this.block && this.block.obj && this.block.obj.shouldAutoReset()) {
                     //console.log("Will Re-Initiualize", this.canvas, $(this.canvas).css('background-color'));                           
                     this.lastRun = new Date()
                     this.runCount++;                                   
@@ -98,8 +137,10 @@ export default {
                    this.$nextTick(function () {
                         //console.log("Will Reset", this.canvas, $(this.canvas).css('background-color'));   
                         this.block.obj.reset($(this.canvas));
+                        this.updateErrors();
                     }.bind(this))  
                 }
+                this.updateErrors();
             }
         },
         onCanvasChange(can){
@@ -128,6 +169,7 @@ export default {
                         //console.log("Will Update", this.canvas, $(this.canvas).css('background-color'));
                                         
                         const result = this.block.obj.update(val, $(this.canvas));       
+                        
                         if (result !== undefined){
                             this.$emit('changeOutput', result);
                         }
@@ -137,7 +179,7 @@ export default {
                 }
                 if (this.block.obj.err.length > 0){
                     if (this.editMode){
-                        //do some error handling
+                        this.updateErrors();
                     } else {                        
                         console.error(this.block.obj.err);
                     }
