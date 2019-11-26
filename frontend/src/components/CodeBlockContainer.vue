@@ -1,6 +1,6 @@
 <template>
   <div class="block">
-    <v-card v-if="editMode" class="mx-0 my-3 pa-0" >
+    <v-card v-if="editMode" class="mx-5 my-3 pa-0" >
         <div :class="colorClass" style="height:4px" />
         <v-card-title class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">

@@ -1,5 +1,5 @@
 <template>
-    <div :class="`codeblocks ${addonClass}`">        
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} mx-2`">        
         <CodeBlockContainer 
             :block="block" 
             :editMode="editMode" 
@@ -32,7 +32,7 @@
                     :editMode="editMode" />
         </CodeBlockContainer>
         
-        <div class="runner" v-if="canRun">
+        <div :class="`runner ${editMode?'pt-5 mx-5':''}`" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
                 <v-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
                     @click="run">
@@ -134,6 +134,9 @@
                 let cl = "";
                 if (this.editMode) cl += "editmode ";
                 return cl;
+            },
+            backgroundColorClass(){
+                return this.editMode?'blue-grey darken-4':''
             }
         },
         methods: {
