@@ -5,7 +5,7 @@
         <v-card-title class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
                 <v-row class="my-0 py-0" dense>
-                    <v-col cols="3"  class="my-0 py-0">
+                    <v-col cols="12" sm="5" md="3" class="my-0 py-0">
                         <v-select
                             :items="types"
                             v-model="type"
@@ -15,7 +15,7 @@
                             class="rect-input"
                         />                        
                     </v-col>
-                    <v-col v-if="canSetLineNumbers" cols="1" class="my-0 py-0">
+                    <v-col v-if="canSetLineNumbers" cols="4" sm="2" md="1" class="my-0 py-0">
                         <v-text-field
                             v-model="visibleLines"
                             :rules="[canSetLineNumbers]"
@@ -26,8 +26,38 @@
                             class="rect-input"
                         />
                     </v-col>
-                   <v-spacer></v-spacer>
-                    <v-col cols="1" class="my-0 py-0 text-right">
+                    <v-col v-if="canDefinePlacement" cols="4" sm="2" md="1" class="my-0 py-0">
+                        <v-text-field
+                            v-model="width"
+                            label="CSS width"                            
+                            maxlength="7"
+                            dense
+                            outlined
+                            class="rect-input"
+                        />
+                    </v-col>
+                    <v-col v-if="canDefinePlacement" cols="4" sm="2" md="1" class="my-0 py-0">
+                        <v-text-field
+                            v-model="height"
+                            label="CSS height"                            
+                            maxlength="7"
+                            dense
+                            outlined
+                            class="rect-input"
+                        />
+                    </v-col>
+                    <v-col v-if="canDefinePlacement" cols="4" sm="3" md="2" class="my-0 py-0">
+                        <v-select
+                            :items="alignments"
+                            v-model="align"
+                            outlined
+                            label="Align"
+                            dense
+                            class="rect-input"
+                        /> 
+                    </v-col>
+                   <v-spacer class="hidden-sm-and-down"></v-spacer>
+                    <v-col cols="12" sm="12" md="1" class="my-0 py-0 text-right">
                         <v-btn 
                             :fab="!expanded"
                             :text="expanded"
@@ -62,6 +92,17 @@ export default {
     data:function(){
         return {
             expanded:true,
+            alignments:[
+                {
+                    text:'Start',
+                    value:'left'
+                },{
+                    text:'Center',
+                    value:'center'
+                },{
+                    text:'End',
+                    value:'right'
+                }],
             types:[
                 {
                     text:'Visualization Canvas',
@@ -104,6 +145,9 @@ export default {
         canSetLineNumbers(){
             return this.type=="BLOCK";
         },
+        canDefinePlacement(){
+            return this.type=="PLAYGROUND";
+        },
         colorClass(){
             const t = this.type
             if (t == 'TEXT'){
@@ -144,6 +188,37 @@ export default {
             set(v) { 
                 this.$emit('visible-lines-change', {
                     visibleLines: v=='auto'?v:new Number(v),
+                    id:this.block.id
+                });
+            }
+        },
+        width:{
+            get() { return this.block.width; },
+            set(v) { 
+                this.$emit('placement-change', {
+                    width: v,
+                    height:this.block.height,
+                    align:this.block.align,
+                    id:this.block.id
+                });
+            }
+        },height:{
+            get() { return this.block.height; },
+            set(v) { 
+                this.$emit('placement-change', {
+                    width: this.block.width,
+                    height:v,
+                    align:this.block.align,
+                    id:this.block.id
+                });
+            }
+        },align:{
+            get() { return this.block.align; },
+            set(v) { 
+                this.$emit('placement-change', {
+                    width: this.block.width,
+                    height:this.block.height,
+                    align:v,
                     id:this.block.id
                 });
             }

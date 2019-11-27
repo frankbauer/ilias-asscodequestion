@@ -43,7 +43,12 @@ class CodeBlocksManager {
             block.visibleLines = block.visibleLines === undefined ? 'auto' : block.visibleLines;            
 
             if (block.type == 'PLAYGROUND') {                
-                block.obj = new ScriptBlock(block.content, block.version);                
+                block.obj = new ScriptBlock(block.content, block.version);  
+                
+                block.width = bl.getAttribute('width')?bl.getAttribute('width'):'100%'
+                block.height = bl.getAttribute('height')?bl.getAttribute('height'):'200px'
+                block.align = bl.getAttribute('align')?bl.getAttribute('align'):'center'
+                console.log(block);
             } else if (block.type == 'BLOCK') {
                 block.hasCode = true;                
             } 

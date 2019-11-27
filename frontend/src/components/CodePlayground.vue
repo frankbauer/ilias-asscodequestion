@@ -1,6 +1,6 @@
 <template>
     <div>
-        <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" @canvas-change="onCanvasChange" />
+        <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" :block="block" @canvas-change="onCanvasChange" />
         <CodeBlock v-if="editMode" :block="block" :theme="options.theme" :mode="options.mode"
                 visibleLines="10" :editMode="this.editMode" />
     </div>
@@ -198,16 +198,5 @@ export default {
 .hiddenBlock    
     opacity: 0
     visibility: hidden
-
-.playground 
-    display: block
-    width:100%
-    height:200px
-    border:1px dashed rgb(128, 48, 48, 0.66)
-    border-radius: 3px
-    background-color:rgba(255, 255, 255, 0.63766)
-    margin-top:4px
-    margin-bottom:4px
-    transition: opacity 600ms, visibility 600ms
 
 </style>

@@ -24,6 +24,12 @@ export default {
             let bl = this.blockById(nfo.id);
             bl.visibleLines = nfo.visibleLines;
         },
+        onPlacementChange(nfo){
+            let bl = this.blockById(nfo.id);
+            bl.width = nfo.width;
+            bl.height = nfo.height;
+            bl.align = nfo.align;
+        },
     }
 }
 </script>

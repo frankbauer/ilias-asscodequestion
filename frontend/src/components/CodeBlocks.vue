@@ -6,7 +6,9 @@
             class="block" 
             v-for="block in blocks" 
             :key="block.id"
-            @type-change="onTypeChange">              
+            @type-change="onTypeChange"
+            @visible-lines-change="onVisibleLinesChange"
+            @placement-change="onPlacementChange">              
 
                 <CodeBlock 
                     v-if="block.hasCode" 
@@ -145,6 +147,7 @@
             },
             onTypeChange(nfo){},
             onVisibleLinesChange(nfo){},
+            onPlacementChange(nfo){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 console.log("NewOutput", newOutput)
