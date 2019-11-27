@@ -10,11 +10,12 @@ const compilerRegistry = new Vue({
     },
     computed:{  
         languages(){
-            return Object
+            const langs = Object
                 .keys(this.compilers)
                 .map(k => this.compilers[k])
                 .map(c => {return {text:c.displayName, value:c.type}})
                 .sort((a, b) => a.text < b.text ? -1 : 1)
+            return langs
         }      
     },
     methods: {
@@ -33,7 +34,7 @@ const compilerRegistry = new Vue({
             if (res===undefined) res = cmps.default;                      
             return res;
         },
-        versionsForLanguage(languageType){            
+        versionsForLanguage(languageType){
             const c = this.compilers[languageType];
             if (c===undefined) return ['none'];
             return c.versions.map(v => v.version);

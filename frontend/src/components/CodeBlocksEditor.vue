@@ -34,7 +34,7 @@ export default {
             const c = this.$compilerRegistry.getCompiler({languageType:v});
             c.preload();
             console.log("Selected Compiler", c, v, this.compiler)
-            this.compiler.languageType = c.language;
+            this.compiler.languageType = v;
             this.compiler.version = c.version;
         },
         onCompilerVersionChange(v){
