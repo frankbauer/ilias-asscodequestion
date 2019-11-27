@@ -9,6 +9,7 @@ new Vue({
     data: function () {
         return {
             type: "python",
+            displayName: "Python 2.7",
 
             //attach all version
             versions: [v100, v101.legacyPython],
@@ -22,6 +23,7 @@ new Vue({
     data: function () {
         return {
             type: "python3",
+            displayName: "Python 3",
 
             //attach all version
             versions: [v101.python3],

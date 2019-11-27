@@ -8,6 +8,7 @@ export default new Vue({
     data: function () {
         return {
             type: "java",
+            displayName: "Java",
 
             //attach all version
             versions: [v001, v100],

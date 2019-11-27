@@ -7,6 +7,7 @@ export default new Vue({
     data: function () {
         return {
             type: "glsl",
+            displayName: "GLSL Shader",
 
             //attach all version
             versions: [v100],

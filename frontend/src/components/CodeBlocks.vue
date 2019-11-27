@@ -2,7 +2,9 @@
     <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} mx-2`">  
         <CodeBlocksSettings 
             v-if="editMode" 
-            :options="options"      
+            :options="options" 
+            @compiler-change="onCompilerChange"
+            @compiler-version-change="onCompilerVersionChange"     
         />
         <CodeBlockContainer 
             :block="block" 
@@ -100,8 +102,8 @@
             'compiler': {
                 type: Object,
                 default: {
-                    languageType: 'none',
-                    version: '1'
+                    languageType: 'javascript',
+                    version: '100'
                 }
             }
         },
@@ -162,9 +164,10 @@
             onTypeChange(nfo){},
             onVisibleLinesChange(nfo){},
             onPlacementChange(nfo){},
+            onCompilerChange(v){},
+            onCompilerVersionChange(v){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
-                console.log("NewOutput", newOutput)
                 if (this.output != newOutput) {
                     this.output = newOutput.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
                     this.outputHTML = this.output;

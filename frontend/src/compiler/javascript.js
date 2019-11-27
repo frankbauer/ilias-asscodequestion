@@ -7,6 +7,7 @@ export default new Vue({
     data: function () {
         return {
             type: "javascript",
+            displayName: "JavaScript",
 
             //attach all version
             versions: [v100],

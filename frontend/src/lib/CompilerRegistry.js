@@ -8,7 +8,14 @@ const compilerRegistry = new Vue({
             compilers:{}
         }
     },
-    computed:{        
+    computed:{  
+        languages(){
+            return Object
+                .keys(this.compilers)
+                .map(k => this.compilers[k])
+                .map(c => {return {text:c.displayName, value:c.type}})
+                .sort((a, b) => a.text < b.text ? -1 : 1)
+        }      
     },
     methods: {
         register(compilers){
@@ -25,6 +32,11 @@ const compilerRegistry = new Vue({
             let res = cmps.versions.find(e => e.version == compilerInfo.version);
             if (res===undefined) res = cmps.default;                      
             return res;
+        },
+        versionsForLanguage(languageType){            
+            const c = this.compilers[languageType];
+            if (c===undefined) return ['none'];
+            return c.versions.map(v => v.version);
         }
     }
 });
