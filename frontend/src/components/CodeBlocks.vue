@@ -1,5 +1,9 @@
 <template>
-    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} mx-2`">        
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} mx-2`">  
+        <CodeBlocksSettings 
+            v-if="editMode" 
+            :options="options"      
+        />
         <CodeBlockContainer 
             :block="block" 
             :editMode="editMode" 
@@ -56,14 +60,16 @@
 <script>
     import Vue from 'vue'
     import CodeBlockContainer from './CodeBlockContainer';
-    import CodeBlock from '../components/CodeBlock';
-    import CodePlayground from '../components/CodePlayground';
-    import SimpleText from '../components/SimpleText';
+    import CodeBlocksSettings from './CodeBlocksSettings';
+    import CodeBlock from './CodeBlock';
+    import CodePlayground from './CodePlayground';
+    import SimpleText from './SimpleText';
 
     export default {
         name: 'CodeBlocks',
         components: {
             CodeBlockContainer,
+            CodeBlocksSettings,
             CodeBlock,
             CodePlayground,
             SimpleText
@@ -100,6 +106,14 @@
             }
         },
         computed: {
+            options(){
+                return {
+                    language:this.language,
+                    compiler:this.compiler,
+                    executionTimeout:this.executionTimeout,
+                    maxCharacters:this.maxCharacters
+                }
+            },
             editMode() {
                 return false;
             },
