@@ -4,7 +4,7 @@
         <div :class="colorClass" style="height:4px" />
         <v-card-title class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                <v-row class="ma-0 pa-0" no-gutters>
+                <v-row class="ma-0 pa-0" dense>
                     <v-col cols="3"  class="ma-0 pa-0">
                         <v-select
                             :items="types"
@@ -12,6 +12,16 @@
                             outlined
                             label="Block Type"
                             dense
+                        />                        
+                    </v-col>
+                    <v-col v-if="canSetLineNumbers" cols="1" class="ma-0 pa-0">
+                        <v-text-field
+                            v-model="visibleLines"
+                            :rules="[canSetLineNumbers]"
+                            label="Visible Lines"                            
+                            maxlength="4"
+                            dense
+                            outlined
                         />
                     </v-col>
                    <v-spacer></v-spacer>
@@ -80,11 +90,18 @@ export default {
         }
     },
     methods:{
+        validNumber(v){
+            if (v!='auto' || isNaN(v)) return "Must be a valid Number or 'auto'."
+            return true
+        },
         toggleExpanded(){
             this.expanded = !this.expanded;
         }
     },
     computed:{
+        canSetLineNumbers(){
+            return this.type=="BLOCK";
+        },
         colorClass(){
             const t = this.type
             if (t == 'TEXT'){
@@ -118,6 +135,15 @@ export default {
                 ret.hasCode = ret.type=='BLOCK';
                 
                 this.$emit('type-change', ret);
+            }
+        },
+        visibleLines:{
+            get() { return this.block.visibleLines; },
+            set(v) { 
+                this.$emit('visible-lines-change', {
+                    visibleLines: v=='auto'?v:new Number(v),
+                    id:this.block.id
+                });
             }
         }
     }

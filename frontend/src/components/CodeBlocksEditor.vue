@@ -15,12 +15,15 @@ export default {
     methods:{
         onTypeChange(nfo){
             let bl = this.blockById(nfo.id);
-            console.log(nfo, bl);
             bl.type = nfo.type;
             bl.hidden = nfo.hidden;
             bl.static = nfo.static;
             bl.hasCode = nfo.hasCode;
-        }
+        },
+        onVisibleLinesChange(nfo){
+            let bl = this.blockById(nfo.id);
+            bl.visibleLines = nfo.visibleLines;
+        },
     }
 }
 </script>

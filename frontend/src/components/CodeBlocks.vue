@@ -143,7 +143,8 @@
             blockById(id){
                 return this.blocks.find( block => block.id == id);
             },
-            onTypeChange(nfo){ },
+            onTypeChange(nfo){},
+            onVisibleLinesChange(nfo){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 console.log("NewOutput", newOutput)
