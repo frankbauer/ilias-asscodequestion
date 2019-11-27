@@ -4,17 +4,18 @@
         <div :class="colorClass" style="height:4px" />
         <v-card-title class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                <v-row class="ma-0 pa-0" dense>
-                    <v-col cols="3"  class="ma-0 pa-0">
+                <v-row class="my-0 py-0" dense>
+                    <v-col cols="3"  class="my-0 py-0">
                         <v-select
                             :items="types"
                             v-model="type"
                             outlined
                             label="Block Type"
                             dense
+                            class="rect-input"
                         />                        
                     </v-col>
-                    <v-col v-if="canSetLineNumbers" cols="1" class="ma-0 pa-0">
+                    <v-col v-if="canSetLineNumbers" cols="1" class="my-0 py-0">
                         <v-text-field
                             v-model="visibleLines"
                             :rules="[canSetLineNumbers]"
@@ -22,10 +23,11 @@
                             maxlength="4"
                             dense
                             outlined
+                            class="rect-input"
                         />
                     </v-col>
                    <v-spacer></v-spacer>
-                    <v-col cols="1" class="ma-0 pa-0 text-right">
+                    <v-col cols="1" class="my-0 py-0 text-right">
                         <v-btn 
                             :fab="!expanded"
                             :text="expanded"
@@ -150,6 +152,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
-
+<style lang="sass" >
+.rect-input.v-input .v-input__slot 
+    border-radius: 0px
 </style>
