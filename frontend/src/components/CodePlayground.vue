@@ -1,8 +1,21 @@
 <template>
     <div>
-        <PlaygroundCanvas ref="playgroundContainer" :output="finalOutputObject.initialOutput" :obj="block.obj" :key="runCount" :block="block" @canvas-change="onCanvasChange" />
-        <CodeBlock v-if="editMode" :block="block" :theme="options.theme" :mode="options.mode"
-                visibleLines="10" :editMode="this.editMode" />
+        <PlaygroundCanvas ref="playgroundContainer" 
+            :output="finalOutputObject.initialOutput" 
+            :obj="block.obj" 
+            :key="runCount" 
+            :block="block" 
+            @canvas-change="onCanvasChange" 
+        />
+        <CodeBlock 
+            v-if="editMode" 
+            :block="block" 
+            :theme="options.theme" 
+            :mode="options.mode"
+            visibleLines="10" 
+            :editMode="this.editMode" 
+            @code-changed-in-edit-mode="onCodeChange"
+        />
     </div>
 </template>
 
@@ -147,7 +160,6 @@ export default {
         },
         onCodeChange(newCode){
             if (this.editMode){
-                this.block.content = newCode;
                 this.needsCodeRebuild = true;
             }
         }

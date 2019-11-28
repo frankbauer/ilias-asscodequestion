@@ -88,6 +88,7 @@
             },
             onCodeChange(newCode) {
                 this.block.content = newCode
+                if (this.editMode) this.$emit("code-changed-in-edit-mode", undefined);
             },
             updateHeight(){
                 if (this.visibleLines === 'auto') {
