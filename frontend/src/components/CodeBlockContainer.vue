@@ -15,6 +15,8 @@
                             class="rect-input"
                         />                        
                     </v-col>
+
+                    <!-- LineNumbers -->
                     <v-col v-if="canSetLineNumbers" cols="4" sm="2" md="1" class="my-0 py-0">
                         <v-text-field
                             v-model="visibleLines"
@@ -26,7 +28,20 @@
                             class="rect-input"
                         />
                     </v-col>
-                    <v-col v-if="canDefinePlacement" cols="4" sm="2" md="1" class="my-0 py-0">
+
+                    <!-- Playground Versioning -->
+                    <v-col v-if="canDefinePlacement" cols="12" md="2" class="my-0 py-0">
+                        <v-select
+                            :items="scriptVersions"
+                            v-model="scriptVersion"
+                            outlined
+                            label="Script Version"
+                            dense
+                            class="rect-input"
+                        />
+                    </v-col>
+                    <!-- Playground Placement Settings -->
+                    <v-col v-if="canDefinePlacement" cols="4" md="1" class="my-0 py-0">
                         <v-text-field
                             v-model="width"
                             label="CSS width"                            
@@ -36,7 +51,7 @@
                             class="rect-input"
                         />
                     </v-col>
-                    <v-col v-if="canDefinePlacement" cols="4" sm="2" md="1" class="my-0 py-0">
+                    <v-col v-if="canDefinePlacement" cols="4" md="1" class="my-0 py-0">
                         <v-text-field
                             v-model="height"
                             label="CSS height"                            
@@ -46,7 +61,7 @@
                             class="rect-input"
                         />
                     </v-col>
-                    <v-col v-if="canDefinePlacement" cols="4" sm="3" md="2" class="my-0 py-0">
+                    <v-col v-if="canDefinePlacement" cols="4" md="2" class="my-0 py-0">
                         <v-select
                             :items="alignments"
                             v-model="align"
@@ -103,6 +118,14 @@ export default {
                     text:'End',
                     value:'right'
                 }],
+            scriptVersions:[
+                {
+                    text:'1.0 (original)',
+                    value:'100'
+                },{
+                    text:'2.0 (since 2020)',
+                    value:'101'
+                }],
             types:[
                 {
                     text:'Visualization Canvas',
@@ -142,11 +165,24 @@ export default {
         }
     },
     computed:{
+        isVersionedPlayground(){
+            return this.type=="PLAYGROUND";
+        },
         canSetLineNumbers(){
             return this.type=="BLOCK";
         },
         canDefinePlacement(){
             return this.type=="PLAYGROUND";
+        },
+        scriptVersion:{
+            get(){
+                if (this.block === undefined || this.block.version === undefined || this.block.version == '')
+                    return '100';
+                return this.block.version
+            },
+            set(v){
+
+            }
         },
         colorClass(){
             const t = this.type
