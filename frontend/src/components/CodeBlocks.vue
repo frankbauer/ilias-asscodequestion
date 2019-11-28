@@ -4,7 +4,9 @@
             v-if="editMode" 
             :options="options" 
             @compiler-change="onCompilerChange"
-            @compiler-version-change="onCompilerVersionChange"     
+            @compiler-version-change="onCompilerVersionChange" 
+            @run-state-change="onRunStateChange"
+            @language-change="onLanguageChange"    
         />
         <CodeBlockContainer 
             :block="block" 
@@ -88,24 +90,7 @@
             }
         },
         props: {
-            'blocks': Array,
-            'language': String,
-            'blockid': Number,
-            'executionTimeout': {
-                type: Number,
-                default: 5000
-            },
-            'maxCharacters': {
-                type: Number,
-                default: 1000
-            },
-            'compiler': {
-                type: Object,
-                default: {
-                    languageType: 'javascript',
-                    version: '100'
-                }
-            }
+            'blockInfo':{ type:Object, required:true}
         },
         computed: {
             options(){
@@ -113,9 +98,18 @@
                     language:this.language,
                     compiler:this.compiler,
                     executionTimeout:this.executionTimeout,
-                    maxCharacters:this.maxCharacters
+                    maxCharacters:this.maxCharacters,
+                    runCode:this.runCode
                 }
             },
+            blocks() { return this.blockInfo.blocks },
+            language() { return this.blockInfo.language},
+            blockid() { return this.blockInfo.id},
+            executionTimeout() { return this.blockInfo.executionTimeout},
+            maxCharacters() { return this.blockInfo.maxCharacters},
+            compiler() { return this.blockInfo.compiler},
+            runCode() { return this.blockInfo.runCode},
+            
             editMode() {
                 return false;
             },
@@ -166,6 +160,8 @@
             onPlacementChange(nfo){},
             onCompilerChange(v){},
             onCompilerVersionChange(v){},
+            onRunStateChange(v){},
+            onLanguageChange(v){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {

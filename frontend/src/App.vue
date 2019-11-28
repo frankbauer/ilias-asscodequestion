@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-content>
-      <CodeBlocks :blocks="blocks.blocks" :language="blocks.language" :blockid="blocks.id" :compiler="blocks.compiler"/>
+      <CodeBlocks :blockInfo="blocks" />
     </v-content>
   </v-app>
 </template>

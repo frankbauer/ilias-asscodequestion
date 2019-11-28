@@ -19,13 +19,32 @@ class CodeBlocksManager {
             blocks: []
         };
 
-        data.compiler = {
-            languageType : data.compiler,
-            version : data.compilerVersion
+        if (data.compiler===undefined){
+            data.runCode = false
+        } else {
+            data.compiler = {
+                languageType : data.compiler,
+                version : data.compilerVersion
+            }
+            const c = CompilerRegistry.getCompiler({languageType:data.compiler.languageType, version:data.compiler.version});
+            if (c===undefined){
+                data.runCode = false
+                data.language = data.compiler.languageType
+            } else {
+                data.runCode = true
+                data.language = c.language
+            }
+            
+            delete data.compilerVersion;        
         }
-        delete data.compilerVersion;        
 
         data.id = Number(data.id);
+
+        if (data.executionTimeout === undefined) data.executionTimeout = 5000
+        else data.executionTimeout = Number(data.executionTimeout);
+
+        if (data.maxCharacters === undefined) data.maxCharacters = 1000
+        else data.maxCharacters = Number(data.maxCharacters);        
 
         el.querySelectorAll("*").forEach(bl => {
             let block = {
@@ -79,7 +98,9 @@ class CodeBlocksManager {
                 }
             }));
         })
-        this.data = data;        
+        this.data = data;   
+        
+        console.log("DATA", data)
     }
 
     instantiateVue(){

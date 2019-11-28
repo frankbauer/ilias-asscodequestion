@@ -6,23 +6,23 @@ import Vue from 'vue'
  * @namespace cmMode The programminglanguages supported
  */
 const mimeTypesForLanguage = {
-    'c': 'text/x-csrc', // (C),
-    'c++': 'text/x-c++src', // (C++),
-    'c#': 'text/x-csharp', // (C#),
-    'css': 'text/css', // (CSS)
-    'fortran': 'text/x-fortran', // (Fortran)
-    'glsl': 'text/x-glsl', // (GLSL)
-    'html': 'text/html', // (HTML)
-    'java': 'text/x-java', // (Java),
-    'javascript': 'text/javascript', // (JavaScript)
-    'objectivec': 'text/x-objectivec', // (Objective-C),
-    'perl': 'text/x-perl', // (Perl)
-    'php': 'application/x-httpd-php', // (PHP)
-    'python': 'text/x-python', // (Python)
-    'r': 'text/x-rsrc', //(R)
-    'ruby': 'text/x-ruby', // (Ruby)
-    'sql': 'text/x-mysql', // (mysql)
-    'xml': 'application/xml' //text/html (XML)
+    'c': {mime:'text/x-csrc', displayName:'C'}, // (C),
+    'c++': {mime:'text/x-c++src', displayName:'C++'}, // (C++),
+    'c#': {mime:'text/x-csharp', displayName:'C#'}, // (C#),
+    'css': {mime:'text/css', displayName:'CSS'}, // (CSS)
+    'fortran': {mime:'text/x-fortran', displayName:'Fortran'}, // (Fortran)
+    'glsl': {mime:'text/x-glsl', displayName:'GLSL'}, // (GLSL)
+    'html': {mime:'text/html', displayName:'HTML'}, // (HTML)
+    'java': {mime:'text/x-java', displayName:'Java'}, // (Java),
+    'javascript': {mime:'text/javascript', displayName:'JavaScript'}, // (JavaScript)
+    'objectivec': {mime:'text/x-objectivec', displayName:'Objective-C'}, // (Objective-C),
+    'perl': {mime:'text/x-perl', displayName:'Perl'}, // (Perl)
+    'php': {mime:'application/x-httpd-php', displayName:'PHP'}, // (PHP)
+    'python': {mime:'text/x-python', displayName:'Python'}, // (Python)
+    'r': {mime:'text/x-rsrc', displayName:'R'}, //(R)
+    'ruby': {mime:'text/x-ruby', displayName:'Ruby'}, // (Ruby)
+    'sql': {mime:'text/x-mysql', displayName:'MySQL'}, // (mysql)
+    'xml': {mime:'application/xml', displayName:'XML'} //text/html (XML)
 };
 
 
@@ -86,7 +86,16 @@ Vue.prototype.$CodeBlock = {
       };
   },
   mimeType(language){
-      return mimeTypesForLanguage[language];
+      const o = mimeTypesForLanguage[language];
+      if (o===undefined) return 'text/javascript'
+      return o.mime;
+  },
+  knownLanguages(){
+    return Object
+        .keys(mimeTypesForLanguage)
+        .map(k => {return {text:mimeTypesForLanguage[k].displayName, value:k}})
+        .sort((a,b) => a.text<b.text ? -1 : 1)
+        
   },
   ...loadSettings(document)
 }

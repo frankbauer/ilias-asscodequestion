@@ -97,7 +97,7 @@ const singleton = new Vue({
       return {
           loadedlibs: 0,
           version: "001",
-          language: "pyjavathon",    
+          language: "java",    
           canRun: true,
           didPreload: false,
           requestedPreload: false,
@@ -153,6 +153,7 @@ const singleton = new Vue({
           return runJavaWorker(questionID, code, callingCodeBlocks, max_ms, log_callback, info_callback, err_callback, compileFailedCallback, finishedExecutionCB, runCreate);
       },
       triggerResourceLoad(){
+        console.log("[Preparing Dependencies for Doppio]");
         let script = document.createElement('script');
         script.src = Vue.$CodeBlock.baseurl+'js/doppio/v001/browserfs/browserfs.min.js';
         script.onload = function () {

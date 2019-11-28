@@ -32,18 +32,34 @@ export default {
         },
         onCompilerChange(v){
             const c = this.$compilerRegistry.getCompiler({languageType:v});
-            c.preload();
+            if (c!==undefined){
+                console.log("Selected Compiler", c, v, this.blockInfo.compiler)
+                this.blockInfo.compiler.languageType = v
+                this.blockInfo.compiler.version = c.version
+                this.blockInfo.language = c.language
 
-            console.log("Selected Compiler", c, v, this.compiler)
-            this.compiler.languageType = v
-            this.compiler.version = c.version
+                console.log("PRELOADING")
+                c.preload();                
+            }
         },
         onCompilerVersionChange(v){
-            console.log("Selected Version", v, this.compiler.languageType)
-            const c = this.$compilerRegistry.getCompiler({languageType:this.compiler.type, version:v});
-            this.compiler.version = v
+            console.log("Selected Version", v, this.blockInfo.compiler.languageType)
+            const c = this.$compilerRegistry.getCompiler({languageType:this.blockInfo.compiler.languageType, version:v});
+            this.blockInfo.compiler.version = v
+
+            if (c!==undefined){
+                this.blockInfo.language = c.language
+
+                console.log("PRELOADING")
+                c.preload(); 
+            }
         },
-            
+        onRunStateChange(v){
+            this.blockInfo.runCode = v;
+        },
+        onLanguageChange(v){
+            this.blockInfo.language = v;
+        },   
     }
 }
 </script>
