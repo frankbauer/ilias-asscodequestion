@@ -5,7 +5,8 @@ import Vue from 'vue'
 const compilerRegistry = new Vue({
     data: function(){
         return {
-            compilers:{}
+            compilers:{},
+            libraries:[]
         }
     },
     computed:{  
@@ -16,7 +17,10 @@ const compilerRegistry = new Vue({
                 .map(c => {return {text:c.displayName, value:c.type}})
                 .sort((a, b) => a.text < b.text ? -1 : 1)
             return langs
-        }      
+        },
+        domLibraries(){
+            return this.libraries.map(l => {return { text: l.displayName + ' ('+l.version+')', value:l.key}});
+        }   
     },
     methods: {
         register(compilers){
@@ -38,6 +42,15 @@ const compilerRegistry = new Vue({
             const c = this.compilers[languageType];
             if (c===undefined) return ['none'];
             return c.versions.map(v => v.version);
+        },
+        registerDOMLib(uri, name, version, displayName){
+            this.libraries.push({
+                key:name+"-"+version,
+                uri:uri,
+                name:name,
+                version:version,
+                displayName:displayName
+            })
         }
     }
 });
@@ -55,5 +68,7 @@ compilerRegistry.register(PythonCompilers);
 import GLSLCompilers from '../compiler/glsl'
 compilerRegistry.register(GLSLCompilers);
 
+
+compilerRegistry.registerDOMLib([''], 'd3', '5.13.4', 'D3 - Data-Driven Documents')
 export default compilerRegistry;
 

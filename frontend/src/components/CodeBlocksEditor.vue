@@ -59,7 +59,13 @@ export default {
         },
         onLanguageChange(v){
             this.blockInfo.language = v;
-        },   
+        },
+        onCharacterLimitChange(v){
+            this.blockInfo.maxCharacters = v;            
+        },
+        onTimeoutChange(v){
+            this.blockInfo.executionTimeout = v;
+        },  
     }
 }
 </script>

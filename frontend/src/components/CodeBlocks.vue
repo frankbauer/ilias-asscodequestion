@@ -6,7 +6,9 @@
             @compiler-change="onCompilerChange"
             @compiler-version-change="onCompilerVersionChange" 
             @run-state-change="onRunStateChange"
-            @language-change="onLanguageChange"    
+            @language-change="onLanguageChange" 
+            @character-limit-change="onCharacterLimitChange"
+            @timeout-change="onTimeoutChange"   
         />
         <CodeBlockContainer 
             :block="block" 
@@ -162,6 +164,8 @@
             onCompilerVersionChange(v){},
             onRunStateChange(v){},
             onLanguageChange(v){},
+            onCharacterLimitChange(v){},
+            onTimeoutChange(v){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {

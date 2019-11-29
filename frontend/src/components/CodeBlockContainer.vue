@@ -1,6 +1,6 @@
 <template>
   <div class="block">
-    <v-card v-if="editMode" class="ml-5 mr-0 my-3 pa-0" >
+    <v-card v-if="editMode" class="ml-0 mr-0 my-3 pa-0" >
         <div :class="colorClass" style="height:4px" />
         <v-card-title class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
@@ -17,10 +17,10 @@
                     </v-col>
 
                     <!-- LineNumbers -->
-                    <v-col v-if="canSetLineNumbers" cols="4" sm="2" md="1" class="my-0 py-0">
+                    <v-col v-if="canSetLineNumbers" cols="4" sm="2" md="2" class="my-0 py-0">
                         <v-text-field
                             v-model="visibleLines"
-                            :rules="[canSetLineNumbers]"
+                            :rules="[validNumber]"
                             label="Visible Lines"                            
                             maxlength="4"
                             dense
