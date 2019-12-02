@@ -12,7 +12,7 @@
             :block="block" 
             :theme="options.theme" 
             :mode="options.mode"
-            visibleLines="10" 
+            visibleLines="auto" 
             :editMode="this.editMode" 
             @code-changed-in-edit-mode="onCodeChange"
         />
