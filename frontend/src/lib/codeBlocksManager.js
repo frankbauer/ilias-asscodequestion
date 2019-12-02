@@ -53,6 +53,7 @@ class CodeBlocksManager {
                 type: bl.tagName,
                 content: bl.textContent,
                 id: data.blocks.length,
+                parentID: data.id,
                 errors:[]
             }
 
