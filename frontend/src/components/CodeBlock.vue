@@ -1,7 +1,7 @@
 <template>
     <div>
         <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
-        @focus="onCodeFocus" @input="onCodeChange">
+        @focus="onCodeFocus" @input="onCodeChange" :name="`block[${block.parentID}][${block.id}]`">
         </codemirror>
         
     </div>
