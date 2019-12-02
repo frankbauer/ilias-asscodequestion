@@ -101,7 +101,8 @@
                     compiler:this.compiler,
                     executionTimeout:this.executionTimeout,
                     maxCharacters:this.maxCharacters,
-                    runCode:this.runCode
+                    runCode:this.runCode,
+                    domLibs:this.domLibraries
                 }
             },
             blocks() { return this.blockInfo.blocks },
@@ -111,6 +112,7 @@
             maxCharacters() { return this.blockInfo.maxCharacters},
             compiler() { return this.blockInfo.compiler},
             runCode() { return this.blockInfo.runCode},
+            domLibraries() { return this.blockInfo.domLibs},
             
             editMode() {
                 return false;

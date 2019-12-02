@@ -14,7 +14,7 @@
                                     <v-select
                                         :items="compiledLanguages"
                                         v-model="compilerLanguage"
-                                        outlined                            
+                                                                    
                                         label="Language"
                                         dense
                                         class="rect-input"
@@ -24,7 +24,7 @@
                                     <v-select
                                         :items="compilerVersions"
                                         v-model="compilerVersion"
-                                        outlined                            
+                                                                    
                                         label="Version"
                                         dense
                                         class="rect-input"
@@ -50,7 +50,7 @@
                                             label="Max. Runtime in ms."                            
                                             maxlength="6"
                                             dense
-                                            outlined
+                                            
                                             class="rect-input"
                                         />
                                     </v-col> 
@@ -61,7 +61,7 @@
                                             label="Max. Output Characters"                            
                                             maxlength="6"
                                             dense
-                                            outlined
+                                            
                                             class="rect-input"
                                         />
                                     </v-col> 
@@ -83,7 +83,8 @@
                                         <v-select
                                             :items="domLibraries"
                                             v-model="domLibrary"
-                                            outlined                            
+                                            multiple 
+                                            chips                        
                                             label="DOM-Libraries"
                                             dense
                                             class="rect-input"
@@ -93,7 +94,8 @@
                                         <v-select
                                             :items="compilerVersions"
                                             v-model="compilerVersion"
-                                            outlined                            
+                                            multiple   
+                                            chips                         
                                             label="Worker-Libraries"
                                             dense
                                             class="rect-input"
@@ -188,6 +190,14 @@ export default {
             },
             set(v){
                 this.$emit('character-limit-change', v)                
+            }
+        },
+        domLibrary:{
+            get(){
+                return this.options.domLibs;
+            },
+            set(v){
+
             }
         }
     }

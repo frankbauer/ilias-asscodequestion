@@ -69,6 +69,7 @@ import GLSLCompilers from '../compiler/glsl'
 compilerRegistry.register(GLSLCompilers);
 
 
-compilerRegistry.registerDOMLib([''], 'd3', '5.13.4', 'D3 - Data-Driven Documents')
+compilerRegistry.registerDOMLib([''], 'd3', '5.13.4', 'D3')
+compilerRegistry.registerDOMLib([''], '3js', '5.13.4', 'Three.JS')
 export default compilerRegistry;
 
