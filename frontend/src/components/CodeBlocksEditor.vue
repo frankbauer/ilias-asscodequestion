@@ -75,6 +75,10 @@ export default {
         onScriptVersionChange(nfo){
             let bl = this.blockById(nfo.id);
             bl.version = nfo.version;
+        },
+        onThemeChange(nfo){
+            this.blockInfo.solutionTheme = nfo.solution;
+            this.blockInfo.codeTheme = nfo.code
         }
     }
 }

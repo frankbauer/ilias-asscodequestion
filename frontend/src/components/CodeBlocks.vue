@@ -10,7 +10,8 @@
             @character-limit-change="onCharacterLimitChange"
             @timeout-change="onTimeoutChange" 
             @worker-libs-change="onWorkerLibChange"
-            @dom-libs_change="onDomLibChange"  
+            @dom-libs-change="onDomLibChange" 
+            @theme-change="onThemeChange" 
         />
         <CodeBlockContainer 
             :block="block" 
@@ -107,7 +108,9 @@
                     runCode:this.runCode,
                     domLibs:this.domLibraries,
                     workerLibs:this.workerLibraries,
-                    id:this.blockInfo.id
+                    id:this.blockInfo.id,
+                    codeTheme:this.codeTheme,
+                    solutionTheme:this.solutionTheme
                 }
             },
             blocks() { return this.blockInfo.blocks },
@@ -119,6 +122,8 @@
             runCode() { return this.blockInfo.runCode},
             domLibraries() { return this.blockInfo.domLibs},
             workerLibraries() { return this.blockInfo.workerLibs},
+            solutionTheme() { return this.blockInfo.solutionTheme},
+            codeTheme() { return this.blockInfo.codeTheme},
             
             editMode() {
                 return false;
@@ -184,6 +189,7 @@
             onTimeoutChange(v){},
             onWorkerLibChange(v){},
             onDomLibChange(v){},
+            onThemeChange(nfo){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {

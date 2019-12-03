@@ -75,7 +75,7 @@
                                     <v-col cols="12" md="6" class="my-0 py-0">
                                         <v-select
                                             :items="themes"
-                                            v-model="compilerLanguage"  
+                                            v-model="codeTheme"  
                                             label="General Theme"
                                             dense
                                             class="rect-input"
@@ -84,7 +84,7 @@
                                     <v-col cols="12" md="6" class="my-0 py-0">
                                         <v-select
                                             :items="themes"
-                                            v-model="compilerLanguage"  
+                                            v-model="solutionTheme"  
                                             label="Solution Theme"
                                             dense
                                             class="rect-input"
@@ -145,9 +145,18 @@ export default {
     data:function(){
         return {
             themes:[
-                {text:"Solarized", value:"solarized"},
-                {text:"Bas16 (dark)", value:"base16-dark"},
-                {text:"Bas16 (light)", value:"base16-light"}
+                {text:"Solarized", value:"solarized light"},
+                {text:"Solarized (dark)", value:"solarized dark"},
+                {text:"Base16 (dark)", value:"base16-dark"},
+                {text:"Base16 (light)", value:"base16-light"},
+                {text:"Duotone (dark)", value:"duotone-dark"},
+                {text:"Duotone (light)", value:"duotone-light"},
+                {text:"XQ (dark)", value:"xq-dark"},
+                {text:"XQ (light)", value:"xq-light"},
+                {text:"Blackboard", value:"blackboard"},
+                {text:"neo", value:"neo"},
+                {text:"mbo", value:"mbo"},
+                {text:"mdn like", value:"mdn-like"}
             ]
         }
     },
@@ -249,6 +258,28 @@ export default {
             },
             set(v){
                 this.$emit('worker-libs-change', v)
+            }
+        },
+        solutionTheme:{
+            get(){
+                return this.options.solutionTheme;
+            },
+            set(v){
+                this.$emit('theme-change', {
+                    solution:v,
+                    code:this.codeTheme
+                })
+            }
+        },
+        codeTheme:{
+            get(){
+                return this.options.codeTheme;
+            },
+            set(v){
+                this.$emit('theme-change', {
+                    solution:this.solutionTheme,
+                    code:v
+                })
             }
         }
     }
