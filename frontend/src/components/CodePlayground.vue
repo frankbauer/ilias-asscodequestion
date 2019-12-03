@@ -140,7 +140,7 @@ export default {
             }
             if (this.block && this.block.obj){
                 if (this.block && this.block.obj && this.block.obj.shouldAutoReset()) {
-                    //console.log("Will Re-Initiualize", this.canvas, $(this.canvas).css('background-color'));                           
+                    //console.log("Will Re-Initialize", this.canvas, $(this.canvas).css('background-color'));                           
                     this.lastRun = new Date()
                     this.runCount++;                                   
                 } else {
@@ -176,9 +176,12 @@ export default {
                     }
 
                     this.$nextTick(function () {
-                        //console.log("Will Update", this.canvas, $(this.canvas).css('background-color'));
-                                        
-                        const result = this.block.obj.update(val, $(this.canvas));       
+                        let result = this.block.obj.update(val, $(this.canvas)); 
+                        console.log(val);
+                        //construct a split output object
+                        if (result === undefined && val.processedOutput.type!='text'){
+                            result = val.processedOutput.text
+                        }      
                         
                         if (result !== undefined){
                             this.$emit('changeOutput', result);

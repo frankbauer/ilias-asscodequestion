@@ -12,7 +12,7 @@ Vue.prototype.$compilerRegistry = CompilerRegistry;
 //this will handle the vue mounting on the dom
 class CodeBlocksManager {
     constructor(el) {
-        console.log("Element", el.dataset);
+        //console.log("Element", el.dataset);
         this.element = el;
         let data = {
             ...el.dataset,
@@ -44,6 +44,11 @@ class CodeBlocksManager {
         } else {
             data.domLibs = JSON.parse(data.domLibs);
         }
+        if (data.workerLibs===undefined){
+            data.workerLibs = []
+        } else {
+            data.workerLibs = JSON.parse(data.workerLibs);
+        }
 
         data.id = Number(data.id);
 
@@ -74,8 +79,7 @@ class CodeBlocksManager {
                 
                 block.width = bl.getAttribute('width')?bl.getAttribute('width'):'100%'
                 block.height = bl.getAttribute('height')?bl.getAttribute('height'):'200px'
-                block.align = bl.getAttribute('align')?bl.getAttribute('align'):'center'
-                console.log(block);
+                block.align = bl.getAttribute('align')?bl.getAttribute('align'):'center'                
             } else if (block.type == 'BLOCK') {
                 block.hasCode = true;                
             } 
@@ -108,7 +112,7 @@ class CodeBlocksManager {
         })
         this.data = data;   
         
-        console.log("DATA", data)
+        //console.log("DATA", data)
     }
 
     instantiateVue(){

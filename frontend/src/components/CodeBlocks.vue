@@ -178,7 +178,12 @@
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {
                     this.output = newOutput.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-                    this.outputHTML = this.output;
+                    if (this.maxCharacters>0 && this.output.length > this.maxCharacters) {
+                        this.outputHTML = this.output.substr(0, this.maxCharacters);
+                        this.outputHTML += this.$CodeBlock.format_info('Info: Output too long. Removed all following Characters. \n<b>...</b>\n\n');                        
+                    } else {
+                        this.outputHTML = this.output;
+                    }
                     this.outputHTML += this.sansoutput;
                 }
             },            
@@ -256,7 +261,7 @@
                 
                 if (output !== undefined && this.playgrounds.length>0){  
                     try {
-                        processed = this.$CodeBlock.processMixedOutput(this.output, true);
+                        processed = this.$CodeBlock.processMixedOutput(output, true);
                     } catch (e) {
                         parseError = e;        
                     }
