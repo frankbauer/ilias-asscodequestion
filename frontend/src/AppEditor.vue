@@ -1,9 +1,12 @@
 <template>
-  <v-app>
-    <v-content>
-      <CodeBlocksEditor :blockInfo="blocks" />
-    </v-content>
-  </v-app>
+  <q-layout view="hHh lpR fFf">
+
+    <q-page-container>
+       <CodeBlocksEditor :blockInfo="blocks" />
+    </q-page-container>
+
+  </q-layout>  
+  
 </template>
 
 <script>
@@ -28,7 +31,6 @@ export default {
 };
 </script>
 
-<style scoped src="vuetify/dist/vuetify.min.css"></style>
 <style lang="sass">
   #app
     margin-bottom: 16px

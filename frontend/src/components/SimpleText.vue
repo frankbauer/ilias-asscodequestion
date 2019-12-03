@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!editMode" v-html="value"></div>
-        <TipTap v-else :value="value" @input="updatedContent" class="editor my-3" />
+        <TipTap v-else :value="value" @input="updatedContent" class="editor q-my-3" />
     </div>
 </template>
 

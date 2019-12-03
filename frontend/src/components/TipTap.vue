@@ -1,11 +1,11 @@
 <template>
-    <v-container fluid class="ma-0 pa-0">
-        <v-row no-gutters>    
-            <v-col  cols="12" md="6">    
-                <tiptap-vuetify :value="value" @input="updatedContent" :extensions="extensions" :class="($vuetify.breakpoint.mdAndUp) ? 'wysiwygMD' : 'wysiwyg'"/>
-            </v-col>
-            <v-col cols="12" md="6">    
-                <v-textarea
+    <q-container fluid class="ma-0 pa-0">
+        <q-row no-gutters>    
+            <q-col  cols="12" md="6">    
+                <!--<tiptap-vuetify :value="value" @input="updatedContent" :extensions="extensions" :class="($vuetify.breakpoint.mdAndUp) ? 'wysiwygMD' : 'wysiwyg'"/> -->
+            </q-col>
+            <q-col cols="12" md="6">    
+                <q-textarea
                 filled
                 auto-grow
                 rows="1"
@@ -14,15 +14,15 @@
                 background-color="blue-grey darken-3"                
                 dark
                 :value="value" @input="updatedContent"
-                :class="($vuetify.breakpoint.mdAndUp) ? 'plainMD' : 'plain'"></v-textarea>
-            </v-col>
-        </v-row>
-    </v-container>
+                :class="($vuetify.breakpoint.mdAndUp) ? 'plainMD' : 'plain'"></q-textarea>
+            </q-col>
+        </q-row>
+    </q-container>
 </template>
 
 <script>
     // import the component and the necessary extensions
-    import {
+    /*import {
         TiptapVuetify,
         Heading,
         Bold,
@@ -39,16 +39,16 @@
         HardBreak,
         HorizontalRule,
         History
-    } from 'tiptap-vuetify'
+    } from 'tiptap-vuetify'*/
 
     export default {
         // specify TiptapVuetify component in "components"
         components: {
-            TiptapVuetify
+            //TiptapVuetify
         },
         data: () => ({
             // declare extensions you want to use
-            extensions: [
+            /*extensions: [
                 History,
                 Blockquote,
                 Link,
@@ -68,7 +68,7 @@
                 HorizontalRule,
                 Paragraph,
                 HardBreak
-            ]
+            ]*/
         }),
         methods: {
             updatedContent(v) {

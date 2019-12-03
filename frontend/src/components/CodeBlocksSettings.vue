@@ -1,142 +1,119 @@
 <template>
-    <v-container fluid class="ma-0 pa-0">
-        <v-row class="my-0 py-0" dense>
-            <v-col cols="12" sm="4">
-                <v-card>
-                    <v-card-title>Language</v-card-title>
-                    <v-card-text>
-                        <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                            <v-row class="my-0 py-0" dense>
-                                <v-col cols="12" md="8" class="my-0 py-0">
-                                    <v-switch v-model="runCode" :disabled="!languageHasCompiler" label="Allow Code Execution"/>
-                                </v-col>
-                                <v-col cols="12" :md="`${runCode?8:12}`" class="my-0 py-0">
-                                    <v-select
-                                        :items="compiledLanguages"
-                                        v-model="compilerLanguage"  
-                                        label="Language"
-                                        dense
-                                        class="rect-input"
+    <div class="row q-my-none q-py-none">
+            <div class="col-xs-12 col-sm-4">
+                <q-card class="q-ma-xs">
+                    <q-card-section>Language</q-card-section>
+                    <q-card-section>                        
+                        <div class="row q-my-none q-py-none">
+                            <div class="col-xs-12 col-md-8 q-my-none q-py-none">
+                                <q-togle v-model="runCode" :disabled="!languageHasCompiler" label="Allow Code Execution"/>
+                            </div>
+                            <div :class="`col-xs-12 col-md-${runCode?8:12} q-my-none q-pr-xs`">
+                                <q-select
+                                    :options="compiledLanguages"
+                                    v-model="compilerLanguageObj"  
+                                    label="Language"   
+                                /> 
+                            </div> 
+                            <div class="col-xs-12 col-md-4 q-my-none q-pl-xs" v-if="runCode">
+                                <q-select
+                                    :options="compilerVersions"
+                                    v-model="compilerVersion"                            
+                                    label="Version"    
+                                />                      
+                            </div>
+                        </div>                        
+                    </q-card-section>
+                </q-card>
+            </div>
+
+            <q-slide-transition>
+                <div class="col-xs-12 col-sm-4" v-if="runCode">
+                    <q-card class="q-ma-xs">
+                        <q-card-section>Restrictions</q-card-section>
+                        <q-card-section>
+                            <div class="row q-my-none q-py-none">                               
+                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
+                                    <q-input
+                                        v-model="maxRuntime"
+                                        :rules="[validNumber]"
+                                        label="Max. Runtime in ms."                            
+                                        maxlength="6"
+                                    />
+                                </div> 
+                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
+                                    <q-input
+                                        v-model="maxCharacters"
+                                        :rules="[validNumber]"
+                                        label="Max. Output Characters"                            
+                                        maxlength="6"
+                                    />
+                                </div> 
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                    <q-card class="q-mt-sm q-ma-xs">
+                        <q-card-section>Themes</q-card-section>
+                        <q-card-section>
+                            <div class="row q-my-none q-py-none" dense>
+                                <div class="col-xs-12 col-md-6 q-my-none q-py-non">
+                                    <q-select
+                                        :options="themes"
+                                        v-model="codeTheme"  
+                                        label="General Theme"
                                     /> 
-                                </v-col> 
-                                <v-col cols="12" md="4" class="my-0 py-0" v-if="runCode">
-                                    <v-select
-                                        :items="compilerVersions"
-                                        v-model="compilerVersion"                            
-                                        label="Version"
-                                        dense
-                                        class="rect-input"
+                                </div>
+                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
+                                    <q-select
+                                        :options="themes"
+                                        v-model="solutionTheme"  
+                                        label="Solution Theme"
+                                    /> 
+                                </div>
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                </div>
+            </q-slide-transition>
+
+            <q-slide-transition>
+                <div class="col-xs-12 col-sm-4" v-if="runCode">
+                    <q-card class="q-ma-xs">
+                        <q-card-section>Libraries</q-card-section>
+                        <q-card-section>
+                            <div class="row q-my-none q-py-none" dense>
+                                <div class="col-xs-12 q-my-none q-py-none">
+                                    <q-select
+                                        :options="domLibraries"
+                                        v-model="domLibrary"
+                                        multiple 
+                                        use-chips
+                                        stack-label  
+                                        deletable-chips                      
+                                        label="DOM-Libraries"
+                                    /> 
+                                </div> 
+                                <div class="col-xs-12 q-my-none q-py-none" v-if="runCode && workerLibraries.length>0">
+                                    <q-select
+                                        :options="workerLibraries"
+                                        v-model="workerLibrary"
+                                        multiple   
+                                        use-chips
+                                        stack-label
+                                        deletable-chips                        
+                                        label="Worker-Libraries" 
                                     />                      
-                                </v-col>
-                            </v-row>
-                        </v-container>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-
-            <v-slide-x-transition>
-                <v-col cols="12" sm="4" v-if="runCode">
-                    <v-card>
-                        <v-card-title>Restrictions</v-card-title>
-                        <v-card-text>
-                            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                                <v-row class="my-0 py-0" dense>                               
-                                    <v-col cols="12" :md="6" class="my-0 py-0">
-                                        <v-text-field
-                                            v-model="maxRuntime"
-                                            :rules="[validNumber]"
-                                            label="Max. Runtime in ms."                            
-                                            maxlength="6"
-                                            dense
-                                            
-                                            class="rect-input"
-                                        />
-                                    </v-col> 
-                                    <v-col cols="12" :md="6" class="my-0 py-0">
-                                        <v-text-field
-                                            v-model="maxCharacters"
-                                            :rules="[validNumber]"
-                                            label="Max. Output Characters"                            
-                                            maxlength="6"
-                                            dense
-                                            
-                                            class="rect-input"
-                                        />
-                                    </v-col> 
-                                </v-row>
-                            </v-container>
-                        </v-card-text>
-                    </v-card>
-                    <v-card class="mt-2">
-                        <v-card-title>Themes</v-card-title>
-                        <v-card-text>
-                            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                                <v-row class="my-0 py-0" dense>
-                                    <v-col cols="12" md="6" class="my-0 py-0">
-                                        <v-select
-                                            :items="themes"
-                                            v-model="codeTheme"  
-                                            label="General Theme"
-                                            dense
-                                            class="rect-input"
-                                        /> 
-                                    </v-col>
-                                    <v-col cols="12" md="6" class="my-0 py-0">
-                                        <v-select
-                                            :items="themes"
-                                            v-model="solutionTheme"  
-                                            label="Solution Theme"
-                                            dense
-                                            class="rect-input"
-                                        /> 
-                                    </v-col>
-                                </v-row>
-                            </v-container>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
-            </v-slide-x-transition>
-
-            <v-slide-x-transition>
-                <v-col cols="12" sm="4" v-if="runCode">
-                    <v-card>
-                        <v-card-title>Libraries</v-card-title>
-                        <v-card-text>
-                            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                                <v-row class="my-0 py-0" dense>
-                                    <v-col cols="12" class="my-0 py-0">
-                                        <v-select
-                                            :items="domLibraries"
-                                            v-model="domLibrary"
-                                            multiple 
-                                            chips  
-                                            deletable-chips                      
-                                            label="DOM-Libraries"
-                                            dense
-                                            class="rect-input"
-                                        /> 
-                                    </v-col> 
-                                    <v-col cols="12" class="my-0 py-0" v-if="runCode && workerLibraries.length>0">
-                                        <v-select
-                                            :items="workerLibraries"
-                                            v-model="workerLibrary"
-                                            multiple   
-                                            chips 
-                                            deletable-chips                        
-                                            label="Worker-Libraries"
-                                            dense
-                                            class="rect-input"
-                                        />                      
-                                    </v-col>
-                                </v-row>
-                            </v-container>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
-            </v-slide-x-transition>
-        </v-row>
-        <textarea :name="`block_settings[${this.options.id}]`" class="blocksettings" v-model="serializedOptions"></textarea>
-    </v-container>
+                                </div>
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                </div>
+            </q-slide-transition>
+        
+        <div class="col-xs-12">
+            <textarea :name="`block_settings[${this.options.id}]`" class="blocksettings" v-model="serializedOptions"></textarea>
+        </div>
+    </div>
         
 </template>
 
@@ -145,18 +122,18 @@ export default {
     data:function(){
         return {
             themes:[
-                {text:"Solarized", value:"solarized light"},
-                {text:"Solarized (dark)", value:"solarized dark"},
-                {text:"Base16 (dark)", value:"base16-dark"},
-                {text:"Base16 (light)", value:"base16-light"},
-                {text:"Duotone (dark)", value:"duotone-dark"},
-                {text:"Duotone (light)", value:"duotone-light"},
-                {text:"XQ (dark)", value:"xq-dark"},
-                {text:"XQ (light)", value:"xq-light"},
-                {text:"Blackboard", value:"blackboard"},
-                {text:"neo", value:"neo"},
-                {text:"mbo", value:"mbo"},
-                {text:"mdn like", value:"mdn-like"}
+                {label:"Solarized", value:"solarized light"},
+                {label:"Solarized (dark)", value:"solarized dark"},
+                {label:"Base16 (dark)", value:"base16-dark"},
+                {label:"Base16 (light)", value:"base16-light"},
+                {label:"Duotone (dark)", value:"duotone-dark"},
+                {label:"Duotone (light)", value:"duotone-light"},
+                {label:"XQ (dark)", value:"xq-dark"},
+                {label:"XQ (light)", value:"xq-light"},
+                {label:"Blackboard", value:"blackboard"},
+                {label:"neo", value:"neo"},
+                {label:"mbo", value:"mbo"},
+                {label:"mdn like", value:"mdn-like"}
             ]
         }
     },
@@ -189,7 +166,7 @@ export default {
         workerLibraries(){
             const c = this.$compilerRegistry.getCompiler({languageType:this.compilerLanguage, version:this.compilerVersion});
             if (c.libraries === undefined) return [];
-            return c.libraries.map(l=>{ return {text:l.displayName, value:l.key};});
+            return c.libraries.map(l=>{ return {label:l.displayName, value:l.key};});
         },
         languages(){
             return this.$CodeBlock.knownLanguages()
@@ -202,19 +179,22 @@ export default {
             const c = this.$compilerRegistry.getCompiler({languageType:this.compilerLanguage});
             return c!==undefined
         },
-        compilerLanguage:{
+        compilerLanguage(){
+            if (this.options.runCode === false) return this.options.language;
+            return this.options.compiler.languageType;
+        },
+        compilerLanguageObj:{
             get(){
-                if (this.options.runCode === false) return this.options.language;
-                return this.options.compiler.languageType;
+                return this.compiledLanguages.find(t => t.value == this.compilerLanguage); 
             },
             set(v){
-                if (this.options.runCode === false) this.$emit('language-change', v)
-                this.$emit('compiler-change', v)
+                if (this.options.runCode === false) this.$emit('language-change', v.value)
+                this.$emit('compiler-change', v.value)
             }
         },
         compilerVersion:{
             get(){
-                return this.options.compiler.version;
+                return this.options.compiler.version; 
             },
             set(v){
                 this.$emit('compiler-version-change', v)
@@ -246,39 +226,39 @@ export default {
         },
         domLibrary:{
             get(){
-                return this.options.domLibs;
+                return this.options.domLibs.map(d => this.domLibraries.find(k=>k.value == d));
             },
             set(v){
-                this.$emit('dom-libs-change', v)
+                this.$emit('dom-libs-change', v.map(vv => vv.value))
             }
         },
         workerLibrary:{
             get(){
-                return this.options.workerLibs;
+                return this.options.workerLibs.map(d => this.workerLibraries.find(k=>k.value == d));
             },
             set(v){
-                this.$emit('worker-libs-change', v)
+                this.$emit('worker-libs-change', v.map(vv => vv.value))
             }
         },
         solutionTheme:{
             get(){
-                return this.options.solutionTheme;
+                return this.themes.find(t => t.value == this.options.solutionTheme);
             },
             set(v){
                 this.$emit('theme-change', {
-                    solution:v,
+                    solution:v.value,
                     code:this.codeTheme
                 })
             }
         },
         codeTheme:{
             get(){
-                return this.options.codeTheme;
+                return this.themes.find(t => t.value == this.options.codeTheme);
             },
             set(v){
                 this.$emit('theme-change', {
                     solution:this.solutionTheme,
-                    code:v
+                    code:v.value
                 })
             }
         }

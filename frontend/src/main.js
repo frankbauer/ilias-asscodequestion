@@ -10,11 +10,13 @@ String.prototype.replaceRec = function (pattern, replacement) {
 };
 
 import Vue from 'vue'
+import './plugins/quasar'
 import './plugins/codemirror';
 import './plugins/codeBlocks';
 import './plugins/compilerState';
 import './plugins/codemirror';
 import CodeBlocksManager from './lib/codeBlocksManager';
+
 
 Vue.config.productionTip = false
 CodeBlocksManager.find(document).mount();

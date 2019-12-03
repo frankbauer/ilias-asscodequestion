@@ -93,7 +93,7 @@ Vue.prototype.$CodeBlock = {
   knownLanguages(){
     return Object
         .keys(mimeTypesForLanguage)
-        .map(k => {return {text:mimeTypesForLanguage[k].displayName, value:k}})
+        .map(k => {return {label:mimeTypesForLanguage[k].displayName, value:k}})
         .sort((a,b) => a.text<b.text ? -1 : 1)
         
   },

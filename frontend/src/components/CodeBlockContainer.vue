@@ -1,139 +1,119 @@
 <template>
   <div class="block">
-    <v-card v-if="editMode" :class="`ml-0 mr-0 my-3 pa-0 editModeBlockContainer ${colorClass}`" >
-        <v-card-text class="mb-0 pb-0">
-            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
-                <v-row class="my-0 py-0" dense>
-                    <v-col cols="9" sm="10" md="4" class="my-0 py-0">
-                        <v-select
-                            :items="types"
-                            v-model="type"
-                            dense
-                            class="rect-input"
-                            style="margin-top:-5px !important"
-                        />                        
-                    </v-col>
-                    
-                    <v-spacer class="hidden-sm-and-down"></v-spacer>
-                    <v-col cols="3" sm="2" md="1" class="my-0 py-0 text-right">
-                        <v-menu
-                            v-if="hasExtendedSettings"
-                            v-model="settingsMenu"
-                            left
-                            :close-on-content-click="false"
-                            :nudge-width="200"
-                            
-                            >
-                            <template v-slot:activator="{ on }">
-                                <v-btn icon small v-blur v-on="on">                            
-                                    <v-icon size="24">
-                                        mdi-settings
-                                    </v-icon>
-                                </v-btn>
-                            </template>
+    <q-card v-if="editMode" :class="`ml-none q-mr-none q-my-md q-pa-none editModeBlockContainer ${colorClass}`" >
+        <q-card-section class="q-mb-none q-pb-none">
+            <div class="row q-my-none q-py-none" dense>
+                <div class="col-xs-9 col-sm-10 col-md-4 q-my-none q-py-none">
+                    <q-select
+                        :options="types"
+                        v-model="typeObj"
+                        dense
+                        class="rect-input"
+                        style="margin-top:-5px !important"
+                    />                        
+                </div>
+                
+                <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
+                    <q-btn icon="mdi-settings" > 
+                        <q-menu auto-close>                        
+                            <div class="row no-wrap q-pa-md" v-if="canSetLineNumbers">  
+                                <!-- LineNumbers -->
+                                <div class="column"  >
+                                    <q-list-item-title>Lines</q-list-item-title>
+                                    <q-list-item-subtitle>Number of Visible lines or <b>auto</b>.</q-list-item-subtitle>
+                                </div>
+                                <div class="column" >
+                                    <q-input
+                                        v-model="visibleLines"
+                                        :rules="[validNumber]"
+                                        maxlength="4"
+                                        class="rect-input"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row no-wrap q-pa-md" v-if="isVersionedPlayground">                       <!-- Playground Versioning -->
+                                <q-subheader>VERSIONING</q-subheader>
+                                <div class="column" >                                    
+                                        <q-list-item-title>Script Version</q-list-item-title>
+                                        <q-list-item-subtitle>API-Version for the Visualization Object.</q-list-item-subtitle>
+                                </div>
+                                <div class="column" >
+                                    
+                                        <q-select
+                                            :items="scriptVersions"
+                                            v-model="scriptVersion"                           
+                                            class="rect-input"
+                                        />
+                                </div>
+                            </div>
 
-                            <v-card>
-                                <v-list flat>          
-                                   <!-- LineNumbers -->
-                                    <v-list-item v-if="canSetLineNumbers" >
-                                        <v-list-item-content>
-                                            <v-list-item-title>Lines</v-list-item-title>
-                                            <v-list-item-subtitle>Number of Visible lines or <b>auto</b>.</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <v-text-field
-                                                v-model="visibleLines"
-                                                :rules="[validNumber]"
-                                                maxlength="4"
-                                                class="rect-input"
-                                            />
-                                    </v-list-item-content>
-                                    </v-list-item>
-
-                                    <!-- Playground Versioning -->
-                                    <v-subheader v-if="isVersionedPlayground">VERSIONING</v-subheader>
-                                    <v-list-item v-if="isVersionedPlayground"> 
-                                        <v-list-item-content>
-                                            <v-list-item-title>Script Version</v-list-item-title>
-                                            <v-list-item-subtitle>API-Version for the Visualization Object.</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <v-select
-                                                :items="scriptVersions"
-                                                v-model="scriptVersion"                           
-                                                class="rect-input"
-                                            />
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                        
+                            <div class="row no-wrap q-pa-md" v-if="canDefinePlacement">                            
                                     <!-- Positioning -->
-                                    <v-subheader v-if="canDefinePlacement">POSITIONING</v-subheader>
-                                    <v-list-item v-if="canDefinePlacement">
-                                        <v-list-item-content>
-                                            <v-list-item-title>Width</v-list-item-title>
-                                            <v-list-item-subtitle>CSS Property for the canvas-width.</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <v-text-field
+                                    <q-subheader >POSITIONING</q-subheader>
+                                    <div class="column" >
+                                            <q-list-item-title>Width</q-list-item-title>
+                                            <q-list-item-subtitle>CSS Property for the canvas-width.</q-list-item-subtitle>
+                                    </div>
+                                    <div class="column" >
+                                            <q-input
                                                 v-model="width"
                                                 maxlength="7"                                            
                                                 class="rect-input"
                                             />
-                                        </v-list-item-content>
-                                    </v-list-item>
+                                        </q-list-item-content>
+                                    </div>
+                            </div>
 
-                                    <v-list-item v-if="canDefinePlacement">
-                                        <v-list-item-content>
-                                            <v-list-item-title>Height</v-list-item-title>
-                                            <v-list-item-subtitle>CSS Property for the canvas-height.</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <v-text-field
+                                    <q-list-item v-if="canDefinePlacement">
+                                        <q-list-item-content>
+                                            <q-list-item-title>Height</q-list-item-title>
+                                            <q-list-item-subtitle>CSS Property for the canvas-height.</q-list-item-subtitle>
+                                        </q-list-item-content>
+                                        <q-list-item-content>
+                                            <q-input
                                                 v-model="height"
                                                 maxlength="7"
                                                 class="rect-input"
                                             />
-                                        </v-list-item-content>
-                                    </v-list-item>
+                                        </q-list-item-content>
+                                    </q-list-item>
 
-                                    <v-list-item v-if="canDefinePlacement">
-                                        <v-list-item-content>
-                                            <v-list-item-title>Alignment</v-list-item-title>
-                                            <v-list-item-subtitle>Horizontal Positioning of the canvas.</v-list-item-subtitle>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <v-select
+                                    <q-list-item v-if="canDefinePlacement">
+                                        <q-list-item-content>
+                                            <q-list-item-title>Alignment</q-list-item-title>
+                                            <q-list-item-subtitle>Horizontal Positioning of the canvas.</q-list-item-subtitle>
+                                        </q-list-item-content>
+                                        <q-list-item-content>
+                                            <q-select
                                                 :items="alignments"
                                                 v-model="align"                                            
                                                 dense
                                                 class="rect-input"
                                             /> 
-                                        </v-list-item-content>
-                                    </v-list-item>                                   
-                                </v-list>
-                            </v-card>
-                        </v-menu>
-                        <v-btn 
-                            icon
-                            color="primary" 
-                            small 
-                            v-blur
-                            @click="toggleExpanded">
-                                <v-icon size="24">
-                                    {{ expanded?'mdi-chevron-up':'mdi-chevron-down'}}
-                                </v-icon>
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
+                                        </q-list-item-content>
+                                    </q-list-item>                                   
+                                
+                            
+                        </q-menu>
+                    </q-btn>
+                    <q-btn 
+                        icon
+                        color="primary" 
+                        small 
+                        v-blur
+                        @click="toggleExpanded">
+                            <q-icon :name="expanded?'mdi-chevron-up':'mdi-chevron-down'" size="24" />                                
+                    </q-btn>
+                </div>
+            </div>
             <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
-        </v-card-text>   
-        <v-expand-transition>     
-            <v-card-text class="my-0 pt-1 pb-0" v-show="expanded">                                     
+        </q-card-section>   
+        <q-expand-transition>     
+            <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">                                     
                 <slot ></slot>            
-            </v-card-text>
-        </v-expand-transition>
-      </v-card>
+            </q-card-section>
+        </q-expand-transition>
+      </q-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>
       </div>
@@ -148,38 +128,38 @@ export default {
             expanded:true,
             alignments:[
                 {
-                    text:'Start',
+                    label:'Start',
                     value:'left'
                 },{
-                    text:'Center',
+                    label:'Center',
                     value:'center'
                 },{
-                    text:'End',
+                    label:'End',
                     value:'right'
                 }],
             scriptVersions:[
                 {
-                    text:'1.0 (original)',
+                    label:'1.0 (original)',
                     value:'100'
                 },{
-                    text:'2.0 (since 2020)',
+                    label:'2.0 (since 2020)',
                     value:'101'
                 }],
             types:[
                 {
-                    text:'Visualization Canvas',
+                    label:'Visualization Canvas',
                     value:'PLAYGROUND'
                 },{
-                    text:'Plain Text',
+                    label:'Plain Text',
                     value:'TEXT'
                 },{
-                    text:'Hidden Code Block',
+                    label:'Hidden Code Block',
                     value:'BLOCK-hidden'
                 },{
-                    text:'Fixed Code Block',
+                    label:'Fixed Code Block',
                     value:'BLOCK-static'
                 },{
-                    text:'Solution Block',
+                    label:'Solution Block',
                     value:'BLOCK'
                 }]
         }
@@ -256,15 +236,19 @@ export default {
             }
             return 'default-border'
         },
-        type:{
-            get(){
-                if (this.block.type == 'BLOCK'){
+        type(){
+    if (this.block.type == 'BLOCK'){                
                     if (this.block.hidden) return 'BLOCK-hidden';
                     if (this.block.static) return 'BLOCK-static';
                 }
-                return this.block.type
+                return this.block.type;  
+        },
+        typeObj:{
+            get(){
+                return this.types.find(t => t.value == this.type);                
             },
             set(v){
+                v = v.value
                 let ret = {
                     type:v.match(/([^-]*)/)[0],
                     hidden:v=='BLOCK-hidden',
@@ -321,27 +305,11 @@ export default {
 </script>
 
 <style lang="sass" >
-$color-pack: false
-@import '~vuetify/src/styles/settings/_colors.scss'
 
-.text-border
-    border-color : map-get($blue-grey, base) !important
-.playground-border
-    border-color : map-get($green, accent-3) !important
-.block-border
-    border-color : map-get($orange, darken-3) !important
-.block-hidden-border
-    border-color : map-get($pink, darken-4) !important
-.block-static-border
-    border-color : map-get($blue, darken-2) !important
-.default-border
-    border-color : map-get($purple, accent-2) !important
 .editModeBlockContainer
     border-radius : 0px !important
     border-left-width : 4px !important
     border-left-style : solid !important
-.rect-input.v-input .v-input__slot 
-    border-radius: 0px
 textarea.blockoptions
     display : none !important
     width : 1px

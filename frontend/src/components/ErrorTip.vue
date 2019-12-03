@@ -1,17 +1,17 @@
 <template>
-    <v-tooltip top>
+    <q-tooltip top>
         <template v-slot:activator="{ on }">
-            <v-icon v-on="on" :class="`mdi ${severityClass}`">{{severityIcon}}</v-icon>            
+            <q-icon v-on="on" :class="`mdi ${severityClass}`">{{severityIcon}}</q-icon>            
         </template>
         <div>
             <ul class="tiplist">
                 <li v-for="error in errors" v-bind:key="error.message">
-                    <v-icon class="pr-3 tipicon">{{ iconForSeverity(error.severity) }}</v-icon>
+                    <q-icon class="pr-3 tipicon">{{ iconForSeverity(error.severity) }}</q-icon>
                     <pre class="tipper">{{ error.message }}</pre>
                 </li>
             </ul>
         </div>
-    </v-tooltip>
+    </q-tooltip>
 </template>
 
 <script>

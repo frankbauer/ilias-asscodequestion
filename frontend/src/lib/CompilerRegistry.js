@@ -14,13 +14,13 @@ const compilerRegistry = new Vue({
             const langs = Object
                 .keys(this.compilers)
                 .map(k => this.compilers[k])
-                .map(c => {return {text:c.displayName, value:c.type}})
-                .sort((a, b) => a.text < b.text ? -1 : 1)
+                .map(c => {return {label:c.displayName, value:c.type}})
+                .sort((a, b) => a.label < b.label ? -1 : 1)
             return langs
         },
         domLibraries(){
             const libs = this.libraries.filter(l=>!l.utility);
-            return libs.map(l => {return { text: l.displayName + ' ('+l.version+')', value:l.key}});
+            return libs.map(l => {return { label: l.displayName + ' ('+l.version+')', value:l.key}});
         }   
     },
     methods: {

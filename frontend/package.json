@@ -7,25 +7,55 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "tiptap-vuetify": "^2.8.0",
+    "@quasar/extras": "^1.3.3",
+    "quasar": "^1.5.4",
     "vue": "^2.6.10",
-    "vue-codemirror": "^4.0.5",
-    "vuetify": "^2.1.0"
+    "vue-codemirror": "^4.0.5"
   },
   "devDependencies": {
     "@vue/cli-service": "^4.0.0",
-    "node-sass": "^4.12.0",
+    "babel-plugin-transform-imports": "1.5.0",
+    "fibers": "^4.0.2",
+    "node-sass": "^4.13.0",
+    "postcss-rtl": "^1.5.0",
     "sass": "^1.19.0",
     "sass-loader": "^8.0.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
     "vue-cli-plugin-codemirror": "0.0.6",
-    "vue-cli-plugin-vuetify": "^2.0.2",
-    "vue-template-compiler": "^2.6.10",
-    "vuetify-loader": "^1.3.0"
+    "vue-cli-plugin-quasar": "^2.0.0",
+    "vue-template-compiler": "^2.6.10"
   },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
+  "babel": {
+    "plugins": [
+      [
+        "transform-imports",
+        {
+          "quasar": {
+            "transform": "quasar/dist/babel-transforms/imports.js",
+            "preventFullImport": true
+          }
+        }
+      ],
+      [
+        "transform-imports",
+        {
+          "quasar": {
+            "transform": "quasar/dist/babel-transforms/imports.js",
+            "preventFullImport": true
+          }
+        }
+      ],
+      [
+        "transform-imports",
+        {
+          "quasar": {
+            "transform": "quasar/dist/babel-transforms/imports.js",
+            "preventFullImport": true
+          }
+        }
+      ]
+    ]
   },
   "browserslist": [
     "> 1%",

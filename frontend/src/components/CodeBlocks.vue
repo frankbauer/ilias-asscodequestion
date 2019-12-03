@@ -1,5 +1,5 @@
 <template>
-    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} mx-2`">  
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-2`">  
         <CodeBlocksSettings 
             v-if="editMode" 
             :options="options" 
@@ -48,21 +48,21 @@
                     :editMode="editMode" />
         </CodeBlockContainer>
         
-        <div :class="`runner ${editMode?'pt-5 mx-5':''}`" v-if="canRun">
+        <div :class="`runner ${editMode?'pt-5 q-mx-5':''}`" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
-                <v-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
+                <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
                     @click="run">
                     Run
-                    <v-icon right dark>mdi-play-button</v-icon>
-                </v-btn>
+                    <q-icon right dark>mdi-play-button</q-icon>
+                </q-btn>
                 
-                <v-fade-transition>
+                <q-fade-transition>
                     <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-show="showGlobalMessages"></div>        
-                </v-fade-transition>  
+                </q-fade-transition>  
             </div>
-            <v-expand-transition>
+            <q-expand-transition>
                 <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
-            </v-expand-transition>
+            </q-expand-transition>
         </div>
     </div>
 </template>
