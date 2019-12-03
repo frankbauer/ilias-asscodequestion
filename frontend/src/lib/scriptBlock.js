@@ -47,7 +47,7 @@ class ScriptBlock {
       if (code!==undefined){
         try {
           this.err = []
-          console.log("!!! REBUILDING !!!");
+          //console.log("!!! REBUILDING !!!");
           this.src = code
           this.fkt = new Function('"use strict"; return ' + code);    
           this.obj = this.fkt();

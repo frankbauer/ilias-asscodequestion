@@ -131,15 +131,7 @@ const singleton = new Vue({
             language: "javascript",    
             canRun: true,
             isReady: true,
-            isRunning: false,
-            libraries: [
-                {
-                    key: 'd3-5-14-3',
-                    name: 'd3',
-                    version: '5.14.3',
-                    displayName: 'D3',
-                }
-            ]
+            isRunning: false
         }
     },
     methods: {
