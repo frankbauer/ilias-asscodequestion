@@ -26,7 +26,7 @@
                 <CodeBlock 
                     v-if="block.hasCode" 
                     :block="block" 
-                    :theme="block.editorTheme" 
+                    :theme="themeForBlock(block)" 
                     :mode="mimeType"
                     :visibleLines="block.visibleLines" 
                     :editMode="editMode" 
@@ -37,7 +37,7 @@
                     :block="block" 
                     :editMode="editMode" 
                     :finalOutputObject="finalOutputObject" 
-                    :theme="block.editorTheme" 
+                    :theme="themeForBlock(block)" 
                     @changeOutput="onPlaygroundChangedOutput" 
                     :eventHub="eventHub" />
 
@@ -162,6 +162,13 @@
             }
         },
         methods: {
+            themeForBlock(bl){
+                if (bl.static || bl.readonly || bl.hidden) {
+                    return this.blockInfo.codeTheme;
+                } 
+                        
+                return this.blockInfo.solutionTheme;    
+            },
             blockById(id){
                 return this.blocks.find( block => block.id == id);
             },

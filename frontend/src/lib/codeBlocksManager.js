@@ -44,11 +44,20 @@ class CodeBlocksManager {
         } else {
             data.domLibs = JSON.parse(data.domLibs);
         }
+
         if (data.workerLibs===undefined){
             data.workerLibs = []
         } else {
             data.workerLibs = JSON.parse(data.workerLibs);
         }
+
+        if (data.solutionTheme===undefined){
+            data.solutionTheme = 'solarized light';
+        } 
+
+        if (data.codeTheme===undefined){
+            data.codeTheme = 'xq-light';
+        } 
 
         data.id = Number(data.id);
 
@@ -88,15 +97,7 @@ class CodeBlocksManager {
 
             data.blocks.push(new Vue({
                 data:function(){return block;},
-                computed:{
-                    editorTheme(){
-                        if (this.theme) return this.theme;                        
-                        if (this.static || this.readonly || this.hidden) {
-                            return 'xq-light';
-                        } 
-                        
-                        return 'solarized light';                        
-                    },                    
+                computed:{                                        
                     firstLine(){
                         if (this.id == 0) return 1;
                         return data.blocks[this.id-1].nextLine;
