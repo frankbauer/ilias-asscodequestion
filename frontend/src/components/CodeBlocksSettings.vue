@@ -82,7 +82,8 @@
                                             :items="domLibraries"
                                             v-model="domLibrary"
                                             multiple 
-                                            chips                        
+                                            chips  
+                                            deletable-chips                      
                                             label="DOM-Libraries"
                                             dense
                                             class="rect-input"
@@ -93,7 +94,8 @@
                                             :items="workerLibraries"
                                             v-model="workerLibrary"
                                             multiple   
-                                            chips                         
+                                            chips 
+                                            deletable-chips                        
                                             label="Worker-Libraries"
                                             dense
                                             class="rect-input"

@@ -1,7 +1,6 @@
 <template>
   <div class="block">
-    <v-card v-if="editMode" class="ml-0 mr-0 my-3 pa-0" >
-        <div :class="colorClass" style="height:4px" />
+    <v-card v-if="editMode" :class="`ml-0 mr-0 my-3 pa-0 editModeBlockContainer ${colorClass}`" >
         <v-card-text class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
                 <v-row class="my-0 py-0" dense>
@@ -9,74 +8,112 @@
                         <v-select
                             :items="types"
                             v-model="type"
-                            outlined
-                            label="Block Type"
                             dense
                             class="rect-input"
                         />                        
                     </v-col>
-
-                    <!-- LineNumbers -->
-                    <v-col v-if="canSetLineNumbers" cols="4" sm="2" md="2" class="my-0 py-0">
-                        <v-text-field
-                            v-model="visibleLines"
-                            :rules="[validNumber]"
-                            label="Visible Lines"                            
-                            maxlength="4"
-                            dense
-                            outlined
-                            class="rect-input"
-                        />
-                    </v-col>
-
-                    <!-- Playground Versioning -->
-                    <v-col v-if="canDefinePlacement" cols="12" md="2" class="my-0 py-0">
-                        <v-select
-                            :items="scriptVersions"
-                            v-model="scriptVersion"
-                            outlined
-                            label="Script Version"
-                            dense
-                            class="rect-input"
-                        />
-                    </v-col>
-                    <!-- Playground Placement Settings -->
-                    <v-col v-if="canDefinePlacement" cols="4" md="1" class="my-0 py-0">
-                        <v-text-field
-                            v-model="width"
-                            label="CSS width"                            
-                            maxlength="7"
-                            dense
-                            outlined
-                            class="rect-input"
-                        />
-                    </v-col>
-                    <v-col v-if="canDefinePlacement" cols="4" md="1" class="my-0 py-0">
-                        <v-text-field
-                            v-model="height"
-                            label="CSS height"                            
-                            maxlength="7"
-                            dense
-                            outlined
-                            class="rect-input"
-                        />
-                    </v-col>
-                    <v-col v-if="canDefinePlacement" cols="4" md="2" class="my-0 py-0">
-                        <v-select
-                            :items="alignments"
-                            v-model="align"
-                            outlined
-                            label="Align"
-                            dense
-                            class="rect-input"
-                        /> 
-                    </v-col>
-                   <v-spacer class="hidden-sm-and-down"></v-spacer>
+                    
+                    <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-col cols="12" sm="12" md="1" class="my-0 py-0 text-right">
+                        <v-menu
+                            v-if="hasExtendedSettings"
+                            v-model="settingsMenu"
+                            left
+                            :close-on-content-click="false"
+                            :nudge-width="200"
+                            
+                            >
+                            <template v-slot:activator="{ on }">
+                                <v-btn icon small v-blur v-on="on">                            
+                                    <v-icon size="24">
+                                        mdi-settings
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+
+                            <v-card>
+                                <v-list flat>          
+                                   <!-- LineNumbers -->
+                                    <v-list-item v-if="canSetLineNumbers" >
+                                        <v-list-item-content>
+                                            <v-list-item-title>Lines</v-list-item-title>
+                                            <v-list-item-subtitle>Number of Visible lines or <b>auto</b>.</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                        <v-list-item-content>
+                                            <v-text-field
+                                                v-model="visibleLines"
+                                                :rules="[validNumber]"
+                                                maxlength="4"
+                                                class="rect-input"
+                                            />
+                                    </v-list-item-content>
+                                    </v-list-item>
+
+                                    <!-- Playground Versioning -->
+                                    <v-subheader v-if="isVersionedPlayground">VERSIONING</v-subheader>
+                                    <v-list-item v-if="isVersionedPlayground"> 
+                                        <v-list-item-content>
+                                            <v-list-item-title>Script Version</v-list-item-title>
+                                            <v-list-item-subtitle>API-Version for the Visualization Object.</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                        <v-list-item-content>
+                                            <v-select
+                                                :items="scriptVersions"
+                                                v-model="scriptVersion"                           
+                                                class="rect-input"
+                                            />
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                        
+                                    <!-- Positioning -->
+                                    <v-subheader v-if="canDefinePlacement">POSITIONING</v-subheader>
+                                    <v-list-item v-if="canDefinePlacement">
+                                        <v-list-item-content>
+                                            <v-list-item-title>Width</v-list-item-title>
+                                            <v-list-item-subtitle>CSS Property for the canvas-width.</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                        <v-list-item-content>
+                                            <v-text-field
+                                                v-model="width"
+                                                maxlength="7"                                            
+                                                class="rect-input"
+                                            />
+                                        </v-list-item-content>
+                                    </v-list-item>
+
+                                    <v-list-item v-if="canDefinePlacement">
+                                        <v-list-item-content>
+                                            <v-list-item-title>Height</v-list-item-title>
+                                            <v-list-item-subtitle>CSS Property for the canvas-height.</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                        <v-list-item-content>
+                                            <v-text-field
+                                                v-model="height"
+                                                maxlength="7"
+                                                class="rect-input"
+                                            />
+                                        </v-list-item-content>
+                                    </v-list-item>
+
+                                    <v-list-item v-if="canDefinePlacement">
+                                        <v-list-item-content>
+                                            <v-list-item-title>Alignment</v-list-item-title>
+                                            <v-list-item-subtitle>Horizontal Positioning of the canvas.</v-list-item-subtitle>
+                                        </v-list-item-content>
+                                        <v-list-item-content>
+                                            <v-select
+                                                :items="alignments"
+                                                v-model="align"                                            
+                                                dense
+                                                class="rect-input"
+                                            /> 
+                                        </v-list-item-content>
+                                    </v-list-item>                                   
+                                </v-list>
+                            </v-card>
+                        </v-menu>
                         <v-btn 
-                            :fab="!expanded"
-                            :text="expanded"
-                            :icon="expanded"
+                            icon
                             color="primary" 
                             small 
                             v-blur
@@ -95,7 +132,6 @@
                 <slot ></slot>            
             </v-card-text>
         </v-expand-transition>
-        <div :class="colorClass" style="height:4px"></div>
       </v-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>
@@ -107,6 +143,7 @@
 export default {
     data:function(){
         return {
+            settingsMenu:false,
             expanded:true,
             alignments:[
                 {
@@ -178,6 +215,9 @@ export default {
             },
             set(v){}
         },
+        hasExtendedSettings(){
+            return this.type=="PLAYGROUND" || this.type=="BLOCK";
+        },
         isVersionedPlayground(){
             return this.type=="PLAYGROUND";
         },
@@ -203,17 +243,17 @@ export default {
         colorClass(){
             const t = this.type
             if (t == 'TEXT'){
-                return 'blue-grey';
+                return 'text-border';
             } else if (t == 'PLAYGROUND'){
-                return 'green accent-3';
+                return 'playground-border';
             } else if (t == 'BLOCK'){
-                return 'orange darken-3';
+                return 'block-border';
             } else if (t == 'BLOCK-hidden'){
-                return 'pink darken-4'
+                return 'block-hidden-border'
             } else if (t == 'BLOCK-static'){
-                return 'blue darken-2'
+                return 'block-static-border'
             }
-            return 'purple accent-2'
+            return 'default-border'
         },
         type:{
             get(){
@@ -280,6 +320,29 @@ export default {
 </script>
 
 <style lang="sass" >
+$color-pack: false
+@import '~vuetify/src/styles/settings/_colors.scss'
+
+.text-border
+    border-color : map-get($blue-grey, base) !important
+.playground-border
+    border-color : map-get($green, accent-3) !important
+.block-border
+    border-color : map-get($orange, darken-3) !important
+.block-hidden-border
+    border-color : map-get($pink, darken-4) !important
+.block-static-border
+    border-color : map-get($blue, darken-2) !important
+.default-border
+    border-color : map-get($purple, accent-2) !important
+.editModeBlockContainer
+    border-radius : 0px !important
+    border-left-width : 4px !important
+    border-left-style : solid !important
 .rect-input.v-input .v-input__slot 
     border-radius: 0px
+textarea.blockoptions
+    display : none !important
+    width : 1px
+    height : 1px
 </style>

@@ -331,9 +331,12 @@
 
 <style lang="sass">   
     div.codeblocks.editmode
-        border: 1px dashed silver
+        box-shadow: 3px 3px 6px rgba(0,0,0,0.1)
         border-radius: 5px        
-        background-color: white 
+        background-repeat: repeat
+        background-image: linear-gradient(45deg, #ffffff 25%, #ebf2f5 25%, #ebf2f5 50%, #ffffff 50%, #ffffff 75%, #ebf2f5 75%, #ebf2f5 100%)
+        background-size: 56.57px 56.57px
+        
     div.codeblocks            
         margin: 4px
         padding: 8px        

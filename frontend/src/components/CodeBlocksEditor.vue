@@ -67,10 +67,10 @@ export default {
             this.blockInfo.executionTimeout = v;
         },  
         onWorkerLibChange(v){
-            this.blockInfo.domLibs = v;
+            this.blockInfo.workerLibs = v;
         },
         onDomLibChange(v){
-            this.blockInfo.workerLibs = v;
+            this.blockInfo.domLibs = v;
         },
         onScriptVersionChange(nfo){
             let bl = this.blockById(nfo.id);

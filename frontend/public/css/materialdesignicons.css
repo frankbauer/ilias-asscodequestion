@@ -46,3 +46,5 @@
   .mdi-menu-down::before{content:"\e5c5"}
   .mdi-checkbox-blank-outline::before{content:"\e835"}
   .mdi-checkbox-marked::before{content:"\e86c"}
+  .mdi-settings::before{content:"\e8b8"}
+  .mdi-close-circle::before{content:"\e15c"}

@@ -18,9 +18,8 @@ const compilerRegistry = new Vue({
                 .sort((a, b) => a.text < b.text ? -1 : 1)
             return langs
         },
-        domLibraries(includeUtility=false){
-            let libs = this.libraries;
-            if (!includeUtility) libs = libs.filter(l=>!l.utility)
+        domLibraries(){
+            const libs = this.libraries.filter(l=>!l.utility);
             return libs.map(l => {return { text: l.displayName + ' ('+l.version+')', value:l.key}});
         }   
     },
