@@ -67,6 +67,33 @@
                             </v-container>
                         </v-card-text>
                     </v-card>
+                    <v-card class="mt-2">
+                        <v-card-title>Themes</v-card-title>
+                        <v-card-text>
+                            <v-container fluid align="start" justify="start" class="ma-0 pa-0">
+                                <v-row class="my-0 py-0" dense>
+                                    <v-col cols="12" md="6" class="my-0 py-0">
+                                        <v-select
+                                            :items="themes"
+                                            v-model="compilerLanguage"  
+                                            label="General Theme"
+                                            dense
+                                            class="rect-input"
+                                        /> 
+                                    </v-col>
+                                    <v-col cols="12" md="6" class="my-0 py-0">
+                                        <v-select
+                                            :items="themes"
+                                            v-model="compilerLanguage"  
+                                            label="Solution Theme"
+                                            dense
+                                            class="rect-input"
+                                        /> 
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </v-card-text>
+                    </v-card>
                 </v-col>
             </v-slide-x-transition>
 
@@ -117,7 +144,11 @@
 export default {
     data:function(){
         return {
-            
+            themes:[
+                {text:"Solarized", value:"solarized"},
+                {text:"Bas16 (dark)", value:"base16-dark"},
+                {text:"Bas16 (light)", value:"base16-light"}
+            ]
         }
     },
     props:{
