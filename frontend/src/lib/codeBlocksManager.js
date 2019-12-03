@@ -12,6 +12,7 @@ Vue.prototype.$compilerRegistry = CompilerRegistry;
 //this will handle the vue mounting on the dom
 class CodeBlocksManager {
     constructor(el) {
+        console.log("Element", el.dataset);
         this.element = el;
         let data = {
             ...el.dataset,
@@ -31,11 +32,17 @@ class CodeBlocksManager {
                 data.runCode = false
                 data.language = data.compiler.languageType
             } else {
-                data.runCode = true
+                data.runCode = data.runCode=='true' || data.runCode=='0';
                 data.language = c.language
             }
             
             delete data.compilerVersion;        
+        }
+        
+        if (data.domLibs===undefined){
+            data.domLibs = []
+        } else {
+            data.domLibs = JSON.parse(data.domLibs);
         }
 
         data.id = Number(data.id);

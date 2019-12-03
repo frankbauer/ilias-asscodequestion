@@ -8,7 +8,9 @@
             @run-state-change="onRunStateChange"
             @language-change="onLanguageChange" 
             @character-limit-change="onCharacterLimitChange"
-            @timeout-change="onTimeoutChange"   
+            @timeout-change="onTimeoutChange" 
+            @worker-libs-change="onWorkerLibChange"
+            @dom-libs_change="onDomLibChange"  
         />
         <CodeBlockContainer 
             :block="block" 
@@ -102,7 +104,8 @@
                     executionTimeout:this.executionTimeout,
                     maxCharacters:this.maxCharacters,
                     runCode:this.runCode,
-                    domLibs:this.domLibraries
+                    domLibs:this.domLibraries,
+                    workerLibs:this.workerLibraries
                 }
             },
             blocks() { return this.blockInfo.blocks },
@@ -113,6 +116,7 @@
             compiler() { return this.blockInfo.compiler},
             runCode() { return this.blockInfo.runCode},
             domLibraries() { return this.blockInfo.domLibs},
+            workerLibraries() { return this.blockInfo.workerLibs},
             
             editMode() {
                 return false;
@@ -168,6 +172,8 @@
             onLanguageChange(v){},
             onCharacterLimitChange(v){},
             onTimeoutChange(v){},
+            onWorkerLibChange(){},
+            onDomLibChange(){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {

@@ -137,7 +137,7 @@ const singleton = new Vue({
                     key: 'd3-5-14-3',
                     name: 'd3',
                     version: '5.14.3',
-                    displayName: 'D3 - Data-Driven Documents',
+                    displayName: 'D3',
                 }
             ]
         }

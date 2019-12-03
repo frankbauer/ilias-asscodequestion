@@ -13,8 +13,7 @@
                                 <v-col cols="12" :md="`${runCode?8:12}`" class="my-0 py-0">
                                     <v-select
                                         :items="compiledLanguages"
-                                        v-model="compilerLanguage"
-                                                                    
+                                        v-model="compilerLanguage"  
                                         label="Language"
                                         dense
                                         class="rect-input"
@@ -23,8 +22,7 @@
                                 <v-col cols="12" md="4" class="my-0 py-0" v-if="runCode">
                                     <v-select
                                         :items="compilerVersions"
-                                        v-model="compilerVersion"
-                                                                    
+                                        v-model="compilerVersion"                            
                                         label="Version"
                                         dense
                                         class="rect-input"
@@ -92,8 +90,8 @@
                                     </v-col> 
                                     <v-col cols="12" class="my-0 py-0" v-if="runCode">
                                         <v-select
-                                            :items="compilerVersions"
-                                            v-model="compilerVersion"
+                                            :items="workerLibraries"
+                                            v-model="workerLibrary"
                                             multiple   
                                             chips                         
                                             label="Worker-Libraries"
@@ -138,6 +136,11 @@ export default {
         compiledLanguages(){
             if (this.options.runCode === false) return this.languages;
             return this.$compilerRegistry.languages
+        },
+        workerLibraries(){
+            const c = this.$compilerRegistry.getCompiler({languageType:this.compilerLanguage, version:this.compilerVersion});
+            if (c.libraries === undefined) return [];
+            return c.libraries.map(l=>{ return {text:l.displayName, value:l.key};});
         },
         languages(){
             return this.$CodeBlock.knownLanguages()
@@ -197,7 +200,15 @@ export default {
                 return this.options.domLibs;
             },
             set(v){
-
+                this.$emit('dom-libs-change', v)
+            }
+        },
+        workerLibrary:{
+            get(){
+                return this.options.workerLibs;
+            },
+            set(v){
+                this.$emit('worker-libs-change', v)
             }
         }
     }
