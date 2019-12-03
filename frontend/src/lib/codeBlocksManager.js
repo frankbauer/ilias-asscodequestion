@@ -82,7 +82,9 @@ class CodeBlocksManager {
                 block.align = bl.getAttribute('align')?bl.getAttribute('align'):'center'                
             } else if (block.type == 'BLOCK') {
                 block.hasCode = true;                
-            } 
+            } else if (block.type == 'LOADING' || block.type == 'DIV') {
+                return;
+            }
 
             data.blocks.push(new Vue({
                 data:function(){return block;},
