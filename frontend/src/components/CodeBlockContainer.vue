@@ -4,17 +4,18 @@
         <v-card-text class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
                 <v-row class="my-0 py-0" dense>
-                    <v-col cols="12" sm="5" md="3" class="my-0 py-0">
+                    <v-col cols="9" sm="10" md="4" class="my-0 py-0">
                         <v-select
                             :items="types"
                             v-model="type"
                             dense
                             class="rect-input"
+                            style="margin-top:-5px !important"
                         />                        
                     </v-col>
                     
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
-                    <v-col cols="12" sm="12" md="1" class="my-0 py-0 text-right">
+                    <v-col cols="3" sm="2" md="1" class="my-0 py-0 text-right">
                         <v-menu
                             v-if="hasExtendedSettings"
                             v-model="settingsMenu"
