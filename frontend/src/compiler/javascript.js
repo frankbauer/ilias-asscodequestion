@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 //load all versions
 import v100 from './javascript.v100'
+import v101 from './javascript.v101'
 
 export default new Vue({
     data: function () {
@@ -10,10 +11,10 @@ export default new Vue({
             displayName: "JavaScript",
 
             //attach all version
-            versions: [v100],
+            versions: [v100, v101],
 
             //declare the default one
-            default: v100
+            default: v101
         }
     }
 });

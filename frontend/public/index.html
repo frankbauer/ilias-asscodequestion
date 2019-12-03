@@ -23,10 +23,85 @@
     </noscript>
     <div id="app"></div>
     <div style="padding-left:50px;padding-right:50px">
-    <codeblockseditor data-compiler="python3" data-compiler-version="101" data-id="35" data-dom-libs='["d3-5.13.4"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
+
+      <codeblockseditor data-compiler="javascript" data-compiler-version="101" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
+    <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
+    
+  },
+  shouldAutoReset: function() {return true;},
+  update: function(text, json, canvasElement, outputElement) {
+    let html_str = d3DomProxyToSaveInnerHTMLString(json);
+    canvasElement.html(html_str)    
+  }
+}
+    </playground>
+<block>var data = JSON.parse(`[{"year":2006,"books":54},{"year":2007,"books":43},{"year":2008,"books":41},{"year":2009,"books":44},{"year":2010,"books":35}]`);
+
+
+  // data accessing functions:
+  const xValue = d => d.books;
+  const yValue = d => d.year;
+
+  // draw area constants
+  const W = 600;
+  const H = 200;
+  const margin = { left: 80, right: 10, bottom: 30, top: 10 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+
+  const maxX = d3.max(data, xValue);
+  const minX = d3.min(data, xValue);
+
+  const xScale = d3.scaleLinear()
+    .domain([0, maxX])
+    .range([0, iW]);
+  const yScale = d3.scaleBand()
+    .domain(data.map(yValue))
+    .range([0, iH])
+    .padding(0.1);
+
+  const colorScaleX = d3.scaleSequential(d3.interpolateYlGn)
+    .domain([minX, maxX]);
+  const colorScaleY = d3.scaleOrdinal(d3.schemeAccent)
+    .domain(data.map(yValue));
+
+  const svg = d3.select("#content")
+    .append("svg")
+    .attr("width", W)
+    .attr("height", H);
+
+  const g = svg.append('g')
+    .attr('transform', "translate(" + margin.left + "," + margin.top + ")");
+
+  // axes for each scale
+  g.append('g')
+    .call(d3.axisLeft(yScale));
+  g.append('g')
+    .call(d3.axisBottom(xScale))
+    .attr('transform', "translate(0," + iH + ")");
+
+  // bars:  svg - rect
+  g.selectAll(".bar")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("width", d => xScale(xValue(d)))
+    .attr("height", yScale.bandwidth())
+    .attr("y", d => yScale(yValue(d)))
+    .attr("fill", d => colorScaleX(xValue(d)))
+    //.attr("fill", d => colorScaleY(yValue(d)))
+    .attr("stroke", "black")
+
+
+
+  console.log("\n\n&lt;JSON>\n" + document.__getD3ResultJSON());</block>
+    </codeblockseditor>
+
+    <codeblockseditor data-compiler="python3" data-compiler-version="101" data-id="35" data-dom-libs='["d3-5.13.4","3js-r0"]' data-execution-timeout="10000" data-max-characters="40000" data-run-code="true">
         <playground data-version="101" width="25%" height="100px" align="center">{init: function(canvasElement) {
           //canvasElement.addClass('hiddenBlock');
-          console.log("foo");
+          //console.log("foo");
   },
   shouldAutoReset: function(){return true;},
   update: function(text, json, canvasElement, outputElement) {
@@ -35,11 +110,13 @@
 </playground>
 <block>print(2)</block>
 </codeblockseditor>
+
+
     <codeblocks data-compiler="python3" data-compiler-version="101" data-id="35">
         <playground data-version="101">{init: function(canvasElement) {
-            console.log("INIT", canvasElement);
+            //console.log("INIT", canvasElement);
             canvasElement.addClass('hiddenBlock');
-            console.log(document.querySelector('#app'));
+            //console.log(document.querySelector('#app'));
         }, //init
 
         getRandomColor() {
@@ -68,9 +145,9 @@
 
     <codeblockseditor data-compiler="javascript" data-compiler-version="100" data-id="34">
       <playground data-version="101">{init: function(canvasElement) {
-              console.log("INIT", canvasElement);
+              //console.log("INIT", canvasElement);
               canvasElement.addClass('hiddenBlock');
-              console.log(document.querySelector('#app'));
+              //console.log(document.querySelector('#app'));
           }, //init
   
           update: function(text, json, canvasElement, outputElement) {
