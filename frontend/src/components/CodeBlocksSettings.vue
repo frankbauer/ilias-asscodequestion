@@ -88,7 +88,7 @@
                                             class="rect-input"
                                         /> 
                                     </v-col> 
-                                    <v-col cols="12" class="my-0 py-0" v-if="runCode">
+                                    <v-col cols="12" class="my-0 py-0" v-if="runCode && workerLibraries.length>0">
                                         <v-select
                                             :items="workerLibraries"
                                             v-model="workerLibrary"

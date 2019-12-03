@@ -18,17 +18,27 @@ const compilerRegistry = new Vue({
                 .sort((a, b) => a.text < b.text ? -1 : 1)
             return langs
         },
-        domLibraries(){
-            return this.libraries.map(l => {return { text: l.displayName + ' ('+l.version+')', value:l.key}});
+        domLibraries(includeUtility=false){
+            let libs = this.libraries;
+            if (!includeUtility) libs = libs.filter(l=>!l.utility)
+            return libs.map(l => {return { text: l.displayName + ' ('+l.version+')', value:l.key}});
         }   
     },
     methods: {
         register(compilers){
             if (Array.isArray(compilers)){
-                compilers.forEach(c => this.compilers[c.type] = c)
+                compilers.forEach(c => this.registerSingle(c))
             } else {
-                this.compilers[compilers.type] = compilers;
+                this.registerSingle(compilers);
             }
+        },
+        registerSingle(c){
+            this.compilers[c.type] = c            
+            c.versions.forEach( v => {
+                if (v.registerLibs) {
+                    v.registerLibs(this);
+                }
+            })
         },
         getCompiler(compilerInfo){
             let cmps = this.compilers[compilerInfo.languageType]            
@@ -43,14 +53,54 @@ const compilerRegistry = new Vue({
             if (c===undefined) return ['none'];
             return c.versions.map(v => v.version);
         },
-        registerDOMLib(uri, name, version, displayName){
+        registerDOMLib(uri, name, version, displayName, utility=false){
             this.libraries.push({
                 key:name+"-"+version,
                 uri:uri,
                 name:name,
                 version:version,
-                displayName:displayName
+                displayName:displayName,
+                didLoad:false,
+                utility:utility
             })
+        },
+        getLibObjects(domLibs){
+            return  this.libraries.filter(l => domLibs.indexOf(l.key)>=0);
+        },
+        urisForDOMLibs(domLibs){
+            const libs = this.getLibObjects(domLibs);
+            const uris = libs
+                .filter(l=> !l.didLoad)
+                .map(l => l.uri)                
+                .reduce((p, c) => c.concat(p), []);
+            
+            return uris;
+        },
+        loadLibraries(domLibraries, whenLoaded){            
+            const libs = this.urisForDOMLibs(domLibraries);
+            const dlibs = this.getLibObjects(domLibraries);
+            this.loadURIs(libs, function(){                
+                dlibs.forEach(l => l.didLoad = true)
+                whenLoaded();
+            }.bind(this))
+        }, 
+        loadURIs(libs, whenLoaded){
+            let loadLib = function(uris, idx){
+                if (idx>=uris.length) {
+                    whenLoaded();
+                    return;
+                }
+
+                const uri = uris[idx];
+                let script = document.createElement('script');
+                script.src = uri;
+                script.onload = function () {                    
+                    loadLib(uris, idx+1);
+                };
+                document.head.appendChild(script);
+            };
+
+            loadLib(libs, 0);
         }
     }
 });
@@ -69,7 +119,26 @@ import GLSLCompilers from '../compiler/glsl'
 compilerRegistry.register(GLSLCompilers);
 
 
-compilerRegistry.registerDOMLib([''], 'd3', '5.13.4', 'D3')
-compilerRegistry.registerDOMLib([''], '3js', '5.13.4', 'Three.JS')
+compilerRegistry.registerDOMLib(
+    [
+        Vue.$CodeBlock.baseurl+'js/d3/5.3.8/d3.v5.min.js'
+    ], 
+    'd3', 
+    '5.13.4', 
+    'D3'
+)
+
+
+compilerRegistry.registerDOMLib(
+    [
+        Vue.$CodeBlock.baseurl+'js/three.js/r0/three.min.js',
+        Vue.$CodeBlock.baseurl+'js/three.js/r0/controls/OrbitControls.js',
+        Vue.$CodeBlock.baseurl+'js/three.js/r0/controls/TrackballControls.js',
+        Vue.$CodeBlock.baseurl+'js/three.js/r0/Detector.js'
+    ], 
+    '3js', 
+    'r0', 
+    'Three.JS'
+)
 export default compilerRegistry;
 

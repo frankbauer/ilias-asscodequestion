@@ -247,7 +247,12 @@
             clearDiagnostics(){
                 this.blocks.forEach( block => block.errors = []);  
                 this.eventHub.$emit('render-diagnostics', {  })                            
-            },    
+            }, 
+            
+            
+            loadLibraries(whenLoaded){
+                this.$compilerRegistry.loadLibraries(this.domLibraries, whenLoaded);                
+            },
             
             
             /**
@@ -285,25 +290,28 @@
                 this.eventHub.$emit('before-run', {  })              
                 this.resetOutput();
                 this.clearDiagnostics();
-                cmp.compileAndRun(
-                    this.blocks.id,
-                    this.completeSource,
-                    this,
-                    this.executionTimeout,
-                    this.log.bind(this),
-                    this.logInfo.bind(this),
-                    this.logError.bind(this),
-                    this.processDiagnostics.bind(this),
-                    function (success = true, overrideOutput = undefined) {
-                        if (!success) {
+                this.loadLibraries(function(){
+                    cmp.compileAndRun(
+                        this.blocks.id,
+                        this.completeSource,
+                        this,
+                        this.executionTimeout,
+                        this.log.bind(this),
+                        this.logInfo.bind(this),
+                        this.logError.bind(this),
+                        this.processDiagnostics.bind(this),
+                        function (success = true, overrideOutput = undefined) {
+                            if (!success) {
+                                this.$compilerState.hideGlobalState();
+                                this.$compilerState.setAllRunButtons(true);
+                                return undefined;
+                            }
+                            let res = this.finishedExecution(overrideOutput?overrideOutput:this.output, this.sansoutput);
                             this.$compilerState.hideGlobalState();
                             this.$compilerState.setAllRunButtons(true);
-                            return undefined;
-                        }
-                        let res = this.finishedExecution(overrideOutput?overrideOutput:this.output, this.sansoutput);
-                        this.$compilerState.hideGlobalState();
-                        this.$compilerState.setAllRunButtons(true);
-                        return res;
+                            return res;
+                        }.bind(this)
+                    )
                     }.bind(this)
                 )
             }
