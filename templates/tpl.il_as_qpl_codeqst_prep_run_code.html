@@ -4,38 +4,147 @@
         var maxMS = Math.max(500, Math.round({TIMEOUT_VAL}+0));
     }
 </script>
-<meta name="codeblocks-baseurl" content="./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/">
-<link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/materialdesignicons.css><link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/roboto.css><link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/main.css><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/app.css rel=preload as=style><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/chunk-vendors.css rel=preload as=style><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/app.js rel=preload as=script><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/chunk-vendors.js rel=preload as=script><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/chunk-vendors.css rel=stylesheet><link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/app.css rel=stylesheet><div id="app"></div>
-<codeblocks data-compiler="java" data-compiler-version="100" data-id="34">
-  <playground>{init: function(canvasElement) {
-          console.log("INIT", canvasElement);
-          canvasElement.addClass('hiddenBlock');
-          console.log(document.querySelector('#app'));
-      }, //init
+<meta name="codeblocks-baseurl"
+  content="./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/">
 
-      update: function(text, json, canvasElement, outputElement) {
-          canvasElement.removeClass('hiddenBlock');
-          console.log("FOO", text, json);
-          return "New Text is here\n\n";
-      } //update
-  }</playground>
-  <block data-readonly data-static>public class Foo {</block>
-  <block data-visible-lines="10">public static void main(String[] args){
-int a;System.out.println("Hello World!");
-System.err.println("Hello World!");
-System.out.print("\n\n&lt;JSON&gt;\n");
-System.out.println("[1, 2, 3]");
-}</block>
+  <link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/materialdesignicons.css>
+  <link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/roboto.css>
+  <link rel=stylesheet href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/main.css>
+  <style>codeblockseditor > *,  codeblocks > *{
+      display:none;        
+    }
 
-  <block data-readonly data-static>}</block>  
-  <block data-hidden>//Secret!!!</block>
-  <text>This was an example</text>   
-</codeblocks>
-<codeblockseditor data-compiler="python" data-compiler-version="100" data-id="35">
-  <block>print(3)</block>
-</codeblockseditor>
-<codeblocks data-compiler="javascript" data-compiler-version="100" data-id="36">
-    <block>console.log("Hello From Javascript");
-        console.error("e");
-    </block>
-  </codeblocks><script src=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/chunk-vendors.js></script><script src=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/app.js></script>
+    codeblockseditor, codeblocks, .code{
+      display: block;
+      position:relative;
+      text-align: center;
+      margin:auto;
+      width:90%;
+      height:150px;
+      border:1px solid rgba(0,0,0,0.2);
+      margin-bottom:50px;
+      font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    }
+
+    codeblockseditor::before, codeblocks::before {
+      content:"loading..."
+    }
+
+
+    loading {
+      display: inline-block;
+      position: relative;
+      top: 35px;
+      width: 80px;
+      height: 80px;
+    }
+    loading div {
+      position: absolute;
+      border: 4px solid rgb(43, 44, 50);
+      opacity: 1;
+      border-radius: 50%;
+      animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    }
+    loading div:nth-child(2) {
+      animation-delay: -0.5s;
+    }
+    @keyframes lds-ripple {
+      0% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+      100% {
+        top: 0px;
+        left: 0px;
+        width: 72px;
+        height: 72px;
+        opacity: 0;
+      }
+    }</style>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/app.css rel=preload as=style>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/chunk-vendors.css rel=preload as=style>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/app.js rel=preload as=script>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/chunk-vendors.js rel=preload as=script>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/chunk-vendors.css rel=stylesheet>
+    <link href=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/css/app.css rel=stylesheet>
+
+
+
+  <codeblockseditor data-compiler="javascript" data-compiler-version="101" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
+      <loading><div></div><div></div></loading>
+  <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
+  
+},
+shouldAutoReset: function() {return true;},
+update: function(text, json, canvasElement, outputElement) {
+  let html_str = d3DomProxyToSaveInnerHTMLString(json);
+  canvasElement.html(html_str)    
+}
+}
+  </playground>
+<block>var data = JSON.parse(`[{"year":2006,"books":54},{"year":2007,"books":43},{"year":2008,"books":41},{"year":2009,"books":44},{"year":2010,"books":35}]`);
+
+
+// data accessing functions:
+const xValue = d => d.books;
+const yValue = d => d.year;
+
+// draw area constants
+const W = 600;
+const H = 200;
+const margin = { left: 80, right: 10, bottom: 30, top: 10 };
+const iW = W - margin.left - margin.right;
+const iH = H - margin.top - margin.bottom;
+
+const maxX = d3.max(data, xValue);
+const minX = d3.min(data, xValue);
+
+const xScale = d3.scaleLinear()
+  .domain([0, maxX])
+  .range([0, iW]);
+const yScale = d3.scaleBand()
+  .domain(data.map(yValue))
+  .range([0, iH])
+  .padding(0.1);
+
+const colorScaleX = d3.scaleSequential(d3.interpolateYlGn)
+  .domain([minX, maxX]);
+const colorScaleY = d3.scaleOrdinal(d3.schemeAccent)
+  .domain(data.map(yValue));
+
+const svg = d3.select("#content")
+  .append("svg")
+  .attr("width", W)
+  .attr("height", H);
+
+const g = svg.append('g')
+  .attr('transform', "translate(" + margin.left + "," + margin.top + ")");
+
+// axes for each scale
+g.append('g')
+  .call(d3.axisLeft(yScale));
+g.append('g')
+  .call(d3.axisBottom(xScale))
+  .attr('transform', "translate(0," + iH + ")");
+
+// bars:  svg - rect
+g.selectAll(".bar")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "bar")
+  .attr("width", d => xScale(xValue(d)))
+  .attr("height", yScale.bandwidth())
+  .attr("y", d => yScale(yValue(d)))
+  .attr("fill", d => colorScaleX(xValue(d)))
+  //.attr("fill", d => colorScaleY(yValue(d)))
+  .attr("stroke", "black")
+
+
+
+console.log("\n\n&lt;JSON>\n" + document.__getD3ResultJSON());</block>
+  </codeblockseditor>
+  <script src=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/chunk-vendors.js></script><script src=./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/js/app.js></script>

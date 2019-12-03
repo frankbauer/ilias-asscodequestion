@@ -28,6 +28,7 @@ export default {
 };
 </script>
 
+<style scoped src="vuetify/dist/vuetify.min.css"></style>
 <style lang="sass">
   #app
     margin-bottom: 16px
