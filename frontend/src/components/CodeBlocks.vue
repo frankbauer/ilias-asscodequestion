@@ -106,7 +106,8 @@
                     maxCharacters:this.maxCharacters,
                     runCode:this.runCode,
                     domLibs:this.domLibraries,
-                    workerLibs:this.workerLibraries
+                    workerLibs:this.workerLibraries,
+                    id:this.blockInfo.id
                 }
             },
             blocks() { return this.blockInfo.blocks },

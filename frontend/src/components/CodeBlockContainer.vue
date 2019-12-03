@@ -2,7 +2,7 @@
   <div class="block">
     <v-card v-if="editMode" class="ml-0 mr-0 my-3 pa-0" >
         <div :class="colorClass" style="height:4px" />
-        <v-card-title class="mb-0 pb-0">
+        <v-card-text class="mb-0 pb-0">
             <v-container fluid align="start" justify="start" class="ma-0 pa-0">
                 <v-row class="my-0 py-0" dense>
                     <v-col cols="12" sm="5" md="3" class="my-0 py-0">
@@ -88,7 +88,8 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-card-title>   
+            <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
+        </v-card-text>   
         <v-expand-transition>     
             <v-card-text class="my-0 pt-1 pb-0" v-show="expanded">                                     
                 <slot ></slot>            
@@ -165,6 +166,18 @@ export default {
         }
     },
     computed:{
+        serializedOptions:{
+            get(){
+                let obj = {};
+                Object
+                    .keys(this.block)
+                    .filter(k => k.indexOf('$')!=0 && k.indexOf('_')!=0 && k!='obj' && k!='errors' && k!='content' && k!='firstLine' && k!='nextLine' && k!='lineCount' && k!='hasCode')
+                    .forEach(k => obj[k] = this.block[k])
+                
+                return JSON.stringify(obj)
+            },
+            set(v){}
+        },
         isVersionedPlayground(){
             return this.type=="PLAYGROUND";
         },

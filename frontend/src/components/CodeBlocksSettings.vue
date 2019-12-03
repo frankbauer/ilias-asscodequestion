@@ -106,6 +106,7 @@
                 </v-col>
             </v-slide-x-transition>
         </v-row>
+        <textarea :name="`block_settings[${this.options.id}]`" class="blocksettings" v-model="serializedOptions"></textarea>
     </v-container>
         
 </template>
@@ -130,6 +131,12 @@ export default {
         }
     },
     computed:{
+        serializedOptions:{
+            get(){                
+                return JSON.stringify(this.options);
+            },
+            set(v){}
+        },
         domLibraries(){
             return this.$compilerRegistry.domLibraries;
         },
@@ -216,5 +223,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-
+textarea.blocksettings
+    display : none !important
+    width : 1px
+    height : 1px
 </style>
