@@ -66,12 +66,16 @@ export default {
         onTimeoutChange(v){
             this.blockInfo.executionTimeout = v;
         },  
-        onWorkerLibChange(){
+        onWorkerLibChange(v){
             this.blockInfo.domLibs = v;
         },
-        onDomLibChange(){
+        onDomLibChange(v){
             this.blockInfo.workerLibs = v;
         },
+        onScriptVersionChange(nfo){
+            let bl = this.blockById(nfo.id);
+            bl.version = nfo.version;
+        }
     }
 }
 </script>

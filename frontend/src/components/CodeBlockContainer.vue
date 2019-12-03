@@ -181,7 +181,10 @@ export default {
                 return this.block.version
             },
             set(v){
-
+                this.$emit('script-version-change', {
+                    version: v,
+                    id:this.block.id
+                });
             }
         },
         colorClass(){

@@ -20,8 +20,9 @@
             :key="block.id"
             @type-change="onTypeChange"
             @visible-lines-change="onVisibleLinesChange"
-            @placement-change="onPlacementChange">              
-
+            @placement-change="onPlacementChange"
+            @script-version-change="onScriptVersionChange">              
+            
                 <CodeBlock 
                     v-if="block.hasCode" 
                     :block="block" 
@@ -166,14 +167,15 @@
             onTypeChange(nfo){},
             onVisibleLinesChange(nfo){},
             onPlacementChange(nfo){},
+            onScriptVersionChange(nfo){},
             onCompilerChange(v){},
             onCompilerVersionChange(v){},
             onRunStateChange(v){},
             onLanguageChange(v){},
             onCharacterLimitChange(v){},
             onTimeoutChange(v){},
-            onWorkerLibChange(){},
-            onDomLibChange(){},
+            onWorkerLibChange(v){},
+            onDomLibChange(v){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {
