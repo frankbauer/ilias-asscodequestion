@@ -17,7 +17,7 @@ import '@quasar/extras/animate/zoomInUp.css'
 
 import  Quasar  from 'quasar'
 import  {Dialog}  from 'quasar'
-console.log(Quasar, Dialog)
+
 Vue.use(Quasar, {
   config: {},
   components: { /* not needed if importStrategy is not 'manual' */ },

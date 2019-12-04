@@ -156,7 +156,7 @@
             canRun() {
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
-                return cmp.canRun;
+                return cmp.canRun && this.runCode;
             },
             completeSource() {
                 return this.blocks.filter(b => b.hasCode).map(b => b.content).reduce((p, c) => p + "\n" + c, "");                      
