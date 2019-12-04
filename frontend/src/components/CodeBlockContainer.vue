@@ -13,7 +13,8 @@
                 </div>
                 <div class="col-grow"></div>
                 <div class="col-xs-4 col-sm-3  q-my-none q-py-none text-right">
-                    <q-btn icon="mdi-settings" flat round v-if="hasExtendedSettings"> 
+                    
+                    <q-btn icon="settings" color="blue-7" push dense v-if="hasExtendedSettings"> 
                         <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
                             <div class="q-pa-md" v-if="canSetLineNumbers"> 
                                 <div class="row no-wrap q-pa-none"> 
@@ -103,13 +104,18 @@
                             </div>
                         </q-popup-proxy >
                     </q-btn>
+
+                    <q-btn @click="moveUp" :disable="!canMoveUp" icon="arrow_drop_up" push dense class="q-ml-md q-mr-xs"  color="orange-6" :ripple="{ center: true }"></q-btn>
+                    <q-btn @click="moveDown" :disabled="!canMoveDown" icon="arrow_drop_down" push dense class="q-mr-md" color="orange-6" :ripple="{ center: true }" ></q-btn>
+                    <q-btn @click="removeBlock" label="Delete" icon="warning" push dense class="q-mr-xl q-pr-sm" color="red-6" right :ripple="{ center: true }"></q-btn>
+
                     <q-btn 
                         icon
                         color="primary" 
                         small 
                         flat round                        
                         @click="toggleExpanded">
-                            <q-icon :name="expanded?'mdi-chevron-up':'mdi-chevron-down'" size="24" />                                
+                            <q-icon :name="expanded?'expand_less':'expand_more'" size="24" />
                     </q-btn>
                 </div>
             </div>
@@ -131,8 +137,7 @@
 export default {
     data:function(){
         return {
-            settingsMenu:false,
-            expanded:true,
+            settingsMenu:false,            
             alignments:[
                 {
                     label:'Start',
@@ -189,9 +194,25 @@ export default {
         },
         toggleExpanded(){
             this.expanded = !this.expanded;
+        },
+        moveUp(){
+            this.$emit('move-up', this.block.id);
+        },
+        moveDown(){
+            this.$emit('move-down', this.block.id);
         }
     },
     computed:{
+        expanded:{
+            get(){ return this.block.expanded },
+            set(v) { this.block.expanded = v }
+        },
+        canMoveUp(){
+            return this.block.id > 0;
+        },
+        canMoveDown(){
+            return !this.block.isLast;
+        },
         serializedOptions:{
             get(){
                 let obj = {};

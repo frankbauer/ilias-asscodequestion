@@ -22,7 +22,9 @@
             @type-change="onTypeChange"
             @visible-lines-change="onVisibleLinesChange"
             @placement-change="onPlacementChange"
-            @script-version-change="onScriptVersionChange">              
+            @script-version-change="onScriptVersionChange"
+            @move-up="moveUp"
+            @move-down="moveDown">              
             
                 <CodeBlock 
                     v-if="block.hasCode" 
@@ -48,12 +50,18 @@
                     :editMode="editMode"
                     :name="`block[${block.parentID}][${block.id}]`" />
         </CodeBlockContainer>
+
+        <div class="row justify-end" v-if="editMode">
+            <div >
+                <q-btn @click="addNewBlock" color="green">Add new Block <q-icon name="library_add" class="q-ml-sm"/></q-btn>
+            </div>
+        </div>
         
         <div :class="`runner ${editMode?'q-pt-lg q-mx-lg':''}`" v-if="canRun">
             <div class="row runnerState">
                 <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text" @click="run" :ripple="{ center: true }" style="border-radius:0px" >
                     Run
-                    <q-icon right dark name="mdi-play-button"></q-icon>
+                    <q-icon right dark name="play_arrow"></q-icon>
                 </q-btn>
                 
                 <transition
@@ -194,6 +202,9 @@
             onWorkerLibChange(v){},
             onDomLibChange(v){},
             onThemeChange(nfo){},
+            moveUp(idx){},
+            moveDown(idx){},
+            addNewBlock(){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;
                 if (this.output != newOutput) {

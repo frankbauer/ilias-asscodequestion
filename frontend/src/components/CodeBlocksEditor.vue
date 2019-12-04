@@ -79,7 +79,16 @@ export default {
         onThemeChange(nfo){
             this.blockInfo.solutionTheme = nfo.solution;
             this.blockInfo.codeTheme = nfo.code
-        }
+        },
+        moveUp(idx){
+            this.blockInfo.moveUp(idx);
+        },
+        moveDown(idx){
+            this.blockInfo.moveDown(idx);
+        },
+        addNewBlock(){
+            this.blockInfo.addNewBlock();
+        },
     }
 }
 </script>

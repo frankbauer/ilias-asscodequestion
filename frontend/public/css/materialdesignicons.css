@@ -1,50 +1,7 @@
-@font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
-    src: local('Material Icons'),
-      local('MaterialIcons-Regular'),
-      url(../fonts/MaterialIcons-Regular.woff2) format('woff2'),
-      url(../fonts/MaterialIcons-Regular.woff) format('woff'),
-      url(../fonts/MaterialIcons-Regular.ttf) format('truetype');
-  }
-.material-icons, .mdi {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;  /* Preferred icon size */
-    display: inline-block;
-    line-height: 1;
-    text-transform: none;
-    padding:0px;
-    letter-spacing: normal;
-    word-wrap: normal;
-    white-space: nowrap;
-    direction: ltr;
-  
-    /* Support for all WebKit browsers. */
-    -webkit-font-smoothing: antialiased;
-    /* Support for Safari and Chrome. */
-    text-rendering: optimizeLegibility;
-  
-    /* Support for Firefox. */
-    -moz-osx-font-smoothing: grayscale;
-  
-    /* Support for IE. */
-    font-feature-settings: 'liga';
-  }
-  #https://github.com/google/material-design-icons/blob/master/iconfont/codepoints
+
 
 
   .mdi-empty::before{content:""}
-  .mdi-play-button::before{content:"\E037"}
   .mdi-code-error::before{content:"\e160"}
   .mdi-code-warning::before{content:"\E002"}
-  .mdi-chevron-up::before{content:"\e316"}
-  .mdi-chevron-down::before{content:"\e313"}
-  .mdi-menu-down::before{content:"\e5c5"}
-  .mdi-checkbox-blank-outline::before{content:"\e835"}
-  .mdi-checkbox-marked::before{content:"\e86c"}
-  .mdi-settings::before{content:"\e8b8"}
-  .mdi-close-circle::before{content:"\e15c"}
+  
