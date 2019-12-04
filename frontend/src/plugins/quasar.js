@@ -2,7 +2,6 @@ import Vue from 'vue'
 
 import '../styles/quasar.styl'
 import '@quasar/extras/material-icons/material-icons.css'
-import '@quasar/extras/animate/animate-list'
 
 import '@quasar/extras/animate/fadeInUp.css'
 import '@quasar/extras/animate/fadeInDown.css'

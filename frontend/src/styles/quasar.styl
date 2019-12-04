@@ -1,6 +1,40 @@
 @import './quasar.variables.styl'
 @import '~quasar-styl'
 
+breakPoints = 'xs' 'sm' 'md' 'lg' 'xl'
+sizeClasses = breakPoints
+push(sizeClasses, 'none')
+positionClasses = 'l' 'r' 't' 'b' 'x' 'y' 'a'
+typeClasses = 'p' 'm'
+
+subPositions(v)
+    return '-left' if v == 'l' 
+    return '-right' if v == 'r' 
+    return '-top' if v == 't' 
+    return '-bottom' if v == 'b'
+    return '-left' '-right' if v == 'x'
+    return '-top' '-bottom' if v == 'y'
+    return '-left' '-right' '-top' '-bottom' if v == 'a' 
+    return ''
+
+subType(v)
+    return 'margin' if v == 'm'
+    return 'padding'
+
+sizeValues(s)
+    return $space-xs if s=='xs'
+    return $space-sm if s=='sm'
+    return $space-md if s=='md'
+    return $space-lg if s=='lg'
+    return $space-xl if s=='xl'
+    return $space-none
+
+sizeValue(s, p)
+    sz = sizeValues(s)
+    return sz.x if p=='-left'
+    return sz.x if p=='-right' 
+    return sz.y
+
 html
     font-size: 16px
 .q-layout, .q-menu
@@ -9,8 +43,21 @@ html
         margin-right: 0px
     .row::before 
         display: block
-    .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12
-        padding-left: 0px
-        padding-right: 0px
+    for cols in 1..12
+        {'.col-' + cols}    
+            padding-left: 0px
+            padding-right: 0px
+        for size in breakPoints
+            {'.col-' + size + '-' + cols}
+                padding-left: 0px
+                padding-right: 0px
+    for posIn in positionClasses
+        pos = subPositions(posIn)
+        for typeIn in typeClasses
+            type = subType(typeIn)
+            for size in sizeClasses
+                {'.q-' + typeIn+posIn + '-' + size}
+                    for p in pos
+                        {type+p}: sizeValue(size, p)
 
 // @import '~quasar-addon-styl'
