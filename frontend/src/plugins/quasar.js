@@ -23,6 +23,5 @@ Vue.use(Quasar, {
   components: { /* not needed if importStrategy is not 'manual' */ },
   directives: { /* not needed if importStrategy is not 'manual' */ },
   plugins: {
-  },
-  animations: 'all'
+  }
  })
