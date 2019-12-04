@@ -13,7 +13,7 @@
                 </div>
                 
                 <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
-                    <q-btn icon="mdi-settings" > 
+                    <q-btn icon="mdi-settings" v-if="hasExtendedSettings"> 
                         <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
                             <div class="q-pa-md" v-if="canSetLineNumbers"> 
                                 <div class="row no-wrap q-pa-none"> 
@@ -106,8 +106,7 @@
                     <q-btn 
                         icon
                         color="primary" 
-                        small 
-                        v-blur
+                        small                         
                         @click="toggleExpanded">
                             <q-icon :name="expanded?'mdi-chevron-up':'mdi-chevron-down'" size="24" />                                
                     </q-btn>
@@ -115,11 +114,15 @@
             </div>
             <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
         </q-card-section>   
-        <q-expand-transition>     
+        <transition
+                    appear
+                    enter-active-class="animated slideDown"
+                    leave-active-class="animated slideUp"
+        >     
             <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">                                     
                 <slot ></slot>            
             </q-card-section>
-        </q-expand-transition>
+        </transition>
       </q-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>

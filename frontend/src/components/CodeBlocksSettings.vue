@@ -6,7 +6,7 @@
                     <q-card-section>                        
                         <div class="row q-my-none q-py-none">
                             <div class="col-xs-12 col-md-8 q-my-none q-py-none">
-                                <q-togle v-model="runCode" :disabled="!languageHasCompiler" label="Allow Code Execution"/>
+                                <q-toggle v-model="runCode" :disabled="!languageHasCompiler" label="Allow Code Execution"/>
                             </div>
                             <div :class="`col-xs-12 col-md-${runCode?8:12} q-my-none q-pr-xs`">
                                 <q-select

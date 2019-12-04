@@ -53,16 +53,24 @@
                 <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
                     @click="run">
                     Run
-                    <q-icon right dark>mdi-play-button</q-icon>
+                    <q-icon right dark name="mdi-play-button"></q-icon>
                 </q-btn>
                 
-                <q-fade-transition>
+                <transition
+                    appear
+                    enter-active-class="animated fadeIn"
+                    leave-active-class="animated fadeOut"
+                >
                     <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-show="showGlobalMessages"></div>        
-                </q-fade-transition>  
+                </transition>  
             </div>
-            <q-expand-transition>
+            <transition
+                    appear
+                    enter-active-class="animated slideDown"
+                    leave-active-class="animated slideUp"
+            >
                 <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
-            </q-expand-transition>
+            </transition>
         </div>
     </div>
 </template>
