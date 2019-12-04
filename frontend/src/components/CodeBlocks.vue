@@ -49,7 +49,7 @@
                     :name="`block[${block.parentID}][${block.id}]`" />
         </CodeBlockContainer>
         
-        <div :class="`runner ${editMode?'pt-5 q-mx-5':''}`" v-if="canRun">
+        <div :class="`runner ${editMode?'q-pt-lg q-mx-lg':''}`" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
                 <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" @click="run" :ripple="{ center: true }" style="border-radius:0px">
                     Run
@@ -64,13 +64,9 @@
                     <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-show="showGlobalMessages"></div>        
                 </transition>  
             </div>
-            <transition
-                    appear
-                    enter-active-class="animated fadeInDown"
-                    leave-active-class="animated fadeOutUp"
-            >
+            <q-slide-transition>
                 <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
-            </transition>
+            </q-slide-transition>
         </div>
     </div>
 </template>
@@ -366,7 +362,6 @@
             margin: 0px
     div.runner
         margin: 8px 0px !important
-        padding: 0px !important
         .runnerState
             margin: 0px !important
             padding: 0px !important

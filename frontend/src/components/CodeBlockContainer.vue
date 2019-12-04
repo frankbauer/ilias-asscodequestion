@@ -1,6 +1,6 @@
 <template>
   <div class="block">
-    <q-card v-if="editMode" :class="`q-mx-xs q-my-md q-pa-none editModeBlockContainer ${colorClass}`" >
+    <q-card v-if="editMode" :class="`q-mx-none q-my-xs q-pa-none editModeBlockContainer ${colorClass}`" >
         <q-card-section class="q-mb-none q-pb-sm q-pt-sm ">
             <div class="row q-my-none q-py-none" dense>
                 <div class="col-xs-8 col-sm-9 col-md-4 q-my-none q-py-none">
