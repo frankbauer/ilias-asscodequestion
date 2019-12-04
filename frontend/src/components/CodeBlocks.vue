@@ -51,8 +51,7 @@
         
         <div :class="`runner ${editMode?'pt-5 q-mx-5':''}`" v-if="canRun">
             <div class="d-flex pa-2 runnerState">
-                <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" tile small
-                    @click="run">
+                <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" @click="run" :ripple="{ center: true }" style="border-radius:0px">
                     Run
                     <q-icon right dark name="mdi-play-button"></q-icon>
                 </q-btn>

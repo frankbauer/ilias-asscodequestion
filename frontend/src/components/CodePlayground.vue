@@ -177,7 +177,6 @@ export default {
 
                     this.$nextTick(function () {
                         let result = this.block.obj.update(val, $(this.canvas)); 
-                        console.log(val);
                         //construct a split output object
                         if (result === undefined && val.processedOutput.type!='text'){
                             result = val.processedOutput.text

@@ -1,5 +1,5 @@
 <template>
-    <div class="row q-my-none q-py-none">
+    <div class="row q-ma-none q-pa-none">
             <div class="col-xs-12 col-sm-4">
                 <q-card class="q-ma-xs">
                     <q-card-section>Language</q-card-section>
