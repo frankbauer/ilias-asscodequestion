@@ -248,7 +248,7 @@ export default {
             set(v){
                 this.$emit('theme-change', {
                     solution:v.value,
-                    code:this.codeTheme
+                    code:this.options.codeTheme
                 })
             }
         },
@@ -258,7 +258,7 @@ export default {
             },
             set(v){
                 this.$emit('theme-change', {
-                    solution:this.solutionTheme,
+                    solution:this.options.solutionTheme,
                     code:v.value
                 })
             }
