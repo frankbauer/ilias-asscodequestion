@@ -8,14 +8,13 @@
                         :options="types"
                         v-model="typeObj"
                         dense
-                        class="rect-input"
                         style="margin-top:-5px !important"
                     />                        
                 </div>
                 
                 <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
                     <q-btn icon="mdi-settings" > 
-                        <q-menu auto-close>                        
+                        <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                        
                             <div class="row no-wrap q-pa-md" v-if="canSetLineNumbers">  
                                 <!-- LineNumbers -->
                                 <div class="column"  >
@@ -27,7 +26,6 @@
                                         v-model="visibleLines"
                                         :rules="[validNumber]"
                                         maxlength="4"
-                                        class="rect-input"
                                     />
                                 </div>
                             </div>
@@ -40,9 +38,8 @@
                                 <div class="column" >
                                     
                                         <q-select
-                                            :items="scriptVersions"
-                                            v-model="scriptVersion"                           
-                                            class="rect-input"
+                                            :options="scriptVersions"
+                                            v-model="scriptVersionObj" 
                                         />
                                 </div>
                             </div>
@@ -57,8 +54,7 @@
                                     <div class="column" >
                                             <q-input
                                                 v-model="width"
-                                                maxlength="7"                                            
-                                                class="rect-input"
+                                                maxlength="7"      
                                             />
                                         </q-list-item-content>
                                     </div>
@@ -73,7 +69,6 @@
                                             <q-input
                                                 v-model="height"
                                                 maxlength="7"
-                                                class="rect-input"
                                             />
                                         </q-list-item-content>
                                     </q-list-item>
@@ -85,16 +80,14 @@
                                         </q-list-item-content>
                                         <q-list-item-content>
                                             <q-select
-                                                :items="alignments"
-                                                v-model="align"                                            
-                                                dense
-                                                class="rect-input"
+                                                :options="alignments"
+                                                v-model="align"    
                                             /> 
                                         </q-list-item-content>
                                     </q-list-item>                                   
                                 
                             
-                        </q-menu>
+                        </q-popup-proxy >
                     </q-btn>
                     <q-btn 
                         icon
@@ -208,15 +201,18 @@ export default {
         canDefinePlacement(){
             return this.type=="PLAYGROUND";
         },
-        scriptVersion:{
+        scriptVersion(){
+            if (this.block === undefined || this.block.version === undefined || this.block.version == '')
+                return '100';
+            return this.block.version
+        },
+        scriptVersionObj:{
             get(){
-                if (this.block === undefined || this.block.version === undefined || this.block.version == '')
-                    return '100';
-                return this.block.version
+                return this.scriptVersions.find(k=>k.value == this.scriptVersion)
             },
             set(v){
                 this.$emit('script-version-change', {
-                    version: v,
+                    version: v.value,
                     id:this.block.id
                 });
             }
@@ -290,12 +286,12 @@ export default {
                 });
             }
         },align:{
-            get() { return this.block.align; },
+            get() { return this.alignments.find(k => k.value==this.block.align); },
             set(v) { 
                 this.$emit('placement-change', {
                     width: this.block.width,
                     height:this.block.height,
-                    align:v,
+                    align:v.value,
                     id:this.block.id
                 });
             }
