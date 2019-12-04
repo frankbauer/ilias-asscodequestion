@@ -3,7 +3,7 @@
     <q-card v-if="editMode" :class="`q-mx-none q-my-xs q-pa-none editModeBlockContainer ${colorClass} ${bgClass}`" >
         <q-card-section class="q-mb-none q-pb-sm q-pt-sm ">
             <div class="row q-my-none q-py-none" dense>
-                <div class="col-xs-8 col-sm-9 col-md-4 q-my-none q-py-none">
+                <div class="col-xs-12 col-sm-4 col-md-4 q-my-none q-py-none">
                     <q-select
                         :options="types"
                         v-model="typeObj"
@@ -12,7 +12,7 @@
                     />                        
                 </div>
                 <div class="col-grow"></div>
-                <div class="col-xs-4 col-sm-3  q-my-none q-py-none text-right">
+                <div class="order-xs-first order-sm-last col-xs-12 col-sm-8 col-md-5 q-my-none q-py-none text-right">
                     
                     <q-btn icon="settings" color="blue-7" push dense v-if="hasExtendedSettings"> 
                         <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
@@ -107,13 +107,14 @@
 
                     <q-btn @click="moveUp" :disable="!canMoveUp" icon="arrow_drop_up" push dense class="q-ml-md q-mr-xs"  color="orange-6" :ripple="{ center: true }"></q-btn>
                     <q-btn @click="moveDown" :disabled="!canMoveDown" icon="arrow_drop_down" push dense class="q-mr-md" color="orange-6" :ripple="{ center: true }" ></q-btn>
-                    <q-btn @click="removeBlock" label="Delete" icon="warning" push dense class="q-mr-xl q-pr-sm" color="red-6" right :ripple="{ center: true }"></q-btn>
-
+                    <q-btn @click="removeBlock" label="Delete" icon="warning" push dense class="gt-xs q-mr-sm-sm q-mr-md-lg q-pr-sm" color="red-6" right :ripple="{ center: true }"></q-btn>
+                    <q-btn @click="removeBlock" icon="warning" push dense class="lt-sm q-mr-lg q-pr-none" color="red-6" right :ripple="{ center: true }"></q-btn>
                     <q-btn 
                         icon
                         color="primary" 
                         small 
-                        flat round                        
+                        flat round   
+                        style="margin-right:-9px"                     
                         @click="toggleExpanded">
                             <q-icon :name="expanded?'expand_less':'expand_more'" size="24" />
                     </q-btn>
