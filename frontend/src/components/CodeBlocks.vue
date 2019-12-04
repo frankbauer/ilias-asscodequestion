@@ -66,8 +66,8 @@
             </div>
             <transition
                     appear
-                    enter-active-class="animated slideDown"
-                    leave-active-class="animated slideUp"
+                    enter-active-class="animated fadeInDown"
+                    leave-active-class="animated fadeOutUp"
             >
                 <pre ref="output" class="output" v-if="hasOutput" v-html="outputHTML"></pre>
             </transition>
