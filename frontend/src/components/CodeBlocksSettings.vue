@@ -1,21 +1,21 @@
 <template>
     <div class="row q-ma-none q-pa-none">
             <div class="col-xs-12 col-sm-4">
-                <q-card class="q-ma-xs">
-                    <q-card-section>Language</q-card-section>
-                    <q-card-section>                        
-                        <div class="row q-my-none q-py-none">
-                            <div class="col-xs-12 col-md-8 q-my-none q-py-none">
+                <q-card class="q-mr-sm-xs">
+                    <q-card-section class="text-overline">Language</q-card-section>
+                    <q-card-section class="q-ml-md">                        
+                        <div class="row">
+                            <div class="col-12">
                                 <q-toggle v-model="runCode" :disabled="!languageHasCompiler" label="Allow Code Execution"/>
                             </div>
-                            <div :class="`col-xs-12 col-md-${runCode?8:12} q-my-none q-pr-xs`">
+                            <div :class="`col-xs-12 col-md-${runCode?8:12} ${runCode?'q-pr-md-sm':''}`">
                                 <q-select
                                     :options="compiledLanguages"
                                     v-model="compilerLanguageObj"  
                                     label="Language"   
                                 /> 
                             </div> 
-                            <div class="col-xs-12 col-md-4 q-my-none q-pl-xs" v-if="runCode">
+                            <div class="col-xs-12 col-md-4" v-if="runCode">
                                 <q-select
                                     :options="compilerVersions"
                                     v-model="compilerVersion"                            
@@ -27,13 +27,13 @@
                 </q-card>
             </div>
 
-            <q-slide-transition>
-                <div class="col-xs-12 col-sm-4" v-if="runCode">
-                    <q-card class="q-ma-xs">
-                        <q-card-section>Restrictions</q-card-section>
-                        <q-card-section>
-                            <div class="row q-my-none q-py-none">                               
-                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
+            <div class="col-xs-12 col-sm-4">
+                <q-slide-transition>
+                    <q-card class="q-mb-sm q-mr-sm-xs" v-if="runCode">
+                        <q-card-section class="text-overline">Restrictions</q-card-section>
+                        <q-card-section class="q-ml-md">
+                            <div class="row">                               
+                                <div class="col-xs-12 col-md-6 q-pr-md-sm">
                                     <q-input
                                         v-model="maxRuntime"
                                         :rules="[validNumber]"
@@ -41,7 +41,7 @@
                                         maxlength="6"
                                     />
                                 </div> 
-                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
+                                <div class="col-xs-12 col-md-6">
                                     <q-input
                                         v-model="maxCharacters"
                                         :rules="[validNumber]"
@@ -52,35 +52,36 @@
                             </div>
                         </q-card-section>
                     </q-card>
-                    <q-card class="q-mt-sm q-ma-xs">
-                        <q-card-section>Themes</q-card-section>
-                        <q-card-section>
-                            <div class="row q-my-none q-py-none" dense>
-                                <div class="col-xs-12 col-md-6 q-my-none q-py-non">
-                                    <q-select
-                                        :options="themes"
-                                        v-model="codeTheme"  
-                                        label="General Theme"
-                                    /> 
-                                </div>
-                                <div class="col-xs-12 col-md-6 q-my-none q-py-none">
-                                    <q-select
-                                        :options="themes"
-                                        v-model="solutionTheme"  
-                                        label="Solution Theme"
-                                    /> 
-                                </div>
+                </q-slide-transition>
+                <q-card class="q-mr-sm-xs">
+                    <q-card-section class="text-overline">Themes</q-card-section>
+                    <q-card-section class="q-ml-md">
+                        <div class="row" dense>
+                            <div class="col-xs-12 col-md-6 q-pr-md-sm">
+                                <q-select
+                                    :options="themes"
+                                    v-model="codeTheme"  
+                                    label="General Theme"
+                                /> 
                             </div>
-                        </q-card-section>
-                    </q-card>
-                </div>
-            </q-slide-transition>
+                            <div class="col-xs-12 col-md-6">
+                                <q-select
+                                    :options="themes"
+                                    v-model="solutionTheme"  
+                                    label="Solution Theme"
+                                /> 
+                            </div>
+                        </div>
+                    </q-card-section>
+                </q-card>
+            </div>
+            
 
             <q-slide-transition>
                 <div class="col-xs-12 col-sm-4" v-if="runCode">
-                    <q-card class="q-ma-xs">
-                        <q-card-section>Libraries</q-card-section>
-                        <q-card-section>
+                    <q-card>
+                        <q-card-section class="text-overline">Libraries</q-card-section>
+                        <q-card-section class="q-ml-md">
                             <div class="row q-my-none q-py-none" dense>
                                 <div class="col-xs-12 q-my-none q-py-none">
                                     <q-select

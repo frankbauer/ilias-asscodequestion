@@ -11,8 +11,7 @@ static-block-color = $blue-7
 fallback-block-color = $purple-13
 
 breakPoints = 'xs' 'sm' 'md' 'lg' 'xl'
-sizeClasses = breakPoints
-push(sizeClasses, 'none')
+sizeClasses = 'xs' 'sm' 'md' 'lg' 'xl' 'none'
 positionClasses = 'l' 'r' 't' 'b' 'x' 'y' 'a'
 typeClasses = 'p' 'm'
 
@@ -68,6 +67,16 @@ html
                 {'.q-' + typeIn+posIn + '-' + size}
                     for p in pos
                         {type+p}: sizeValue(size, p)
+    for bp in breakPoints     
+        @media (min-width: $sizes[bp])   
+            for posIn in positionClasses
+                pos = subPositions(posIn)
+                for typeIn in typeClasses
+                    type = subType(typeIn)
+                    for size in sizeClasses
+                        {'.q-' + typeIn+posIn + '-' + bp + '-' + size}
+                            for p in pos
+                                {type+p}: sizeValue(size, p)
     .text-border
         border-color : text-block-color !important
     .playground-border
@@ -80,4 +89,6 @@ html
         border-color : static-block-color !important
     .default-border
         border-color : fallback-block-color !important
-// @import '~quasar-addon-styl'
+    .text-overline
+        text-transform: uppercase
+@import '~quasar-addon-styl'

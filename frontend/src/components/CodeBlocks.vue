@@ -1,5 +1,5 @@
 <template>
-    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-2`">  
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-sm q-mb-md`">  
         <CodeBlocksSettings 
             v-if="editMode" 
             :options="options" 

@@ -3,7 +3,7 @@
     <q-card v-if="editMode" :class="`q-mx-xs q-my-md q-pa-none editModeBlockContainer ${colorClass}`" >
         <q-card-section class="q-mb-none q-pb-sm q-pt-sm ">
             <div class="row q-my-none q-py-none" dense>
-                <div class="col-xs-9 col-sm-10 col-md-4 q-my-none q-py-none">
+                <div class="col-xs-8 col-sm-9 col-md-4 q-my-none q-py-none">
                     <q-select
                         :options="types"
                         v-model="typeObj"
@@ -12,7 +12,7 @@
                     />                        
                 </div>
                 <div class="col-grow"></div>
-                <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
+                <div class="col-xs-4 col-sm-3  q-my-none q-py-none text-right">
                     <q-btn icon="mdi-settings" flat round v-if="hasExtendedSettings"> 
                         <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
                             <div class="q-pa-md" v-if="canSetLineNumbers"> 
@@ -114,10 +114,12 @@
                 </div>
             </div>
             <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
-        </q-card-section>                   
+        </q-card-section>   
+            <q-slide-transition>                
                 <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">
                     <slot ></slot>            
                 </q-card-section>            
+            </q-slide-transition>
       </q-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>
