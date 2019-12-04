@@ -14,79 +14,92 @@
                 
                 <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
                     <q-btn icon="mdi-settings" > 
-                        <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                        
-                            <div class="row no-wrap q-pa-md" v-if="canSetLineNumbers">  
-                                <!-- LineNumbers -->
-                                <div class="column"  >
-                                    <q-list-item-title>Lines</q-list-item-title>
-                                    <q-list-item-subtitle>Number of Visible lines or <b>auto</b>.</q-list-item-subtitle>
-                                </div>
-                                <div class="column" >
-                                    <q-input
-                                        v-model="visibleLines"
-                                        :rules="[validNumber]"
-                                        maxlength="4"
-                                    />
-                                </div>
-                            </div>
-                            <div class="row no-wrap q-pa-md" v-if="isVersionedPlayground">                       <!-- Playground Versioning -->
-                                <q-subheader>VERSIONING</q-subheader>
-                                <div class="column" >                                    
-                                        <q-list-item-title>Script Version</q-list-item-title>
-                                        <q-list-item-subtitle>API-Version for the Visualization Object.</q-list-item-subtitle>
-                                </div>
-                                <div class="column" >
-                                    
-                                        <q-select
-                                            :options="scriptVersions"
-                                            v-model="scriptVersionObj" 
+                        <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
+                            <div class="q-pa-md" v-if="canSetLineNumbers"> 
+                                <div class="row no-wrap q-pa-none"> 
+                                    <div class="text-overline">DISPLAY</div>
+                                </div>                  
+                                <div class="row no-wrap q-pl-md"> 
+                                   <div class="col-7" >                                    
+                                        <div class="text-subtitle2">Lines</div>
+                                        <div class="text-caption text-blue-grey-4">Number of Visible lines or <b>auto</b>.</div>
+                                    </div>
+                                    <div class="col-5" >                            
+                                        <q-input
+                                            v-model="visibleLines"
+                                            :rules="[validNumber]"
+                                            maxlength="4"
+                                            dense
                                         />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="row no-wrap q-pa-md" v-if="canDefinePlacement">                            
-                                    <!-- Positioning -->
-                                    <q-subheader >POSITIONING</q-subheader>
-                                    <div class="column" >
-                                            <q-list-item-title>Width</q-list-item-title>
-                                            <q-list-item-subtitle>CSS Property for the canvas-width.</q-list-item-subtitle>
+                            <!-- Playground Versioning -->
+                            <div class="q-pa-md" v-if="isVersionedPlayground"> 
+                                <div class="row no-wrap q-pa-none"> 
+                                    <div class="text-overline">VERSIONING</div>
+                                </div>                  
+                                <div class="row no-wrap q-pl-md"> 
+                                   <div class="col-7" >                                    
+                                            <div class="text-subtitle2">Script Version</div>
+                                            <div class="text-caption text-blue-grey-4">API-Version for the Visualization Object.</div>
                                     </div>
-                                    <div class="column" >
+                                    <div class="col-5" >                            
+                                            <q-select
+                                                dense
+                                                :options="scriptVersions"
+                                                v-model="scriptVersionObj" 
+                                            />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Positioning -->
+                            <div class="q-pa-md" v-if="canDefinePlacement"> 
+                                <div class="row no-wrap q-pa-none"> 
+                                    <div class="text-overline">POSITIONING</div>
+                                </div>                  
+                                <div class="row no-wrap q-pl-md q-pb-md"> 
+                                    <div class="col-7" >
+                                        <div class="text-subtitle2">Width</div>
+                                        <div class="text-caption text-blue-grey-4">CSS Property for the canvas-width.</div>                                            
+                                    </div>
+                                    <div class="col-5" >
                                             <q-input
                                                 v-model="width"
-                                                maxlength="7"      
-                                            />
-                                        </q-list-item-content>
+                                                maxlength="7" 
+                                                dense     
+                                            />                                        
                                     </div>
-                            </div>
-
-                                    <q-list-item v-if="canDefinePlacement">
-                                        <q-list-item-content>
-                                            <q-list-item-title>Height</q-list-item-title>
-                                            <q-list-item-subtitle>CSS Property for the canvas-height.</q-list-item-subtitle>
-                                        </q-list-item-content>
-                                        <q-list-item-content>
+                                </div>
+                                <div class="row no-wrap q-pl-md q-pb-md"> 
+                                    <div class="col-7" >
+                                        <div class="text-subtitle2">Height</div>
+                                        <div class="text-caption text-blue-grey-4">CSS Property for the canvas-height.</div>                                            
+                                    </div>
+                                    <div class="col-5" >
                                             <q-input
                                                 v-model="height"
-                                                maxlength="7"
-                                            />
-                                        </q-list-item-content>
-                                    </q-list-item>
-
-                                    <q-list-item v-if="canDefinePlacement">
-                                        <q-list-item-content>
-                                            <q-list-item-title>Alignment</q-list-item-title>
-                                            <q-list-item-subtitle>Horizontal Positioning of the canvas.</q-list-item-subtitle>
-                                        </q-list-item-content>
-                                        <q-list-item-content>
+                                                maxlength="7" 
+                                                dense     
+                                            />                                        
+                                    </div>
+                                </div>
+                                <div class="row no-wrap q-pl-md"> 
+                                    <div class="col-7" >
+                                        <div class="text-subtitle2">Alignment</div>
+                                        <div class="text-caption text-blue-grey-4">Horizontal Positioning of the canvas.</div>                                            
+                                    </div>
+                                    <div class="col-5" >
                                             <q-select
                                                 :options="alignments"
-                                                v-model="align"    
-                                            /> 
-                                        </q-list-item-content>
-                                    </q-list-item>                                   
-                                
-                            
+                                                v-model="align"  
+                                                dense  
+                                            />                                         
+                                    </div>
+                                </div>
+                            </div>
                         </q-popup-proxy >
                     </q-btn>
                     <q-btn 
@@ -169,7 +182,8 @@ export default {
     },
     methods:{
         validNumber(v){
-            if (v!='auto' || isNaN(v)) return "Must be a valid Number or 'auto'."
+            console.log(v, isNaN(v), v!='auto');
+            if (v!='auto' && isNaN(v)) return "Must be a valid Number or 'auto'."
             return true
         },
         toggleExpanded(){
@@ -260,7 +274,7 @@ export default {
             get() { return this.block.visibleLines; },
             set(v) { 
                 this.$emit('visible-lines-change', {
-                    visibleLines: v=='auto'?v:new Number(v),
+                    visibleLines: isNaN(v)?v:new Number(v),
                     id:this.block.id
                 });
             }
