@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpR fFf" style="min-height:0">
 
     <q-page-container>
        <CodeBlocks :blockInfo="blocks" />
@@ -33,7 +33,5 @@ export default {
 <style lang="sass">
   #app
     margin-bottom: 16px
-    background-color: rgba(1,1,1,0)
-    .v-application--wrap
-      min-height: 1vh!important
+    background-color: rgba(1,1,1,0)    
 </style>

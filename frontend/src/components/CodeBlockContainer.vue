@@ -114,13 +114,13 @@
                 </div>
             </div>
             <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
-        </q-card-section>   
-            <q-slide-transition>                
-                <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">
-                    <slot ></slot>            
-                </q-card-section>            
-            </q-slide-transition>
-      </q-card>
+            </q-card-section>   
+                <q-slide-transition>                
+                    <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">
+                        <slot ></slot>            
+                    </q-card-section>            
+                </q-slide-transition>
+            </q-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>
       </div>
