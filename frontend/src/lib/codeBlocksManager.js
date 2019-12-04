@@ -161,6 +161,12 @@ class CodeBlocksManager {
                                     if (id>=this.blocks.length-1) return;
                                     this.swap(id, id+1);
                                 },
+                                removeBlock(idx){
+                                    data.blocks.splice(idx, 1)
+                                    for (let i=idx; i<data.blocks.length; i++){
+                                        data.blocks[i].id = i;
+                                    }
+                                },
                                 addNewBlock(){
                                     let block = {
                                         hasCode: true,

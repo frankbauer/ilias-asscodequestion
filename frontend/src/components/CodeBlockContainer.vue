@@ -207,7 +207,7 @@ export default {
             self.highlighted = true;
             this.$q.dialog({
                 title: 'Confirm',
-                message: 'Do you really want to delete this (the <span class="highlightedCard sample">highlighted</span>) Block?',
+                message: 'Do you really want to delete the <span class="highlightedCard sample">highlighted</span> Block?',
                 html: true,
                 ok: {
                     push: true,

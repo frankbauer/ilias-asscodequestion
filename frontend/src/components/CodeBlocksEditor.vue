@@ -90,7 +90,7 @@ export default {
             this.blockInfo.addNewBlock();
         },
         removeBlock(idx){
-            console.log("remove", idx)
+            this.blockInfo.removeBlock(idx);
         },
     }
 }
