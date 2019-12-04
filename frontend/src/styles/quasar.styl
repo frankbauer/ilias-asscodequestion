@@ -1,6 +1,15 @@
 @import './quasar.variables.styl'
 @import '~quasar-styl'
 
+
+
+text-block-color = $blue-grey
+playground-block-color = $green-13
+block-color = $orange-8
+hidden-block-color = $pink-9
+static-block-color = $blue-7
+fallback-block-color = $purple-13
+
 breakPoints = 'xs' 'sm' 'md' 'lg' 'xl'
 sizeClasses = breakPoints
 push(sizeClasses, 'none')
@@ -59,5 +68,16 @@ html
                 {'.q-' + typeIn+posIn + '-' + size}
                     for p in pos
                         {type+p}: sizeValue(size, p)
-
+    .text-border
+        border-color : text-block-color !important
+    .playground-border
+        border-color : playground-block-color !important
+    .block-border
+        border-color : block-color !important
+    .block-hidden-border
+        border-color : hidden-block-color !important
+    .block-static-border
+        border-color : static-block-color !important
+    .default-border
+        border-color : fallback-block-color !important
 // @import '~quasar-addon-styl'
