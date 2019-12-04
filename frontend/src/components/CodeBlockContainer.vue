@@ -200,6 +200,9 @@ export default {
         },
         moveDown(){
             this.$emit('move-down', this.block.id);
+        },
+        removeBlock(){
+            this.$emit('remove-block', this.block.id);
         }
     },
     computed:{

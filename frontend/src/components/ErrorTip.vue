@@ -1,17 +1,22 @@
 <template>
-    <q-tooltip top>
-        <template v-slot:activator="{ on }">
-            <q-icon v-on="on" :class="`mdi ${severityClass}`">{{severityIcon}}</q-icon>            
-        </template>
-        <div>
-            <ul class="tiplist">
-                <li v-for="error in errors" v-bind:key="error.message">
-                    <q-icon class="pr-3 tipicon">{{ iconForSeverity(error.severity) }}</q-icon>
-                    <pre class="tipper">{{ error.message }}</pre>
-                </li>
-            </ul>
-        </div>
-    </q-tooltip>
+    <q-icon :class="`mdi ${severityClass} mainTipIcon`" :name="severityIcon">
+        <q-tooltip>
+            <div>
+                <ul class="tiplist">
+                    <li v-for="error in errors" v-bind:key="error.message">
+                        <div class="row">
+                            <div class="col-1">
+                                <q-icon class="" :name="iconForSeverity(error.severity)"></q-icon>
+                            </div>
+                            <div class="col-11 q-pr-md">
+                                <div class="q-my-none tipper">{{ error.message }}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </q-tooltip>
+    </q-icon>    
 </template>
 
 <script>
@@ -28,17 +33,22 @@ export default {
             return "gutter-warning";
         },
         iconForSeverity(s){
-            if (s == this.SEVERITY_ERROR) return "mdi-code-error";
-            return "mdi-code-warning"
+            if (s == this.SEVERITY_ERROR) return "report";
+            return "warning"
         }
     }
 }
 </script>
 
 <style lang="sass">
+    .mainTipIcon
+        margin-top: -1px
     .tiplist
+        font-size: 0.9rem
         list-style-type: none
         padding-left: 0px !important
+        max-width: 480px
+        min-width: 300px
         li:first-of-type
             padding: 0px 0px 0px 0px
         li
@@ -49,6 +59,6 @@ export default {
                 color: white !important
                 vertical-align: top
             .tipper
-                display: inline-block
                 vertical-align: top
+                font-family: monospace
 </style>
