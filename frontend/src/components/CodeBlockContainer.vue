@@ -1,7 +1,7 @@
 <template>
   <div class="block">
     <q-card v-if="editMode" :class="`ml-none q-mr-none q-my-md q-pa-none editModeBlockContainer ${colorClass}`" >
-        <q-card-section class="q-mb-none q-pb-none">
+        <q-card-section class="q-mb-none q-pb-sm q-pt-sm">
             <div class="row q-my-none q-py-none" dense>
                 <div class="col-xs-9 col-sm-10 col-md-4 q-my-none q-py-none">
                     <q-select
@@ -11,9 +11,9 @@
                         style="margin-top:-5px !important"
                     />                        
                 </div>
-                
+                <div class="col-grow"></div>
                 <div class="col-xs-3 col-sm-2 col-md-1 q-my-none q-py-none text-right">
-                    <q-btn icon="mdi-settings" v-if="hasExtendedSettings"> 
+                    <q-btn icon="mdi-settings" flat round v-if="hasExtendedSettings"> 
                         <q-popup-proxy transition-show="flip-up" transition-hide="flip-down">                    <!-- LineNumbers -->
                             <div class="q-pa-md" v-if="canSetLineNumbers"> 
                                 <div class="row no-wrap q-pa-none"> 
@@ -29,7 +29,7 @@
                                             v-model="visibleLines"
                                             :rules="[validNumber]"
                                             maxlength="4"
-                                            dense
+                                            
                                             style="width:132px"
                                         />
                                     </div>
@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="col-5 q-pl-sm" >                            
                                             <q-select
-                                                dense
+                                                
                                                 :options="scriptVersions"
                                                 v-model="scriptVersionObj" 
                                             />
@@ -106,7 +106,8 @@
                     <q-btn 
                         icon
                         color="primary" 
-                        small                         
+                        small 
+                        flat round                        
                         @click="toggleExpanded">
                             <q-icon :name="expanded?'mdi-chevron-up':'mdi-chevron-down'" size="24" />                                
                     </q-btn>
