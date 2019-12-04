@@ -89,6 +89,9 @@ export default {
         addNewBlock(){
             this.blockInfo.addNewBlock();
         },
+        removeBlock(idx){
+            console.log("remove", idx)
+        },
     }
 }
 </script>

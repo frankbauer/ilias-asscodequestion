@@ -24,7 +24,8 @@
             @placement-change="onPlacementChange"
             @script-version-change="onScriptVersionChange"
             @move-up="moveUp"
-            @move-down="moveDown">              
+            @move-down="moveDown"
+            @remove-block="removeBlock">              
             
                 <CodeBlock 
                     v-if="block.hasCode" 
@@ -53,7 +54,7 @@
 
         <div class="row justify-end" v-if="editMode">
             <div >
-                <q-btn @click="addNewBlock" color="green">Add new Block <q-icon name="library_add" class="q-ml-sm"/></q-btn>
+                <q-btn @click="addNewBlock" push color="green">Add new Block <q-icon name="library_add" class="q-ml-sm"/></q-btn>
             </div>
         </div>
         
@@ -204,6 +205,7 @@
             onThemeChange(nfo){},
             moveUp(idx){},
             moveDown(idx){},
+            removeBlock(idx){},
             addNewBlock(){},
             onPlaygroundChangedOutput(newOutput){
                 if (newOutput===undefined) return;

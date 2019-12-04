@@ -1,6 +1,6 @@
 <template>
   <div class="block">
-    <q-card v-if="editMode" :class="`q-mx-none q-my-xs q-pa-none editModeBlockContainer ${colorClass}`" >
+    <q-card v-if="editMode" :class="`q-mx-none q-my-xs q-pa-none editModeBlockContainer ${colorClass} ${bgClass}`" >
         <q-card-section class="q-mb-none q-pb-sm q-pt-sm ">
             <div class="row q-my-none q-py-none" dense>
                 <div class="col-xs-8 col-sm-9 col-md-4 q-my-none q-py-none">
@@ -137,7 +137,8 @@
 export default {
     data:function(){
         return {
-            settingsMenu:false,            
+            settingsMenu:false,
+            highlighted:false,            
             alignments:[
                 {
                     label:'Start',
@@ -202,7 +203,29 @@ export default {
             this.$emit('move-down', this.block.id);
         },
         removeBlock(){
-            this.$emit('remove-block', this.block.id);
+            const self = this;
+            self.highlighted = true;
+            this.$q.dialog({
+                title: 'Confirm',
+                message: 'Do you really want to delete this (the <span class="highlightedCard sample">highlighted</span>) Block?',
+                html: true,
+                ok: {
+                    push: true,
+                    color: 'negative',
+                    icon: 'warning'
+                },
+                cancel: {
+                    push: true,
+                    color: 'positive'
+                },
+                persistent: true
+            }).onOk(() => {
+                this.$emit('remove-block', this.block.id);
+            }).onCancel(() => {                
+            }).onDismiss(() => {
+                self.highlighted = false;                
+            })
+            
         }
     },
     computed:{
@@ -270,6 +293,10 @@ export default {
                 return 'block-static-border'
             }
             return 'default-border'
+        },
+        bgClass(){
+            if (this.highlighted) return 'highlightedCard';
+            return '';
         },
         type(){
     if (this.block.type == 'BLOCK'){                
@@ -349,4 +376,15 @@ textarea.blockoptions
     display : none !important
     width : 1px
     height : 1px
+.highlightedCard
+    background-image: linear-gradient(45deg, #d15151 25%, #5F5370 25%, #5F5370 50%, #d15151 50%, #d15151 75%, #5F5370 75%, #5F5370 100%)
+    background-size: 56.57px 56.57px
+    background-repeat: repeat    
+.highlightedCard.sample
+    border-radius: 6px
+    padding: 4px
+    margin: 3px
+    box-shadow: 2px 2px 3px rgba(0,0,0, 0.3)
+    color: white
+    font-weight: bold
 </style>
