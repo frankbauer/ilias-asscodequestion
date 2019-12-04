@@ -101,6 +101,131 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	private function prepareTemplate($force=false, $negativeQuestionID=false)
+	{
+		$qidf = $negativeQuestionID?-1:1;
+		$lngData = $this->getLanguageData();
+
+		if (!$this->tpl->didPrepare) {
+			$this->tpl->addInlineCss("codeblockseditor > *,  codeblocks > *{
+				display:none;        
+			  }
+			  
+			  codeblockseditor, codeblocks, .code{
+				display: block;
+				position:relative;
+				text-align: center;
+				margin:auto;
+				width:90%;
+				height:150px;
+				border:1px solid rgba(0,0,0,0.2);
+				margin-bottom:50px;
+				font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+			  }			  
+			  codeblockseditor::before, codeblocks::before {
+				content:\"loading...\"
+			  }			  			  
+			  loading {
+				display: inline-block;
+				position: relative;
+				top: 35px;
+				width: 80px;
+				height: 80px;
+			  }
+			  loading div {
+				position: absolute;
+				border: 4px solid rgb(43, 44, 50);
+				opacity: 1;
+				border-radius: 50%;
+				animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+			  }
+			  loading div:nth-child(2) {
+				animation-delay: -0.5s;
+			  }
+			  @keyframes lds-ripple {
+				0% {
+				  top: 36px;
+				  left: 36px;
+				  width: 0;
+				  height: 0;
+				  opacity: 1;
+				}
+				100% {
+				  top: 0px;
+				  left: 0px;
+				  width: 72px;
+				  height: 72px;
+				  opacity: 0;
+				}
+			  }");
+			//$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/materialdesignicons.css');
+			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/roboto.css');
+			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/main.css');
+			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/app.css');
+			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/chunk-vendors.css');
+
+
+			$tm = $this->object->getROTheme();
+			if ($tm =='default') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='base16-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='base16-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='duotone-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='duotone-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='xq-light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='xq-dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='blackborard') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='mbo') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='mdn-like') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='midnight') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='neo') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='solarized light') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='solarized dark') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
+			}
+			else if ($tm =='yeti') {
+				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
+			}
+			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
+		}		
+
+		if (!$this->didPrepare) {			
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
+
+			$this->tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . self::URL_PATH . "/frontend/dist/\">');");
+
+			$this->tpl->addOnLoadCode("import('" . self::URL_PATH . "/frontend/dist/js/chunk-vendors.js')");
+			$this->tpl->addOnLoadCode("import('" . self::URL_PATH . "/frontend/dist/js/app.js')");
+		}
+	}
+	private function prepareTemplateOLD($force=false, $negativeQuestionID=false)
 	{		
 		$qidf = $negativeQuestionID?-1:1;
 		//if (($this->didPrepare) && !$force) return;
@@ -831,142 +956,162 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$points->setValue($this->object->getPoints());
 		$form->addItem($points);
 
-		// Add Source Code Type Selection
-		// first complete scripts for codemirror
-		$language = $this->getLanguage();
-		$lngData = $this->getLanguageData();
-		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
-        $select->setOptions(array(
-			'c'=>'C', 
-			'c++'=>'C++',
-			'c#' => 'C#', 
-			'fortran'=>'Fortran', 
-			'glsl'=>'GLSL', 			
-			'java2'=>'Java',
-			'javascript'=>'JavaScript',
-			'objectivec'=>'Objective-C',
-			'perl'=>'Perl',
-			'python'=>'Python',
-			'r' => 'R', 
-			'ruby'=>'Ruby',
-			'java'=>'[Java (legacy)]')
-			);
-		$select->addCustomAttribute('onchange="selectLanguage( )"');
-		$select->setValue($this->getLanguage());
-		$select->setInfo($this->plugin->txt('source_lang_info'));
-		$form->addItem($select);
+		// // Add Source Code Type Selection
+		// // first complete scripts for codemirror
+		// $language = $this->getLanguage();
+		// $lngData = $this->getLanguageData();
+		// $select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
+        // $select->setOptions(array(
+		// 	'c'=>'C', 
+		// 	'c++'=>'C++',
+		// 	'c#' => 'C#', 
+		// 	'fortran'=>'Fortran', 
+		// 	'glsl'=>'GLSL', 			
+		// 	'java2'=>'Java',
+		// 	'javascript'=>'JavaScript',
+		// 	'objectivec'=>'Objective-C',
+		// 	'perl'=>'Perl',
+		// 	'python'=>'Python',
+		// 	'r' => 'R', 
+		// 	'ruby'=>'Ruby',
+		// 	'java'=>'[Java (legacy)]')
+		// 	);
+		// $select->addCustomAttribute('onchange="selectLanguage( )"');
+		// $select->setValue($this->getLanguage());
+		// $select->setInfo($this->plugin->txt('source_lang_info'));
+		// $form->addItem($select);
 
-		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
-		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		$allowRun->setChecked( $this->object->getAllowRun() );		
-		$form->addItem($allowRun);
+		// $allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
+		// $allowRun->setInfo($this->plugin->txt('allow_run_info'));	
+		// $allowRun->setChecked( $this->object->getAllowRun() );		
+		// $form->addItem($allowRun);
 
-		$haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
-		$haved3->setInfo($this->plugin->txt('havedthree_info'));	
-		$haved3->setChecked( $this->object->getIncludeD3() );
-		$form->addItem($haved3);
+		// $haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
+		// $haved3->setInfo($this->plugin->txt('havedthree_info'));	
+		// $haved3->setChecked( $this->object->getIncludeD3() );
+		// $form->addItem($haved3);
 
-		$have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
-		$have3js->setInfo($this->plugin->txt('havethreejs_info'));	
-		$have3js->setChecked( $this->object->getIncludeThreeJS() );
-		$form->addItem($have3js);
+		// $have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
+		// $have3js->setInfo($this->plugin->txt('havethreejs_info'));	
+		// $have3js->setChecked( $this->object->getIncludeThreeJS() );
+		// $form->addItem($have3js);
 
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
-			$allowRun->setValue('true');
-			$haved3->setValue('true');
-			$have3js->setValue('true');
-		} else {
-			$allowRun->setValue('false');
-			$haved3->setValue('false');
-			$have3js->setValue('false');
-		}
+		// if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
+		// 	$allowRun->setValue('true');
+		// 	$haved3->setValue('true');
+		// 	$have3js->setValue('true');
+		// } else {
+		// 	$allowRun->setValue('false');
+		// 	$haved3->setValue('false');
+		// 	$have3js->setValue('false');
+		// }
 
-		$id = 'timeout_ms-question'.$this->object->getId().'value1';
-		$runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
-		$runtime->setInfo($this->plugin->txt('timeout_ms_info'));
-		$runtime->setSize(5);
-		$runtime->setMinValue(500);
-		$runtime->allowDecimals(0);
-		//$runtime->setRequired(true);
-		$runtime->setValue($this->object->getTimeoutMS());
-		$form->addItem($runtime);
+		// $id = 'timeout_ms-question'.$this->object->getId().'value1';
+		// $runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
+		// $runtime->setInfo($this->plugin->txt('timeout_ms_info'));
+		// $runtime->setSize(5);
+		// $runtime->setMinValue(500);
+		// $runtime->allowDecimals(0);
+		// //$runtime->setRequired(true);
+		// $runtime->setValue($this->object->getTimeoutMS());
+		// $form->addItem($runtime);
 
-		$id = 'max_chars-question'.$this->object->getId().'value1';
-		$maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
-		$maxChars->setInfo($this->plugin->txt('max_chars_info'));
-		$maxChars->setSize(5);
-		$maxChars->setMinValue(512);
-		$maxChars->allowDecimals(0);
-		//$runtime->setRequired(true);
-		$maxChars->setValue($this->object->getMaxChars());
-		$form->addItem($maxChars);
+		// $id = 'max_chars-question'.$this->object->getId().'value1';
+		// $maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
+		// $maxChars->setInfo($this->plugin->txt('max_chars_info'));
+		// $maxChars->setSize(5);
+		// $maxChars->setMinValue(512);
+		// $maxChars->allowDecimals(0);
+		// //$runtime->setRequired(true);
+		// $maxChars->setValue($this->object->getMaxChars());
+		// $form->addItem($maxChars);
 
-		$selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
-		$selectTheme->setOptions(array(
-			'default' => 'default',
-			'base16-dark' => 'base16-dark',
-			'base16-light' => 'base16-light',
-			'duotone-dark' => 'duotone-dark',
-			'duotone-light' => 'duotone-light',
-			'xq-light' => 'xq-light',
-			'xq-dark' => 'xq-dark',
-			'blackborard' => 'blackboard',
-			'mbo' => 'mbo',
-			'mdn-like' => 'mdn-like',
-			'midnight' => 'midnight',
-			'neo' => 'neo',
-			'solarized light' => 'solarized light',
-			'solarized dark' => 'solarized dark',
-			'yeti' => 'yeti'
-		));
-		$selectTheme->addCustomAttribute('onchange="selectTheme()"');
-		$selectTheme->setValue($this->object->getTheme());
-		$selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
-		$form->addItem($selectTheme);
+		// $selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
+		// $selectTheme->setOptions(array(
+		// 	'default' => 'default',
+		// 	'base16-dark' => 'base16-dark',
+		// 	'base16-light' => 'base16-light',
+		// 	'duotone-dark' => 'duotone-dark',
+		// 	'duotone-light' => 'duotone-light',
+		// 	'xq-light' => 'xq-light',
+		// 	'xq-dark' => 'xq-dark',
+		// 	'blackborard' => 'blackboard',
+		// 	'mbo' => 'mbo',
+		// 	'mdn-like' => 'mdn-like',
+		// 	'midnight' => 'midnight',
+		// 	'neo' => 'neo',
+		// 	'solarized light' => 'solarized light',
+		// 	'solarized dark' => 'solarized dark',
+		// 	'yeti' => 'yeti'
+		// ));
+		// $selectTheme->addCustomAttribute('onchange="selectTheme()"');
+		// $selectTheme->setValue($this->object->getTheme());
+		// $selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
+		// $form->addItem($selectTheme);
 
-		$selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
-		$selectROTheme->setOptions($selectTheme->getOptions());
-		$selectROTheme->addCustomAttribute('onchange="selectTheme()"');
-		$selectROTheme->setValue($this->object->getROTheme());
-		$selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
-		$form->addItem($selectROTheme);
+		// $selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
+		// $selectROTheme->setOptions($selectTheme->getOptions());
+		// $selectROTheme->addCustomAttribute('onchange="selectTheme()"');
+		// $selectROTheme->setValue($this->object->getROTheme());
+		// $selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
+		// $form->addItem($selectROTheme);
 
-		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
-		$item->setInfo($this->plugin->txt('cq_blocks_info'));
-		$form->addItem($item);
+		// $item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
+		// $item->setInfo($this->plugin->txt('cq_blocks_info'));
+		// $form->addItem($item);
 
-		foreach ($this->object->getBlocks() as $block) {
+		// foreach ($this->object->getBlocks() as $block) {
 			
-		}
-		
+		// }
+
+		$html = '<codeblockseditor '.
+				'data-id="'.$this->object->getId().'" '.
+				'data-compiler="'.$this->getLanguage().'" '.
+				'>';
 		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-			$elname = 'block['.$i.']';
-			$item = new ilCustomInputGUI('');		
-			$item->setHTML($this->createCodeBlockInput($i, $elname));
-			$form->addItem($item);			
+			
+			$type = $this->object->getTypeForBlock($i);
+			if ($type==assCodeQuestionBlockTypes::Text) $html .= "<text>".$this->object->getContentForBlock($i)."</text>";
+			else if ($type==assCodeQuestionBlockTypes::StaticCode) $html .= "<block data-static>".$this->object->getContentForBlock($i)."</block>";
+			else if ($type==assCodeQuestionBlockTypes::HiddenCode) $html .= "<block data-hidden>".$this->object->getContentForBlock($i)."</block>";
+			else if ($type==assCodeQuestionBlockTypes::SolutionCode) $html .= "<block>".$this->object->getContentForBlock($i)."</block>";
+			else if ($type==assCodeQuestionBlockTypes::Canvas) $html .= "<playground>".$this->object->getContentForBlock($i)."</playground>";
+				
+						
 		}
-
-		//Add Button and Template UI
-		$rect = new ilCustomInputGUI('');
-		$rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
-		$form->addItem($rect);
-
-		//$this->prepareTemplate();
-		$language = $this->getLanguage();	
-		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());		
-
-		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-		$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-		$tpl->setVariable("QUESTION_ID", $this->object->getId());
-		$tpl->setVariable("LANGUAGE", 'codeqst_edit_mode');
-		
-		$item = new ilCustomInputGUI(" ");
-		$item->setInfo(" ");
-		$item->setHTML($tplPrep->get() . $tpl->get());
-
+		$html .= '</codeblockseditor>';
+		$item = new ilCustomInputGUI('');		
+		$item->setHTML($html);
 		$form->addItem($item);
+		
+		// for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+		// 	$elname = 'block['.$i.']';
+		// 	$item = new ilCustomInputGUI('');		
+		// 	$item->setHTML($this->createCodeBlockInput($i, $elname));
+		// 	$form->addItem($item);			
+		// }
+
+		// //Add Button and Template UI
+		// $rect = new ilCustomInputGUI('');
+		// $rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
+		// $form->addItem($rect);
+
+		// //$this->prepareTemplate();
+		// $language = $this->getLanguage();	
+		// $tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
+		// $tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
+		// $tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());		
+
+		// $tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
+		// $tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
+		// $tpl->setVariable("QUESTION_ID", $this->object->getId());
+		// $tpl->setVariable("LANGUAGE", 'codeqst_edit_mode');
+		
+		// $item = new ilCustomInputGUI(" ");
+		// $item->setInfo(" ");
+		// $item->setHTML($tplPrep->get() . $tpl->get());
+
+		// $form->addItem($item);
 
 
 		return $form;
@@ -982,6 +1127,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
 	{		
+		print_r($_POST);
+		die;
 		// Here you can write the question type specific values
 		$this->object->setPoints((int) $_POST["points"]);
 		$this->object->setLanguage((string) $_POST["source_lang"]);
