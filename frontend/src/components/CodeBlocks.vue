@@ -50,8 +50,8 @@
         </CodeBlockContainer>
         
         <div :class="`runner ${editMode?'q-pt-lg q-mx-lg':''}`" v-if="canRun">
-            <div class="d-flex pa-2 runnerState">
-                <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text flex-grow-0" @click="run" :ripple="{ center: true }" style="border-radius:0px">
+            <div class="row runnerState">
+                <q-btn :loading="!isReady" :disabled="!isReady" color="primary" class="white--text" @click="run" :ripple="{ center: true }" style="border-radius:0px" >
                     Run
                     <q-icon right dark name="mdi-play-button"></q-icon>
                 </q-btn>
@@ -61,7 +61,7 @@
                     enter-active-class="animated fadeIn"
                     leave-active-class="animated fadeOut"
                 >
-                    <div class="globalState flex-grow-1 align-self-center" v-html="$compilerState.globalStateMessage" v-show="showGlobalMessages"></div>        
+                    <div class="globalState col-grow" style="align-self: center;" v-show="showGlobalMessages"><div id="message" v-html="$compilerState.globalStateMessage"> </div></div>        
                 </transition>  
             </div>
             <q-slide-transition>
