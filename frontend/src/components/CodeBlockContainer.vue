@@ -24,7 +24,7 @@
                                         <div class="text-subtitle2">Lines</div>
                                         <div class="text-caption text-blue-grey-4">Number of Visible lines or <b>auto</b>.</div>
                                     </div>
-                                    <div class="col-5" >                            
+                                    <div class="col-5 q-pl-sm" >                            
                                         <q-input
                                             v-model="visibleLines"
                                             :rules="[validNumber]"
@@ -45,7 +45,7 @@
                                             <div class="text-subtitle2">Script Version</div>
                                             <div class="text-caption text-blue-grey-4">API-Version for the Visualization Object.</div>
                                     </div>
-                                    <div class="col-5" >                            
+                                    <div class="col-5 q-pl-sm" >                            
                                             <q-select
                                                 dense
                                                 :options="scriptVersions"
@@ -65,7 +65,7 @@
                                         <div class="text-subtitle2">Width</div>
                                         <div class="text-caption text-blue-grey-4">CSS Property for the canvas-width.</div>                                            
                                     </div>
-                                    <div class="col-5" >
+                                    <div class="col-5 q-pl-sm" >
                                             <q-input
                                                 v-model="width"
                                                 maxlength="7" 
@@ -78,7 +78,7 @@
                                         <div class="text-subtitle2">Height</div>
                                         <div class="text-caption text-blue-grey-4">CSS Property for the canvas-height.</div>                                            
                                     </div>
-                                    <div class="col-5" >
+                                    <div class="col-5 q-pl-sm" >
                                             <q-input
                                                 v-model="height"
                                                 maxlength="7" 
@@ -91,7 +91,7 @@
                                         <div class="text-subtitle2">Alignment</div>
                                         <div class="text-caption text-blue-grey-4">Horizontal Positioning of the canvas.</div>                                            
                                     </div>
-                                    <div class="col-5" >
+                                    <div class="col-5 q-pl-sm" >
                                             <q-select
                                                 :options="alignments"
                                                 v-model="align"  
