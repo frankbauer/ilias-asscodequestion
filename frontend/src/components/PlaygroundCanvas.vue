@@ -1,7 +1,7 @@
 <template>
-    <q-container fluid class="ma-0 pa-0"><q-row no-gutters align="start" justify="center"  class="ma-0 pa-0"><q-col cols="12" :class="`text-${block.align}`">
+    <div class="row ma-0 pa-0"><div :class="`col-12 text-${block.align}`">
         <div ref="innerPlaygroundContainer" class="playground" :style="`width:${block.width};height:${block.height}`">{{output}}</div>        
-    </q-col></q-row></q-container>
+    </div></div>
 </template>
 
 <script>
