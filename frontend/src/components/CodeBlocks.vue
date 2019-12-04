@@ -45,7 +45,8 @@
                 <SimpleText 
                     v-else-if="block.type=='TEXT'" 
                     v-model="block.content" 
-                    :editMode="editMode" />
+                    :editMode="editMode"
+                    :name="`block[${block.parentID}][${block.id}]`" />
         </CodeBlockContainer>
         
         <div :class="`runner ${editMode?'pt-5 q-mx-5':''}`" v-if="canRun">

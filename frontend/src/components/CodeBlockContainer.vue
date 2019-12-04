@@ -114,16 +114,10 @@
                 </div>
             </div>
             <textarea :name="`block_options[${this.block.parentID}][${this.block.id}]`" class="blockoptions" v-model="serializedOptions"></textarea>
-        </q-card-section>   
-            <transition  
-                :duration="200"
-                enter-active-class="animated zoomInDown"
-                leave-active-class="animated zoomInUp"
-            >     
-                <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">                                    
+        </q-card-section>                   
+                <q-card-section class="my-0 q-pt-1 q-pb-0" v-show="expanded">
                     <slot ></slot>            
-                </q-card-section>
-            </transition>
+                </q-card-section>            
       </q-card>
       <div v-else class="ma-0 pa-0">
         <slot></slot>
