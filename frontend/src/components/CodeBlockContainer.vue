@@ -30,6 +30,7 @@
                                             :rules="[validNumber]"
                                             maxlength="4"
                                             dense
+                                            style="width:132px"
                                         />
                                     </div>
                                 </div>
