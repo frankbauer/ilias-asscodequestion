@@ -1,6 +1,6 @@
 <?php 
 
-class codeBlockUI {
+class codeBlocksUI {
     //a codeBlock instance
     var $model = null;
 

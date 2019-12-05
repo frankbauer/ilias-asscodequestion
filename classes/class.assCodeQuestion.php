@@ -52,7 +52,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	{
 		// needed for excel export
 		$this->getPlugin()->loadLanguageModule();
-		$this->getPlugin()->includeClass("./support/codeBlock.php");
+		$this->getPlugin()->includeClass("./support/codeBlocks.php");
 		parent::__construct($title, $comment, $author, $owner, $question);
 	}
 
