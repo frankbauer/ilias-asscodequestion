@@ -1,6 +1,8 @@
 <?php 
 
 class codeBlocks implements ArrayAccess {
+	const DEFAULT_DATA_VERSION = '101';
+
     /* custom data we need to store fpr this question type. This array is serialized to json and stored in the db */
     var $additional_data = array();
 
@@ -18,7 +20,7 @@ class codeBlocks implements ArrayAccess {
 
 		if ($json_data == null){
 			$this->additional_data = array();
-			$this->additional_data['version'] = '101';
+			$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
 			$this->additional_data['blocks'] = array();
 			$this->additional_data['domlibs'] = array();
 			$this->additional_data['workerlibs'] = array();
@@ -135,10 +137,33 @@ class codeBlocks implements ArrayAccess {
 		$blockOptions = $P['block_options'][$this->getID()];
 		for ($i=0;$i<count($blockOptions); $i++){
 			$blockOptions[$i] = json_decode($blockOptions[$i]);
-		}
-		print_r($settings);
-		echo ("\n\n");		
+		}	
 
+		//rebuild Data object
+		$this->additional_data = array();
+		
+		$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
+		$this->additional_data['language'] = $settings->language;
+		
+		if (isset($settings->compiler)){
+			$this->additional_data['compiler'] = array(
+				'language' => $settings->compiler->languageType,
+				'version' => $settings->compiler->version
+			);
+		} else {
+			unset($this->additional_data['compiler']);
+		}
+
+		$this->additional_data['domlibs'] = $settings->domLibs;
+		$this->additional_data['workerlibs'] = $settings->workerLibs;
+
+		$this->setTimeoutMS( $settings->executionTimeout );
+		$this->setMaxChars( $settings->maxCharacters );
+		$this->setAllowRun( $settings->runCode == 1 || $settings->runCode == 'true' );
+		$this->setTheme( $settings->solutionTheme );
+		$this->setROTheme( $settings->codeTheme );
+
+		//handle blocks
 		$this->clearBlocks();
 		for ($i=0;$i<count($blocks); $i++){
 			$this->blocks[] = codeBlock::createFromPreparedPOST($blockOptions[$i], $blocks[$i], $this);
