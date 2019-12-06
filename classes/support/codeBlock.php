@@ -31,15 +31,46 @@ class codeBlock {
 	}
 
 	function tidyUnusedProperties(){
-		if (getType()!=assCodeQuestionBlockTypes::SolutionCode){
+		if ($this->getType()!=assCodeQuestionBlockTypes::SolutionCode){
 			unset($this->block['lines']);
 		}
-		if (getType()!=assCodeQuestionBlockTypes::Canvas){
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
 			unset($this->block['width']);
 			unset($this->block['height']);
 			unset($this->block['version']);
 			unset($this->block['align']);
 		}
+	}
+
+	public static function createFromPreparedPOST($options, $content, $object){		
+		$t = assCodeQuestionBlockTypes::StaticCode;
+		if ($options->type == 'BLOCK'){
+			if ($options->static==1 || $options->static=='true') 
+				$t = assCodeQuestionBlockTypes::StaticCode;
+			else if ($options->hidden==1 || $options->hidden=='true') 
+				$t = assCodeQuestionBlockTypes::HiddenCode;
+			else 
+				$t = assCodeQuestionBlockTypes::SolutionCode;
+		} else if ($options->type == 'PLAYGROUND'){
+			$t = assCodeQuestionBlockTypes::Canvas;
+		} else if ($options->type == 'TEXT'){
+			$t = assCodeQuestionBlockTypes::Text;
+		}
+
+		$data = array(
+			'type' => $t,
+			'content' => $content,
+			'lines' => $options->visibleLines,
+			'width' => $options->width,
+			'height' => $options->height,
+			'align' => $options->align,
+			'version' => $options->version
+		);
+		
+		$o = new codeBlock($data, $object);
+		$o->tidyUnusedProperties();
+		
+		return $o;
 	}
 
     var $ui = null;

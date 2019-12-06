@@ -245,7 +245,7 @@ export default {
                 let obj = {};
                 Object
                     .keys(this.block)
-                    .filter(k => k.indexOf('$')!=0 && k.indexOf('_')!=0 && k!='obj' && k!='errors' && k!='content' && k!='firstLine' && k!='nextLine' && k!='lineCount' && k!='hasCode')
+                    .filter(k => k.indexOf('$')!=0 && k.indexOf('_')!=0 && k!='obj' && k!='errors' && k!='content' && k!='firstLine' && k!='nextLine' && k!='lineCount' && k!='hasCode' && k!='isLast')
                     .forEach(k => obj[k] = this.block[k])
                 
                 return JSON.stringify(obj)

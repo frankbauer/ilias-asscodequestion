@@ -893,114 +893,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$points->setRequired(true);
 		$points->setValue($this->object->getPoints());
 		$form->addItem($points);
-
-		// // Add Source Code Type Selection
-		// // first complete scripts for codemirror
-		// $language = $this->getLanguage();
-		// $lngData = $this->getLanguageData();
-		// $select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
-        // $select->setOptions(array(
-		// 	'c'=>'C', 
-		// 	'c++'=>'C++',
-		// 	'c#' => 'C#', 
-		// 	'fortran'=>'Fortran', 
-		// 	'glsl'=>'GLSL', 			
-		// 	'java2'=>'Java',
-		// 	'javascript'=>'JavaScript',
-		// 	'objectivec'=>'Objective-C',
-		// 	'perl'=>'Perl',
-		// 	'python'=>'Python',
-		// 	'r' => 'R', 
-		// 	'ruby'=>'Ruby',
-		// 	'java'=>'[Java (legacy)]')
-		// 	);
-		// $select->addCustomAttribute('onchange="selectLanguage( )"');
-		// $select->setValue($this->getLanguage());
-		// $select->setInfo($this->plugin->txt('source_lang_info'));
-		// $form->addItem($select);
-
-		// $allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
-		// $allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		// $allowRun->setChecked( $this->object->blocks->getAllowRun() );		
-		// $form->addItem($allowRun);
-
-		// $haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
-		// $haved3->setInfo($this->plugin->txt('havedthree_info'));	
-		// $haved3->setChecked( $this->object->blocks()->getIncludeD3() );
-		// $form->addItem($haved3);
-
-		// $have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
-		// $have3js->setInfo($this->plugin->txt('havethreejs_info'));	
-		// $have3js->setChecked( $this->object->blocks()->getIncludeThreeJS() );
-		// $form->addItem($have3js);
-
-		// if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
-		// 	$allowRun->setValue('true');
-		// 	$haved3->setValue('true');
-		// 	$have3js->setValue('true');
-		// } else {
-		// 	$allowRun->setValue('false');
-		// 	$haved3->setValue('false');
-		// 	$have3js->setValue('false');
-		// }
-
-		// $id = 'timeout_ms-question'.$this->object->getId().'value1';
-		// $runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
-		// $runtime->setInfo($this->plugin->txt('timeout_ms_info'));
-		// $runtime->setSize(5);
-		// $runtime->setMinValue(500);
-		// $runtime->allowDecimals(0);
-		// //$runtime->setRequired(true);
-		// $runtime->setValue($this->object->blocks()->getTimeoutMS());
-		// $form->addItem($runtime);
-
-		// $id = 'max_chars-question'.$this->object->getId().'value1';
-		// $maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
-		// $maxChars->setInfo($this->plugin->txt('max_chars_info'));
-		// $maxChars->setSize(5);
-		// $maxChars->setMinValue(512);
-		// $maxChars->allowDecimals(0);
-		// //$runtime->setRequired(true);
-		// $maxChars->setValue($this->object->getMaxChars());
-		// $form->addItem($maxChars);
-
-		// $selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
-		// $selectTheme->setOptions(array(
-		// 	'default' => 'default',
-		// 	'base16-dark' => 'base16-dark',
-		// 	'base16-light' => 'base16-light',
-		// 	'duotone-dark' => 'duotone-dark',
-		// 	'duotone-light' => 'duotone-light',
-		// 	'xq-light' => 'xq-light',
-		// 	'xq-dark' => 'xq-dark',
-		// 	'blackborard' => 'blackboard',
-		// 	'mbo' => 'mbo',
-		// 	'mdn-like' => 'mdn-like',
-		// 	'midnight' => 'midnight',
-		// 	'neo' => 'neo',
-		// 	'solarized light' => 'solarized light',
-		// 	'solarized dark' => 'solarized dark',
-		// 	'yeti' => 'yeti'
-		// ));
-		// $selectTheme->addCustomAttribute('onchange="selectTheme()"');
-		// $selectTheme->setValue($this->object->blocks()->getTheme());
-		// $selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
-		// $form->addItem($selectTheme);
-
-		// $selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
-		// $selectROTheme->setOptions($selectTheme->getOptions());
-		// $selectROTheme->addCustomAttribute('onchange="selectTheme()"');
-		// $selectROTheme->setValue($this->object->blocks()->getROTheme());
-		// $selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
-		// $form->addItem($selectROTheme);
-
-		// $item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
-		// $item->setInfo($this->plugin->txt('cq_blocks_info'));
-		// $form->addItem($item);
-
-		// foreach ($this->object->getBlocks() as $block) {
-			
-		// }
 	
 		$item = new ilCustomInputGUI('');		
 		$item->setHTML($this->object->blocks()->ui()->render(true));
@@ -1019,10 +911,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
 	{		
+		$this->object->setPoints((int) $_POST["points"]);
+
+		$this->object->blocks()->setFromPOST($_POST);
+
 		print_r($_POST);
 		die;
 		// Here you can write the question type specific values
-		$this->object->setPoints((int) $_POST["points"]);
+		
 		$this->object->blocks()->setLanguage((string) $_POST["source_lang"]);
 		$this->object->blocks()->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
 		$this->object->blocks()->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);

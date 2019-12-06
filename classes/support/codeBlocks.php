@@ -124,6 +124,26 @@ class codeBlocks implements ArrayAccess {
 	public function getDataVersion(){		
 		return $this->additional_data['version'];
 	}
+
+
+
+
+
+	public function setFromPOST($P){
+		$settings = json_decode($P['block_settings'][$this->getID()]);
+		$blocks = $P['block'][$this->getID()];
+		$blockOptions = $P['block_options'][$this->getID()];
+		for ($i=0;$i<count($blockOptions); $i++){
+			$blockOptions[$i] = json_decode($blockOptions[$i]);
+		}
+		print_r($settings);
+		echo ("\n\n");		
+
+		$this->clearBlocks();
+		for ($i=0;$i<count($blocks); $i++){
+			$this->blocks[] = codeBlock::createFromPreparedPOST($blockOptions[$i], $blocks[$i], $this);
+		}
+	}
 	
 	
 
