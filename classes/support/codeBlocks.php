@@ -7,15 +7,26 @@ class codeBlocks implements ArrayAccess {
     /* store the block-access objects. Data is allways stored in $additional_data, but the block-objects provide the Model for the data */
     var $blocks = null;
     
-    var $plugin = null;
+	var $plugin = null;
+	var $id = 0;
     
     public function __construct($plugin, $json_data, $id) {
 		$this->plugin = $plugin;
+		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
         $this->getPlugin()->includeClass("./support/codeBlock.php");
 
 		if ($json_data == null){
+			$this->additional_data = array();
+			$this->additional_data['version'] = '101';
+			$this->additional_data['blocks'] = array();
+			$this->additional_data['domlibs'] = array();
+			$this->additional_data['workerlibs'] = array();
 
+			$this->blocks = array();
+			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
+			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::SolutionCode, 'lines'=>'10', 'content'=>''), $this);
+			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
 		} else {
 			$this->setJSONEncodedAdditionalData($json_data);
 		}
@@ -23,6 +34,10 @@ class codeBlocks implements ArrayAccess {
 
     public function getPlugin(){
         return $this->plugin;
+	}
+
+	public function getId(){
+		return $this->id;
 	}
 	
 	var $ui = null;
@@ -35,7 +50,10 @@ class codeBlocks implements ArrayAccess {
 
     private function setJSONEncodedAdditionalData($data) {
         $this->additional_data = json_decode($data, true);   
-        
+		
+		if (!isset($this->additional_data['version'])){
+			$this->additional_data['version'] = 100;
+		}
         // initialize new block structure for
         // old version with fixed code blocks
         if (!is_array($this->additional_data['blocks'])){
@@ -59,7 +77,21 @@ class codeBlocks implements ArrayAccess {
             unset($this->additional_data['prefixCode']);
             unset($this->additional_data['bestSolution']);
             unset($this->additional_data['postfixCode']);
-        }
+		}
+		
+		if (!is_array($this->additional_data['domlibs'])){
+			$this->additional_data['domlibs'] = array();
+			if (isset($this->additional_data['includeThreeJS']) && $this->additional_data['includeThreeJS']){
+				$this->additional_data['domlibs'][] = "3js-r0";
+			} 
+			if (isset($this->additional_data['includeD3']) && $this->additional_data['includeD3']){
+				$this->additional_data['domlibs'][] = "d3-5.13.4";
+			} 
+		}
+
+		if (!is_array($this->additional_data['workerlibs'])){
+			$this->additional_data['workerlibs'] = array();
+		}
 
 		//force reload ob blocks data structure
         $this->loadBlocks(true);
@@ -82,20 +114,39 @@ class codeBlocks implements ArrayAccess {
 	function getJSONEncodedAdditionalData(){
 		$bls = array();
 		foreach($this->blocks as $cbl){
+			$cbl.tidyUnusedProperties();
 			$bls[] = $cbl.getRawData();
 		}
 		$this->additional_data['blocks'] = $bls;
 		return json_encode($this->additional_data);
+	}
+
+	public function getDataVersion(){		
+		return $this->additional_data['version'];
 	}
 	
 	
 
 
 
+	function getDomLibs() {
+		return $this->additional_data['domlibs'];
+	}
 
+	function getWorkerLibs() {
+		return $this->additional_data['workerlibs'];
+	}
+
+	function getCompilerLanguage() {
+		return is_string($this->additional_data['compiler']['language']) ? $this->additional_data['compiler']['language'] : $this->getLanguage();
+	}
+    
+    function getCompilerVersion() {
+		return is_string($this->additional_data['compiler']['version']) ? $this->additional_data['compiler']['version'] : 'default';
+	}
     
     function getLanguage() {
-		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
+		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
 	}
 
 	function setLanguage($newLanguage) {
@@ -141,23 +192,6 @@ class codeBlocks implements ArrayAccess {
 	function setROTheme($newValue) {
 		$this->additional_data['themeRO'] = ''.$newValue;
 	}
-
-	function getIncludeThreeJS() {
-		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
-	}
-	
-	function setIncludeThreeJS($newValue) {
-		$this->additional_data['includeThreeJS'] = (bool)$newValue;
-	}
-
-	function getIncludeD3() {
-		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
-	}
-	
-	function setIncludeD3($newValue) {
-		$this->additional_data['includeD3'] = (bool)$newValue;
-    }
-    
 
 	public function __get($property) {
 		return $this->additional_data[$porperty];

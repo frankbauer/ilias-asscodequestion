@@ -104,66 +104,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		$qidf = $negativeQuestionID?-1:1;
 		$lngData = $this->getLanguageData();
+		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);
 
 		if (!$this->tpl->didPrepare) {
-			$this->tpl->addInlineCss("codeblockseditor > *,  codeblocks > *{
-				display:none;        
-			  }
-			  
-			  codeblockseditor, codeblocks, .code{
-				display: block;
-				position:relative;
-				text-align: center;
-				margin:auto;
-				width:90%;
-				height:150px;
-				border:1px solid rgba(0,0,0,0.2);
-				margin-bottom:50px;
-				font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
-			  }			  
-			  codeblockseditor::before, codeblocks::before {
-				content:\"loading...\"
-			  }			  			  
-			  loading {
-				display: inline-block;
-				position: relative;
-				top: 35px;
-				width: 80px;
-				height: 80px;
-			  }
-			  loading div {
-				position: absolute;
-				border: 4px solid rgb(43, 44, 50);
-				opacity: 1;
-				border-radius: 50%;
-				animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-			  }
-			  loading div:nth-child(2) {
-				animation-delay: -0.5s;
-			  }
-			  @keyframes lds-ripple {
-				0% {
-				  top: 36px;
-				  left: 36px;
-				  width: 0;
-				  height: 0;
-				  opacity: 1;
-				}
-				100% {
-				  top: 0px;
-				  left: 0px;
-				  width: 72px;
-				  height: 72px;
-				  opacity: 0;
-				}
-			  }");
-			//$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/materialdesignicons.css');
-			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/roboto.css');
-			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/main.css');
-			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/app.css');
-			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/chunk-vendors.css');
-
-
 			$tm = $this->object->blocks()->getROTheme();
 			if ($tm =='default') {
 				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
@@ -217,12 +160,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
 			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
-
-			$this->tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . self::URL_PATH . "/frontend/dist/\">');");
-
-			$this->tpl->addOnLoadCode("import('" . self::URL_PATH . "/frontend/dist/js/chunk-vendors.js')");
-			$this->tpl->addOnLoadCode("import('" . self::URL_PATH . "/frontend/dist/js/app.js')");
+			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");			
 		}
 	}
 	private function prepareTemplateOLD($force=false, $negativeQuestionID=false)
@@ -351,20 +289,20 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 					
 		}
 
-		if ($this->object->blocks()->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/OrbitControls.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/TrackballControls.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/Detector.js');			
-			$this->tpl->addOnLoadCode('initThreeJS();');
-			$this->tpl->didIncludeThreeJS = true;			
-		}
+		// if ($this->object->blocks()->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
+		// 	$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
+		// 	$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/OrbitControls.js');
+		// 	$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/TrackballControls.js');
+		// 	$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/Detector.js');			
+		// 	$this->tpl->addOnLoadCode('initThreeJS();');
+		// 	$this->tpl->didIncludeThreeJS = true;			
+		// }
 
-		if ($this->object->blocks()->getIncludeD3() && !$this->tpl->didIncludeD3){
-			$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
-			$this->tpl->addOnLoadCode('initD3();');
-			$this->tpl->didIncludeD3 = true;			
-		}
+		// if ($this->object->blocks()->getIncludeD3() && !$this->tpl->didIncludeD3){
+		// 	$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
+		// 	$this->tpl->addOnLoadCode('initD3();');
+		// 	$this->tpl->didIncludeD3 = true;			
+		// }
 
 		
 		
@@ -1063,56 +1001,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// foreach ($this->object->getBlocks() as $block) {
 			
 		// }
-
-		$html = '<codeblockseditor '.
-				'data-id="'.$this->object->getId().'" '.
-				'data-compiler="'.$this->getLanguage().'" '.
-				'>';
-		for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
-			
-			$type = $this->object->blocks()[$i]->getType();
-			if ($type==assCodeQuestionBlockTypes::Text) $html .= "<text>".$this->object->blocks()[$i]->getContent()."</text>";
-			else if ($type==assCodeQuestionBlockTypes::StaticCode) $html .= "<block data-static>".$this->object->blocks()[$i]->getContent()."</block>";
-			else if ($type==assCodeQuestionBlockTypes::HiddenCode) $html .= "<block data-hidden>".$this->object->blocks()[$i]->getContent()."</block>";
-			else if ($type==assCodeQuestionBlockTypes::SolutionCode) $html .= "<block>".$this->object->blocks()[$i]->getContent()."</block>";
-			else if ($type==assCodeQuestionBlockTypes::Canvas) $html .= "<playground>".$this->object->blocks()[$i]->getContent()."</playground>";
-				
-						
-		}
-		$html .= '</codeblockseditor>';
+	
 		$item = new ilCustomInputGUI('');		
-		$item->setHTML($html);
+		$item->setHTML($this->object->blocks()->ui()->render(true));
 		$form->addItem($item);
-		
-		// for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
-		// 	$elname = 'block['.$i.']';
-		// 	$item = new ilCustomInputGUI('');		
-		// 	$item->setHTML($this->createCodeBlockInput($i, $elname));
-		// 	$form->addItem($item);			
-		// }
-
-		// //Add Button and Template UI
-		// $rect = new ilCustomInputGUI('');
-		// $rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
-		// $form->addItem($rect);
-
-		// //$this->prepareTemplate();
-		// $language = $this->getLanguage();	
-		// $tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		// $tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
-		// $tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());		
-
-		// $tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-		// $tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-		// $tpl->setVariable("QUESTION_ID", $this->object->getId());
-		// $tpl->setVariable("LANGUAGE", 'codeqst_edit_mode');
-		
-		// $item = new ilCustomInputGUI(" ");
-		// $item->setInfo(" ");
-		// $item->setHTML($tplPrep->get() . $tpl->get());
-
-		// $form->addItem($item);
-
 
 		return $form;
 	}
@@ -1137,8 +1029,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->blocks()->setTheme(((string) $_POST["cm_theme"]));
 		$this->object->blocks()->setROTheme(((string) $_POST["cm_ro_theme"]));
 		$this->object->blocks()->setAllowRun(((string) $_POST["allow_run"])=='true');
-		$this->object->blocks()->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
-		$this->object->blocks()->setIncludeD3(((string) $_POST["havedthree"])=='true');
+		
 		$this->object->blocks()->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
@@ -1147,7 +1038,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$t = $_POST['block_type_'.$k];
 			if ($_POST["source_lang"]=='glsl' && $k==0){
 				$t = 4;
-				$this->object->blocks()->setIncludeThreeJS(true);
+				//$this->object->blocks()->setIncludeThreeJS(true);
 			}
 			$this->object->blocks()[$i]->setType($t);
 			$this->object->blocks()[$i]->setLines($lns);
