@@ -541,15 +541,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$html = '';
 		$script = '';
 		//Add Code Blocks
-		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+		for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
 			$questionID = $this->object->getId()*$qidf ;
-			$code = $this->object->getContentForBlock($i);
+			$code = $this->object->blocks()[$i]->getContent();
 			if ($print) $code = $this->printableString($code);
 			$id = 'block['.$questionID.']['.$i.']';
 			if ($active_id!=NULL){
 				$id .= '['.$active_id.']';
 			}
-			$type = $this->object->getTypeForBlock($i);
+			$type = $this->object->blocks()[$i]->getType();
 
 			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
 			$tpl->setVariable("NAME", $id);
@@ -702,9 +702,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		else
 		{
 			$bestSolution = array();
-			for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-				if ($this->object->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
-					$bestSolution[$i] = $this->object->getContentForBlock($i);
+			for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
+				if ($this->object->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
+					$bestSolution[$i] = $this->object->blocks()[$i]->getContent();
 				}
 			}
 			// show the correct solution
@@ -908,7 +908,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	public function createCodeBlockInput($i, $elname){
-		$type = $this->object->getTypeForBlock($i);
+		$type = $this->object->blocks()[$i]->getType();
 		$options_html  = $this->createBlockTypeOption(assCodeQuestionBlockTypes::Text, 'plain_text', $type);
 		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::StaticCode, 'static_code', $type);
 		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::HiddenCode, 'hidden_code', $type);
@@ -921,9 +921,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("BLOCK_TYPE_OPTIONS", $options_html);
 		$tpl->setVariable("CODE_EDITOR_ID", $elname);
 		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
-		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $type));
+		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->blocks()[$i]->getContent(), $i, $type));
 		$tpl->setVariable("SHOW_LINES_TXT", $this->plugin->txt('show_lines_label'));
-		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
+		$tpl->setVariable("SHOW_LINES", $this->object->blocks()[$i]->getLines());
 		
 		return $tpl->get();		
 	}
@@ -935,7 +935,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$tpl->setVariable("BLOCK_ID", $blockID==-1?'[ID]':$blockID);
 		$tpl->setVariable("BLOCK_TYPE", $blockType);
 		$tpl->setVariable("QUESTION_ID", $this->object->getId());	
-		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($blockID));
+		$tpl->setVariable("SHOW_LINES", $this->object->blocks()[$blockID]->getLines());
 		$tpl->setVariable("ADDITIONAL_ATTRIBUTES", ' '.($blockID==-1?'data-ignore=true':'').' ');	
 		$item = new ilCustomInputGUI('');
 		
@@ -1068,14 +1068,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				'data-id="'.$this->object->getId().'" '.
 				'data-compiler="'.$this->getLanguage().'" '.
 				'>';
-		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+		for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
 			
-			$type = $this->object->getTypeForBlock($i);
-			if ($type==assCodeQuestionBlockTypes::Text) $html .= "<text>".$this->object->getContentForBlock($i)."</text>";
-			else if ($type==assCodeQuestionBlockTypes::StaticCode) $html .= "<block data-static>".$this->object->getContentForBlock($i)."</block>";
-			else if ($type==assCodeQuestionBlockTypes::HiddenCode) $html .= "<block data-hidden>".$this->object->getContentForBlock($i)."</block>";
-			else if ($type==assCodeQuestionBlockTypes::SolutionCode) $html .= "<block>".$this->object->getContentForBlock($i)."</block>";
-			else if ($type==assCodeQuestionBlockTypes::Canvas) $html .= "<playground>".$this->object->getContentForBlock($i)."</playground>";
+			$type = $this->object->blocks()[$i]->getType();
+			if ($type==assCodeQuestionBlockTypes::Text) $html .= "<text>".$this->object->blocks()[$i]->getContent()."</text>";
+			else if ($type==assCodeQuestionBlockTypes::StaticCode) $html .= "<block data-static>".$this->object->blocks()[$i]->getContent()."</block>";
+			else if ($type==assCodeQuestionBlockTypes::HiddenCode) $html .= "<block data-hidden>".$this->object->blocks()[$i]->getContent()."</block>";
+			else if ($type==assCodeQuestionBlockTypes::SolutionCode) $html .= "<block>".$this->object->blocks()[$i]->getContent()."</block>";
+			else if ($type==assCodeQuestionBlockTypes::Canvas) $html .= "<playground>".$this->object->blocks()[$i]->getContent()."</playground>";
 				
 						
 		}
@@ -1084,7 +1084,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$item->setHTML($html);
 		$form->addItem($item);
 		
-		// for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
+		// for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
 		// 	$elname = 'block['.$i.']';
 		// 	$item = new ilCustomInputGUI('');		
 		// 	$item->setHTML($this->createCodeBlockInput($i, $elname));
@@ -1142,15 +1142,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->object->blocks()->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
+			$this->object->blocks()->addBlock();
 			$lns = $_POST['block_lines_'.$k] + 0;
 			$t = $_POST['block_type_'.$k];
 			if ($_POST["source_lang"]=='glsl' && $k==0){
 				$t = 4;
 				$this->object->blocks()->setIncludeThreeJS(true);
 			}
-			$this->object->setTypeForBlock($i, $t);
-			$this->object->setLinesForBlock($i, $lns);
-			$this->object->setContentForBlock($i, $c);
+			$this->object->blocks()[$i]->setType($t);
+			$this->object->blocks()[$i]->setLines($lns);
+			$this->object->blocks()[$i]->setContent($c);
 			$i = $i + 1;
 		}
 	}
