@@ -54,10 +54,10 @@ class CodeBlocksManager {
                 data.runCode = false
                 data.language = data.compiler.languageType
             } else {
-                data.runCode = data.runCode=='true' || data.runCode=='0';
+                data.runCode = data.runCode=='true' || data.runCode=='1';
                 data.language = c.language
+                data.compiler.version = c.version
             }
-            
             delete data.compilerVersion;        
         }
         
