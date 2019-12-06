@@ -138,15 +138,38 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	function getCompilerLanguage() {
-		return is_string($this->additional_data['compiler']['language']) ? $this->additional_data['compiler']['language'] : $this->getLanguage();
+		//old style
+		if (
+			$this->getDataVersion()=='100' 
+			||
+			!is_string($this->additional_data['compiler']['language'])
+		) {
+			return $this->getLanguage();
+		}
+		
+		return $this->additional_data['compiler']['language'];		
 	}
     
     function getCompilerVersion() {
+		//old style
+		if ( $this->getDataVersion()=='100' ) {
+			$v = $this->_getLanguage();
+			if ($v == 'java2') return '100';
+			if ($v == 'java') return '001';
+			return '100';
+		}
+		
 		return is_string($this->additional_data['compiler']['version']) ? $this->additional_data['compiler']['version'] : 'default';
+	}
+
+	private function _getLanguage() {
+		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
 	}
     
     function getLanguage() {
-		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
+		$v = $this->_getLanguage();
+		if ($v == 'java2') $v = 'java';
+		return $v;
 	}
 
 	function setLanguage($newLanguage) {
