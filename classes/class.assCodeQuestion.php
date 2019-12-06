@@ -180,8 +180,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			. " WHERE d.question_fi ="
 			. $ilDB->quote($question_id, 'integer'));
 
-		$data = $ilDB->fetchAssoc($result);
-		echo "LOADED ".$question_id."\n";
+		$data = $ilDB->fetchAssoc($result);		
 		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
 
 		try
