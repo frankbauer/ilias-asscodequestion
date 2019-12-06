@@ -10,14 +10,27 @@ class codeBlocks implements ArrayAccess {
     var $plugin = null;
     
     public function __construct($plugin, $json_data, $id) {
-        $this->plugin = $plugin;
+		$this->plugin = $plugin;
+		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
         $this->getPlugin()->includeClass("./support/codeBlock.php");
 
-        $this->setJSONEncodedAdditionalData($json_data);
+		if ($json_data == null){
+
+		} else {
+			$this->setJSONEncodedAdditionalData($json_data);
+		}
     }
 
     public function getPlugin(){
         return $this->plugin;
+	}
+	
+	var $ui = null;
+    function ui(){
+        if ($this->ui==null){
+            $this->ui = new codeBlocksUI($this);
+        }
+        return $this->ui;
     }
 
     private function setJSONEncodedAdditionalData($data) {

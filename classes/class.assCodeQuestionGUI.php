@@ -60,7 +60,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	function getLanguage() {
-		return $this->object->getBlocks()->getLanguage();
+		return $this->object->blocks()->getLanguage();
 	}
 
 	var $didPrepare = false;
@@ -164,7 +164,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addCss(self::URL_PATH.'/frontend/dist/css/chunk-vendors.css');
 
 
-			$tm = $this->object->getROTheme();
+			$tm = $this->object->blocks()->getROTheme();
 			if ($tm =='default') {
 				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
 			}
@@ -249,7 +249,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mbo.css'.self::URL_SUFFIX);
 			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mdn-like.css'.self::URL_SUFFIX);
 
-			$tm = $this->object->getROTheme();
+			$tm = $this->object->blocks()->getROTheme();
 			if ($tm =='default') {
 				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
 			}
@@ -318,7 +318,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 			if ($lngData['org'] == "java") {
 				if (!$this->tpl->hasJava){
-					if ($this->object->getAllowRun()){
+					if ($this->object->blocks()->getAllowRun()){
 						$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
 						$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
 						$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
@@ -351,7 +351,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 					
 		}
 
-		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
+		if ($this->object->blocks()->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
 			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/OrbitControls.js');
 			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/TrackballControls.js');
@@ -360,7 +360,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$this->tpl->didIncludeThreeJS = true;			
 		}
 
-		if ($this->object->getIncludeD3() && !$this->tpl->didIncludeD3){
+		if ($this->object->blocks()->getIncludeD3() && !$this->tpl->didIncludeD3){
 			$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
 			$this->tpl->addOnLoadCode('initD3();');
 			$this->tpl->didIncludeD3 = true;			
@@ -490,11 +490,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	private function createRunHTMLCode($language, $questionID){
 		$runCode = "";
 		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
+		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
+		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
 		$runCode = $tplPrep->get();	
 
-		if ($this->object->getAllowRun()) {
+		if ($this->object->blocks()->getAllowRun()) {
 			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
 			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
 			$tpl->setVariable("QUESTION_ID", $questionID);			
@@ -556,9 +556,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$tpl->setVariable("BLOCK_ID", $i);
 			$tpl->setVariable("BLOCK_TYPE", $type);
 			$tpl->setVariable("QUESTION_ID", $questionID);				
-			$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
-			$tpl->setVariable("THEME", $this->object->getTheme());
-			$tpl->setVariable("ROTHEME", $this->object->getROTheme());
+			$tpl->setVariable("SHOW_LINES", $this->object->blocks()[$i]->getLines());
+			$tpl->setVariable("THEME", $this->object->blocks()->getTheme());
+			$tpl->setVariable("ROTHEME", $this->object->blocks()->getROTheme());
 			if ($readOnly)
 				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
 			else 
@@ -594,8 +594,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
+		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
+		$template->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
 
 		$questionoutput = $template->get();
 		return $questionoutput;
@@ -724,7 +724,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
 		}		
 		
-		if ( $this->object->getAllowRun() ) {			
+		if ( $this->object->blocks->getAllowRun() ) {			
 			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
 		}
 			
@@ -794,8 +794,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$this->didAddLinksToSolutions = true;
 
 				$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-				$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-				$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());	
+				$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
+				$tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());	
 				
 				$solutionoutput .= $tplPrep->get();
 			}
@@ -983,17 +983,17 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		// $allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
 		// $allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		// $allowRun->setChecked( $this->object->getAllowRun() );		
+		// $allowRun->setChecked( $this->object->blocks->getAllowRun() );		
 		// $form->addItem($allowRun);
 
 		// $haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
 		// $haved3->setInfo($this->plugin->txt('havedthree_info'));	
-		// $haved3->setChecked( $this->object->getIncludeD3() );
+		// $haved3->setChecked( $this->object->blocks()->getIncludeD3() );
 		// $form->addItem($haved3);
 
 		// $have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
 		// $have3js->setInfo($this->plugin->txt('havethreejs_info'));	
-		// $have3js->setChecked( $this->object->getIncludeThreeJS() );
+		// $have3js->setChecked( $this->object->blocks()->getIncludeThreeJS() );
 		// $form->addItem($have3js);
 
 		// if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
@@ -1013,7 +1013,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// $runtime->setMinValue(500);
 		// $runtime->allowDecimals(0);
 		// //$runtime->setRequired(true);
-		// $runtime->setValue($this->object->getTimeoutMS());
+		// $runtime->setValue($this->object->blocks()->getTimeoutMS());
 		// $form->addItem($runtime);
 
 		// $id = 'max_chars-question'.$this->object->getId().'value1';
@@ -1045,14 +1045,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// 	'yeti' => 'yeti'
 		// ));
 		// $selectTheme->addCustomAttribute('onchange="selectTheme()"');
-		// $selectTheme->setValue($this->object->getTheme());
+		// $selectTheme->setValue($this->object->blocks()->getTheme());
 		// $selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
 		// $form->addItem($selectTheme);
 
 		// $selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
 		// $selectROTheme->setOptions($selectTheme->getOptions());
 		// $selectROTheme->addCustomAttribute('onchange="selectTheme()"');
-		// $selectROTheme->setValue($this->object->getROTheme());
+		// $selectROTheme->setValue($this->object->blocks()->getROTheme());
 		// $selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
 		// $form->addItem($selectROTheme);
 
@@ -1099,8 +1099,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// //$this->prepareTemplate();
 		// $language = $this->getLanguage();	
 		// $tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		// $tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		// $tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());		
+		// $tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
+		// $tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());		
 
 		// $tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
 		// $tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
@@ -1131,22 +1131,22 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		die;
 		// Here you can write the question type specific values
 		$this->object->setPoints((int) $_POST["points"]);
-		$this->object->setLanguage((string) $_POST["source_lang"]);
-		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
-		$this->object->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
-		$this->object->setTheme(((string) $_POST["cm_theme"]));
-		$this->object->setROTheme(((string) $_POST["cm_ro_theme"]));
-		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
-		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
-		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');
-		$this->object->clearBlocks();
+		$this->object->blocks()->setLanguage((string) $_POST["source_lang"]);
+		$this->object->blocks()->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
+		$this->object->blocks()->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
+		$this->object->blocks()->setTheme(((string) $_POST["cm_theme"]));
+		$this->object->blocks()->setROTheme(((string) $_POST["cm_ro_theme"]));
+		$this->object->blocks()->setAllowRun(((string) $_POST["allow_run"])=='true');
+		$this->object->blocks()->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
+		$this->object->blocks()->setIncludeD3(((string) $_POST["havedthree"])=='true');
+		$this->object->blocks()->clearBlocks();
 		$i = 0;
 		foreach($_POST["block"] as $k=>$c){
 			$lns = $_POST['block_lines_'.$k] + 0;
 			$t = $_POST['block_type_'.$k];
 			if ($_POST["source_lang"]=='glsl' && $k==0){
 				$t = 4;
-				$this->object->setIncludeThreeJS(true);
+				$this->object->blocks()->setIncludeThreeJS(true);
 			}
 			$this->object->setTypeForBlock($i, $t);
 			$this->object->setLinesForBlock($i, $lns);

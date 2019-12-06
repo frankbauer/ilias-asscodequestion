@@ -49,10 +49,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$question = ""
 		
 	)
-	{
+	{		
 		// needed for excel export
 		$this->getPlugin()->loadLanguageModule();
 		$this->getPlugin()->includeClass("./support/codeBlocks.php");
+
+		$this->blocks = new codeBlocks($this->getPlugin(), null, $question);
 		parent::__construct($title, $comment, $author, $owner, $question);
 	}
 
@@ -68,65 +70,65 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	// 	return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
 	// }
 
-	function setLanguage($newLanguage) {
-		$this->additional_data['language'] = $newLanguage;
-	}
+	// function setLanguage($newLanguage) {
+	// 	$this->additional_data['language'] = $newLanguage;
+	// }
 
-	function getAllowRun() {
-		return isset($this->additional_data['allowRun']) ? $this->additional_data['allowRun'] : true;
-	}
+	// function getAllowRun() {
+	// 	return isset($this->additional_data['allowRun']) ? $this->additional_data['allowRun'] : true;
+	// }
 
-	function setAllowRun($newValue) {
-		$this->additional_data['allowRun'] = (bool)$newValue;
-	}
+	// function setAllowRun($newValue) {
+	// 	$this->additional_data['allowRun'] = (bool)$newValue;
+	// }
 
-	function getTimeoutMS() {
-		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 500; 
-	}
+	// function getTimeoutMS() {
+	// 	return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 500; 
+	// }
 
-	function setTimeoutMS($newValue) {
-		$this->additional_data['timeoutMS'] = (int)$newValue;
-	}
+	// function setTimeoutMS($newValue) {
+	// 	$this->additional_data['timeoutMS'] = (int)$newValue;
+	// }
 
-	function getMaxChars() {
-		return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000; 
-	}
+	// function getMaxChars() {
+	// 	return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000; 
+	// }
 	
-	function setMaxChars($newValue) {
-		$this->additional_data['maxChars'] = (int)$newValue;
-	}
+	// function setMaxChars($newValue) {
+	// 	$this->additional_data['maxChars'] = (int)$newValue;
+	// }
 
-	function getTheme() {
-		return isset($this->additional_data['theme']) ? $this->additional_data['theme'] : 'solarized light'; 
-	}
+	// function getTheme() {
+	// 	return isset($this->additional_data['theme']) ? $this->additional_data['theme'] : 'solarized light'; 
+	// }
 	
-	function setTheme($newValue) {
-		$this->additional_data['theme'] = ''.$newValue;
-	}
+	// function setTheme($newValue) {
+	// 	$this->additional_data['theme'] = ''.$newValue;
+	// }
 
-	function getROTheme() {
-		return isset($this->additional_data['themeRO']) ? $this->additional_data['themeRO'] : 'xq-light'; 
-	}
+	// function getROTheme() {
+	// 	return isset($this->additional_data['themeRO']) ? $this->additional_data['themeRO'] : 'xq-light'; 
+	// }
 	
-	function setROTheme($newValue) {
-		$this->additional_data['themeRO'] = ''.$newValue;
-	}
+	// function setROTheme($newValue) {
+	// 	$this->additional_data['themeRO'] = ''.$newValue;
+	// }
 
-	function getIncludeThreeJS() {
-		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
-	}
+	// function getIncludeThreeJS() {
+	// 	return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
+	// }
 	
-	function setIncludeThreeJS($newValue) {
-		$this->additional_data['includeThreeJS'] = (bool)$newValue;
-	}
+	// function setIncludeThreeJS($newValue) {
+	// 	$this->additional_data['includeThreeJS'] = (bool)$newValue;
+	// }
 
-	function getIncludeD3() {
-		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
-	}
+	// function getIncludeD3() {
+	// 	return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
+	// }
 	
-	function setIncludeD3($newValue) {
-		$this->additional_data['includeD3'] = (bool)$newValue;
-	}	
+	// function setIncludeD3($newValue) {
+	// 	$this->additional_data['includeD3'] = (bool)$newValue;
+	// }	
 
 	function getNumberOfBlocks() {
 		if (is_array($this->additional_data['blocks'])){
@@ -219,7 +221,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return $this->plugin;
 	}
 
-	public function getBlocks(){
+	public function blocks(){
 		return $this->blocks;
 	}
 
