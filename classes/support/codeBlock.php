@@ -2,14 +2,30 @@
 
 class codeBlock {
     var $object = null;
-    var $nr = null;    
+    var $block = null;    
 
-    public function __construct($nr, $object)
+	/**
+	 * $block - Data of this block or null if we should create a default set
+	 * $object - The paret codeBlocks Object
+	 */
+    public function __construct($block, $object)
 	{
-        $object->plugin->includeClass("./ui/codeBlockUI.php");
-        $this->object = $object;
-        $this->nr = $nr;        
-    }
+        $object->getPlugin()->includeClass("./ui/codeBlockUI.php");
+		$this->object = $object;
+		if ($block==null){
+			$this->block = array(
+				'type' => assCodeQuestionBlockTypes::StaticCode,
+				'content' => '',
+				'LINES' => 'auto'
+			);
+		} else {
+			$this->block = $block;        
+		}
+	}
+	
+	function getRawData(){
+		return $block;
+	}
 
     var $ui = null;
     function getUI(){
@@ -27,59 +43,42 @@ class codeBlock {
 		return str_replace('<', '&lt;', $str);
 	}
 
-    function getLinesForBlock() {
-		if (is_array($this->object->additional_data['blocks'])){
-			$res = $this->object->additional_data['blocks'][$this->nr]['lines']+0;
-			if ($res==0) $res = 15;
-			return $res;
-		} else {
-			return 15;
+	public function __get($property) {
+		return $this->block[$porperty];
+	  }
+	
+	public function __set($property, $value) {
+		if (property_exists($this, $property)) {
+			return $this->block[$porperty] = $value;
 		}
+
+		return $this;
 	}
 
-	function setLinesForBlock($value) {
-		if (!is_array($this->object->additional_data['blocks'])){
-			$this->object->additional_data['blocks'] = array();			
-		} 	
-		$this->object->additional_data['blocks'][$this->nr]['lines'] = $value;
+    function getLines() {
+		$res = $this->block['lines'];
+		if ($res==0) $res = 15;
+		return $res;		
 	}
 
-    function getTypeForBlock() {
-		if (is_array($this->object->additional_data['blocks'])){
-			return $this->object->additional_data['blocks'][$this->nr]['type'];
-		} else {
-			if ($this->nr==0) return assCodeQuestionBlockTypes::StaticCode;
-			if ($this->nr==1) return assCodeQuestionBlockTypes::SolutionCode;
-			if ($this->nr==2) return assCodeQuestionBlockTypes::StaticCode;
-
-			return assCodeQuestionBlockTypes::HiddenCode;
-		}
+	function setLines($value) {
+		$this->block['lines'] = $value;
 	}
 
-	function setTypeForBlock($value) {
-		if (!is_array($this->object->additional_data['blocks'])){
-			$this->object->additional_data['blocks'] = array();			
-		} 	
-		$this->object->additional_data['blocks'][$this->nr]['type'] = $value;
+    function getType() {
+		return $this->block['type'];		
 	}
 
-	function getContentForBlock() {
-		if (is_array($this->object->additional_data['blocks'])){
-			return $this->fixLoadedCode($this->object->additional_data['blocks'][$this->nr]['content']);
-		} else {
-			if ($this->nr==0) return $this->fixLoadedCode($this->object->additional_data['prefixCode']);
-			if ($this->nr==1) return $this->fixLoadedCode($this->object->additional_data['bestSolution']);
-			if ($this->nr==2) return $this->fixLoadedCode($this->object->additional_data['postfixCode']);
-
-			return '';
-		}
+	function setType($value) {
+		$this->block['type'] = $value;
 	}
 
-	function setContentForBlock($value) {
-		if (!is_array($this->object->additional_data['blocks'])){
-			$this->object->additional_data['blocks'] = array();			
-		} 	
-		$this->object->additional_data['blocks'][$this->nr]['content'] = $value;
+	function getContent() {
+		return $this->fixLoadedCode($this->block['content']);
+	}
+
+	function setContent($value) {
+		$this->block['content'] = $value;
 	}
 }
 

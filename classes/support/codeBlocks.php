@@ -1,6 +1,6 @@
 <?php 
 
-class codeBlocks {
+class codeBlocks implements ArrayAccess {
     /* custom data we need to store fpr this question type. This array is serialized to json and stored in the db */
     var $additional_data = array();
 
@@ -16,7 +16,7 @@ class codeBlocks {
         $this->setJSONEncodedAdditionalData($json_data);
     }
 
-    private function getPlugion(){
+    public function getPlugin(){
         return $this->plugin;
     }
 
@@ -48,6 +48,7 @@ class codeBlocks {
             unset($this->additional_data['postfixCode']);
         }
 
+		//force reload ob blocks data structure
         $this->loadBlocks(true);
     }
     
@@ -56,7 +57,7 @@ class codeBlocks {
      */
 	private function loadBlocks($forecReload=false){
         $ct = count($this->additional_data['blocks']);
-		if ($forecReload || $this->blocks == null || $ct!=count($this->blocks)){
+		if ($forecReload || $this->blocks == null /*|| $ct!=count($this->blocks)*/){
 			$this->blocks = array();
 			for ($i=0; $i<$ct; $i++){
 				$this->blocks[] = new codeBlock($this->additional_data['blocks'][$i], $this);
@@ -66,8 +67,19 @@ class codeBlocks {
 	}
 
 	function getJSONEncodedAdditionalData(){
+		$bls = array();
+		foreach($this->blocks as $cbl){
+			$bls[] = $cbl.getRawData();
+		}
+		$this->additional_data['blocks'] = $bls;
 		return json_encode($this->additional_data);
-    }
+	}
+	
+	
+
+
+
+
     
     function getLanguage() {
 		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
@@ -134,41 +146,54 @@ class codeBlocks {
     }
     
 
+	public function __get($property) {
+		return $this->additional_data[$porperty];
+	  }
+	
+	public function __set($property, $value) {
+		if (property_exists($this, $property)) {
+			return $this->additional_data[$porperty] = $value;
+		}
+
+		return $this;
+	}
     
 
+
+
+
+
+	public function offsetSet($offset, $value) {
+        //we do not support the change of an offset
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->blocks[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->blocks[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->blocks[$offset]) ? $this->blocks[$offset] : null;
+	}
+	
 	function getNumberOfBlocks() {
-		return count($this->additional_data['blocks']);		
+		return count($this->blocks);		
+	}
+
+	function getBlock($idx){
+		return $this->blocks[idx];
 	}
 
 	function clearBlocks(){
 		$this->additional_data['blocks'] = array();
-		$this->blocks = null;
+		$this->blocks = array();
 	}
 
-	function getLinesForBlock($nr) {
-		$res = $this->additional_data['blocks'][$nr]['lines']+0;
-		if ($res==0) $res = 15;
-		return $res;		
-	}
-
-	function setLinesForBlock($nr, $value) {
-		$this->additional_data['blocks'][$nr]['lines'] = $value;
-	}
-
-	function getTypeForBlock($nr) {
-		return $this->additional_data['blocks'][$nr]['type'];		
-	}
-
-	function setTypeForBlock($nr, $value) {
-		$this->additional_data['blocks'][$nr]['type'] = $value;
-	}
-
-	function getContentForBlock($nr) {
-		return $this->fixLoadedCode($this->additional_data['blocks'][$nr]['content']);		
-	}
-
-	function setContentForBlock($nr, $value) {
-		$this->additional_data['blocks'][$nr]['content'] = $value;
+	function addBlock(){
+		$this->blocks[] = new codeBlock(null, $this);
 	}
 }
 

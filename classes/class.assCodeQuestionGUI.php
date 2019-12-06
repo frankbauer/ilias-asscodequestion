@@ -60,7 +60,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	function getLanguage() {
-		return $this->object->getLanguage();
+		return $this->object->getBlocks()->getLanguage();
 	}
 
 	var $didPrepare = false;

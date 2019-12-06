@@ -64,9 +64,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return str_replace('<', '&lt;', $str);
 	}
 
-	function getLanguage() {
-		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
-	}
+	// function getLanguage() {
+	// 	return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
+	// }
 
 	function setLanguage($newLanguage) {
 		$this->additional_data['language'] = $newLanguage;
@@ -126,17 +126,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	
 	function setIncludeD3($newValue) {
 		$this->additional_data['includeD3'] = (bool)$newValue;
-	}
-
-	function getBlocks($forecReload=false){
-		if ($forecReload || $this->blocks == null || $this->getNumberOfBlocks()!=count($this->blocks)){
-			$this->blocks = array();
-			for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
-				$this->blocks[] = new codeBlock($i, $this);
-			}
-		}
-		return $this->blocks;
-	}
+	}	
 
 	function getNumberOfBlocks() {
 		if (is_array($this->additional_data['blocks'])){
@@ -206,13 +196,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->additional_data['blocks'][$nr]['content'] = $value;
 	}
 
-	function setJSONEncodedAdditionalData($data) {
-		$this->additional_data = json_decode($data, true);
-	}
+	// function setJSONEncodedAdditionalData($data) {
+	// 	$this->additional_data = json_decode($data, true);
+	// }
 
-	function getJSONEncodedAdditionalData(){
-		return json_encode($this->additional_data);
-	}
+	// function getJSONEncodedAdditionalData(){
+	// 	return json_encode($this->additional_data);
+	// }
 
 	/**
 	 * Get the plugin object
@@ -227,6 +217,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 				
 		}
 		return $this->plugin;
+	}
+
+	public function getBlocks(){
+		return $this->blocks;
 	}
 
 	/**
@@ -284,7 +278,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			),
 			array(
 				'question_fi' => array('integer', $ilDB->quote($this->getId(), 'integer')),
-				'data' => array('clob', $this->getJSONEncodedAdditionalData())
+				'data' => array('clob', $this->blocks->getJSONEncodedAdditionalData())
 			)
 		);
 	}
@@ -333,7 +327,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			. $ilDB->quote($question_id, 'integer'));
 
 		$data = $ilDB->fetchAssoc($result);
-		$this->setJSONEncodedAdditionalData($data["data"]);
+		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
+		//$this->setJSONEncodedAdditionalData($data["data"]);
 
 		try
 		{
@@ -883,7 +878,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	/*-----------------*/
 
 	function getExportExtension() {
-		$language = $this->getLanguage();
+		$language = $this->blocks->getLanguage();
 		if ($language=='c') return 'c';
 		if ($language=='c++') return 'cpp';		
 		if ($language=='c#') return 'cs';
@@ -904,7 +899,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	function getExportFilename() {
 		if (is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
-		} else if ($this->getLanguage()=='java' || $this->getLanguage()=='java2'){
+		} else if ($this->blocks->getLanguage()=='java' || $this->blocks->getLanguage()=='java2'){
 			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
 			$className = trim($matches[1][0]);
 			if ($className=='') $className="Unbekannt";
@@ -950,7 +945,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	private function createCommentedCodeLine($str){
-		$language = $this->getLanguage();
+		$language = $this->blocks->getLanguage();
 		if ($language=='python' || $language=='perl' || $language=='ruby' || $language=='r') return '# '.$str;
 		if ($language=='fortran') return 'c '.$str;				
 
