@@ -24,15 +24,18 @@ class codeBlockUI {
         if ($type==assCodeQuestionBlockTypes::Canvas) 
             return $this->renderCanvas();
 
+        if ($type==assCodeQuestionBlockTypes::Text) 
+            return $this->renderText();
+
         return '';
     }
 
     private function renderCanvas(){
         $html  = '<playground ';
-        $html .= 'data-visible-lines="'.$this->model->getVersion().'" '.
-        'width="'.$this->model->getWidth().'" '.
-        'height="'.$this->model->getHeight().'" '.
-        'align="'.$this->model->getAlign().'" '.
+        $html .= 'data-version="'.$this->model->getVersion().'" '.
+                 'width="'.$this->model->getWidth().'" '.
+                 'height="'.$this->model->getHeight().'" '.
+                 'align="'.$this->model->getAlign().'" ';
         $html .= '>'.$this->model->getContent()."</playground>";
         return $html;
     }

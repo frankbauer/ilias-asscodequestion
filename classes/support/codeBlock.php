@@ -23,11 +23,11 @@ class codeBlock {
 	}
 
 	public function getDataVersion(){
-		return $object->getDataVersion();
+		return $this->object->getDataVersion();
 	}
 	
 	function getRawData(){
-		return $block;
+		return $this->block;
 	}
 
 	function tidyUnusedProperties(){
@@ -132,7 +132,7 @@ class codeBlock {
 	}
 
 	function getVersion(){
-		if ($this.getDataVersion()==100){
+		if ($this->getDataVersion()==100){
 			return '100';
 		}
 

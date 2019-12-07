@@ -95,7 +95,7 @@ class codeBlocks implements ArrayAccess {
 			$this->additional_data['workerlibs'] = array();
 		}
 
-		//force reload ob blocks data structure
+		//force reload of blocks data structure
         $this->loadBlocks(true);
     }
     
@@ -116,8 +116,8 @@ class codeBlocks implements ArrayAccess {
 	function getJSONEncodedAdditionalData(){
 		$bls = array();
 		foreach($this->blocks as $cbl){
-			$cbl.tidyUnusedProperties();
-			$bls[] = $cbl.getRawData();
+			$cbl->tidyUnusedProperties();
+			$bls[] = $cbl->getRawData();
 		}
 		$this->additional_data['blocks'] = $bls;
 		return json_encode($this->additional_data);

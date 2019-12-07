@@ -729,9 +729,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
 	{		
 		$this->object->setPoints((int) $_POST["points"]);
-		$this->object->blocks()->setFromPOST($_POST);
-
-		die;		
+		$this->object->blocks()->setFromPOST($_POST);			
 	}
 
 	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)

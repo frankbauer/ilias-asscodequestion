@@ -22,8 +22,8 @@ class codeBlocksUI {
                  'data-run-code="'.($this->model->getAllowRun()?'true':'false').'" '.
                  'data-solution-theme="'.$this->model->getTheme().'" '.
                  'data-code-theme="'.$this->model->getROTheme().'" '.
-                 'data-dom-libs="'.json_encode($this->model->getDomLibs()).'" '.
-                 'data-worker-libs="'.json_encode($this->model->getWorkerLibs()).'" '.
+                 "data-dom-libs='".json_encode($this->model->getDomLibs())."' ".
+                 "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
                  '>';
 
         $html .= '<loading><div></div><div></div></loading>';
