@@ -93,6 +93,7 @@ const compilerRegistry = new Vue({
                 const uri = uris[idx];
                 let script = document.createElement('script');
                 script.src = uri;
+                console.log("[Loading Library from " + uri+"]")
                 script.onload = function () {                    
                     loadLib(uris, idx+1);
                 };

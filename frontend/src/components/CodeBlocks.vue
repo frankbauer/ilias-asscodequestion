@@ -319,11 +319,11 @@
                 let cmp = this.$compilerRegistry.getCompiler(this.compiler);
                 if (!cmp) return false;
 
-                this.$compilerState.setAllRunButtons(false);  
-                this.eventHub.$emit('before-run', {  })              
+                this.$compilerState.setAllRunButtons(false);                  
                 this.resetOutput();
                 this.clearDiagnostics();
                 this.loadLibraries(function(){
+                    this.eventHub.$emit('before-run', {  })
                     cmp.compileAndRun(
                         this.blocks.id,
                         this.completeSource,
@@ -354,6 +354,9 @@
             if (cmp) {
                 cmp.preload();
             }
+            this.loadLibraries(function(){
+                    this.eventHub.$emit('initialized-libraries', {  })
+            }.bind(this));
             this.didInitialize = true;
         }
     }

@@ -47,9 +47,12 @@ class ScriptBlock {
       if (code!==undefined){
         try {
           this.err = []
-          //console.log("!!! REBUILDING !!!");
+          console.log("!!! REBUILDING !!!");
           this.src = code
-          this.fkt = new Function('"use strict"; return ' + code);    
+          if (this.requestsOriginalVersion())
+            this.fkt = new Function('              return ' + code);    
+          else
+            this.fkt = new Function('"use strict"; return ' + code);    
           this.obj = this.fkt();
         } catch (e){
           this.pushError(e);
@@ -66,6 +69,7 @@ class ScriptBlock {
     init(canvasElement, outputElement){
       if (this.obj===undefined) return;
       try {
+        console.log("!!! INIT !!!");        
         this.obj.init(canvasElement);
       } catch(e) {
          this.pushError(e); 
@@ -96,16 +100,20 @@ class ScriptBlock {
 
     update(outputObject, canvasElement){
       if (this.obj===undefined) return outputObject.initialOutput;
-      try {
+      try {        
         if (this.obj.update){  
           //console.log(this.obj.update.length, outputObject, this.obj);
           //this is the old behaviour  
           if (this.obj.update.length == 2 || this.requestsOriginalVersion()){              
-            if (outputObject.processedOutput.type=='json')
+            if (outputObject.processedOutput.type=='json') {
+              console.log("!!! UPDATE (org, json) !!!");
               return this.obj.update(outputObject.processedOutput.json, canvasElement);
-            else
+            } else {
+              console.log("!!! UPDATE (org, text) !!!");
               return this.obj.update(outputObject.initialOutput, canvasElement);
+            }
           } else {
+            console.log("!!! UPDATE ("+this.version+")!!!");
             return this.obj.update(outputObject.processedOutput.text, outputObject.processedOutput.json, canvasElement, outputObject.outputElement);
           }
         }

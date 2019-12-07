@@ -73,8 +73,11 @@ export default {
             this.blockInfo.domLibs = v;
         },
         onScriptVersionChange(nfo){
+            
             let bl = this.blockById(nfo.id);
+            console.log(bl, nfo);
             bl.version = nfo.version;
+            if (bl.obj) bl.obj.version = nfo.version;
         },
         onThemeChange(nfo){
             this.blockInfo.solutionTheme = nfo.solution;

@@ -29,6 +29,9 @@ class CodeBlocksManager {
                 nextLine(){
                     if (!this.hasCode) return this.firstLine;
                     return this.firstLine + this.lineCount;
+                },
+                domLibs(){
+                    return data.domLibs;
                 }
             }
         })

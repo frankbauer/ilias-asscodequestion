@@ -25,8 +25,12 @@ export default {
     mounted(){
         //console.log("MOUNTED");
         if (this.obj){
-            //console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));    
-            this.obj.init($(this.canvas));
+            //console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));  
+
+            this.$compilerRegistry.loadLibraries(this.block.domLibs, function(){  
+                this.obj.init($(this.canvas));
+            }.bind(this));          
+            
         }
         this.$emit('canvas-change', this.canvas);
     }
