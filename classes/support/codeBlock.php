@@ -82,7 +82,8 @@ class codeBlock {
     }
 
     function fixLoadedCode($str){
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
+		return str_replace('<', '&lt;', $str);
+		//return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
 	}
 
 	function fixSentCode($str){
