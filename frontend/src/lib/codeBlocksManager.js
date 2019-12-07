@@ -118,7 +118,8 @@ class CodeBlocksManager {
                 
                 block.width = bl.getAttribute('width')?bl.getAttribute('width'):block.width
                 block.height = bl.getAttribute('height')?bl.getAttribute('height'):block.height
-                block.align = bl.getAttribute('align')?bl.getAttribute('align'):block.align                
+                block.align = bl.getAttribute('align')?bl.getAttribute('align'):block.align   
+                block.version = bl.getAttribute('version')?bl.getAttribute('version'):'101'
             } else if (block.type == 'BLOCK') {
                 block.hasCode = true;                
             } else if (block.type == 'LOADING' || block.type == 'DIV') {
