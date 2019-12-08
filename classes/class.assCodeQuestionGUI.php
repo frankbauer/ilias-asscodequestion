@@ -436,6 +436,19 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
 
+		if ($show_manual_scoring){
+			// always load jQuery
+			include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
+			iljQueryUtil::initjQuery($template);
+			iljQueryUtil::initjQueryUI($template);
+			$this->object->blocks()->ui()->prepareTemplate($template, self::URL_PATH);
+			$template->setCurrentBlock("DEFAULT");
+			$template->fillCssFiles();
+			$template->fillInlineCss();
+			$template->fillJavaScriptFiles();
+			$template->fillOnLoadCode();
+		}
+
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
 		if ($showStudentResults)
@@ -484,9 +497,12 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
+		
+
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 
+		
 		$solutionoutput = $solutiontemplate->get();	
 		if(!$show_question_only)
 		{

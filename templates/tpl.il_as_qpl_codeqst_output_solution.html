@@ -1,6 +1,32 @@
+<!-- BEGIN css_file -->
+<link rel="stylesheet" type="text/css" href="{CSS_FILE}" media="{CSS_MEDIA}" />
+<!-- END css_file -->
+<!-- BEGIN css_inline -->
+<style>
+    {CSS_INLINE}
+</style>
+<!-- END css_inline -->
+
+<!-- BEGIN view_append_inline_css -->
+{APPEND_STYLES}
+<!-- END view_append_inline_css -->
+
+<!-- BEGIN js_file -->
+<script type="text/javascript" src="{JS_FILE}"></script>
+<!-- END js_file -->
+
 <p highlight={LANGUAGE}>{QUESTIONTEXT}</p>
 <p>
     <b>{LABEL_VALUE1}</b>
     <br>
     {BLOCK_HTML}
 </p>
+
+<!-- BEGIN on_load_code -->
+<script type="text/javascript">
+    il.Util.addOnLoad(function() {
+        <!-- BEGIN on_load_code_inner -->{OLCODE}
+        <!-- END on_load_code_inner -->
+    });
+</script>
+<!-- END on_load_code -->
