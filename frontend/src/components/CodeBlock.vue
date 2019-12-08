@@ -1,9 +1,8 @@
 <template>
     <div>
-        <codemirror ref="codeBox" :value="code" :options="options" :class="boxClass" @ready="onCodeReady"
+        <codemirror ref="codeBox" :value="code" :options="options" :class="`accqstXmlInput noRTEditor ${boxClass}`" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange" :name="`block[${block.parentID}][${block.id}]`">
-        </codemirror>
-        
+        </codemirror>        
     </div>
 </template>
 
@@ -81,12 +80,20 @@
                 this.codemirror.getDoc().clearGutter('diagnostics');                
             },
             onCodeReady(editor) {
+                //we need this for StudON to make sure tinyMCE is not taking over :D
+                this.codemirror.display.input.textarea.className = "noRTEditor"                
+                this.$refs.codeBox.$el.querySelectorAll('textarea[name]').forEach(el => {
+                    el.className = (el.className + " accqstXmlInput noRTEditor").trim();
+                })
                 this.updateDiagnosticDisplay();
             },
             onCodeFocus(editor) {
 
             },
             onCodeChange(newCode) {
+                const tb = this.$refs.codeBox.$el.querySelector('textarea[name]');
+                tb.value = newCode
+                
                 this.block.content = newCode
                 if (this.editMode) this.$emit("code-changed-in-edit-mode", undefined);
             },
@@ -105,7 +112,7 @@
                     const first = this.block.firstLine;
                     val.forEach(error => {
                         if (error.start.column>=0){
-                            console.log("squiggle", this.block.type);
+                            //console.log("squiggle", this.block.type);
                             //put a squigly line as code marker 
                             this.codemirror.getDoc().markText(
                                 {line:error.start.line-first, ch:error.start.column}, 
@@ -123,7 +130,7 @@
                         let info = this.codemirror.getDoc().lineInfo(error.start.line-first);
                         let element = info && info.gutterMarkers ? info.gutterMarkers['diagnostics'].$component : null;
                         if (element == null) {
-                            console.log("Gutter", this.block.type, error.start.line, error.message, first);
+                            //console.log("Gutter", this.block.type, error.start.line, error.message, first);
                             element = document.createElement("span");
 
                             //place the updated element

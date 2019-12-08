@@ -2,6 +2,7 @@
     <div class="row q-ma-0 q-pa-0" >    
         <div class="col-xs-12 col-md-6 q-px-sm">    
             <q-input
+                ref="editBox"
                 type="textarea"
                 autogrow
                 filled
@@ -9,7 +10,7 @@
                 label="HTML Source"
                 background-color="blue-grey darken-3"                                
                 v-model="text"
-                class="plain">
+                class="plain accqstXmlInput noRTEditor">
             </q-input>
         </div>
         <div class="col-xs-12 col-md-6 q-px-sm">    
@@ -43,6 +44,12 @@
             value: '',
             name: '',
             language:undefined
+        },
+        mounted(){
+            //we need this for StudON to make sure tinyMCE is not taking over :D
+            this.$refs.editBox.$el.querySelectorAll('textarea[name]').forEach(el => {
+                el.className = (el.className + " accqstXmlInput noRTEditor").trim();
+            })    
         }
     }
 </script>
