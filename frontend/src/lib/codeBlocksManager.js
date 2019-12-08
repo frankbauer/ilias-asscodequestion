@@ -41,7 +41,7 @@ class CodeBlocksManager {
         this.element = el;
         let data = {
             ...el.dataset,
-            editMode: el.tagName == 'CODEBLOCKSEDITOR',
+            editMode: el.tagName == 'CODEBLOCKSEDITOR' || el.hasAttribute("codeblockseditor"),
             blocks: []
         };
 
@@ -205,7 +205,7 @@ class CodeBlocksManager {
 export default {
     find(scope) {
         if (scope === undefined) scope = document;
-        const allCodeBlockParents = scope.querySelectorAll("codeblocks, codeblockseditor");
+        const allCodeBlockParents = scope.querySelectorAll("codeblocks, codeblockseditor, div[codeblocks], div[codeblockseditor]");
         let result = [];
         allCodeBlockParents.forEach(el => {
             result.push(new CodeBlocksManager(el));
