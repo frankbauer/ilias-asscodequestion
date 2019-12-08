@@ -429,9 +429,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		//print_r("getSolutionOutput $active_id $pass $graphicalOutput $result_output $show_question_only $show_feedback $show_correct_solution $show_manual_scoring $show_question_text"); //die;
+		print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); //die;
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
+		
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
 
@@ -441,8 +442,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
-
-			$template->setVariable("NAME_MODIFIER", "");
 		}
 		else
 		{
@@ -456,8 +455,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$solutions = array(array(
 				"value1" => json_encode($bestSolution),
 				"value2" => "..."
-			));
-			$template->setVariable("NAME_MODIFIER", "_SOL");			
+			));			
 		}
 
 		// loop through the saved values if more records exist
@@ -467,11 +465,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
 			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
-		}		
-		
-		if ( $this->object->blocks->getAllowRun() ) {			
-			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
-		}
+		}	
 			
 		if ($showStudentResults)
 		{
@@ -493,53 +487,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 
-		$solutionoutput = $solutiontemplate->get();
-
-		//include everything we need to execute python code when we just want to display a brief answer
-		if ($_GET['cmd'] == 'getAnswerDetail' ) {
-			$lngData = $this->getLanguageData();
-			if (!$this->didAddLinksToSolutions) {
-				$solutionoutput .= '
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/css/custom.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-dark.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-light.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mbo.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mdn-like.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized-dark.css" media="screen" />
-				
-				
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>';
-								
-				$this->didAddLinksToSolutions = true;
-
-				$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-				$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
-				$tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());	
-				
-				$solutionoutput .= $tplPrep->get();
-			}
-			
-		}
-		
-		
+		$solutionoutput = $solutiontemplate->get();	
 		if(!$show_question_only)
 		{
 			// get page object output
