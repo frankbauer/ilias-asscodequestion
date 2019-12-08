@@ -64,7 +64,7 @@ Vue.prototype.$CodeBlock = {
       const idx = outputObject.indexOf(magicString);    
       if (idx >= 0) {
           const str = outputObject.substr(0, idx);
-          const json = undefined;
+          let json = undefined;
           const pString = outputObject.substr(idx+magicString.length);
           try {
             json = JSON.parse(pString); 
