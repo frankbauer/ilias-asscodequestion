@@ -9,7 +9,14 @@ class codeBlockUI {
         $this->model = $model;        
     }
 
-    public function render(){
+    public function print(){
+        if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
+            return '<pre>' . $this->model->getPrintableContent() . '</pre>';
+        } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
+        }
+    }
+
+    public function render($withSolution=false, $solutions=NULL){
         $type = $this->model->getType();
             
         if ($type==assCodeQuestionBlockTypes::StaticCode) 
@@ -19,7 +26,7 @@ class codeBlockUI {
             return $this->renderHiddenBlock();
 
         if ($type==assCodeQuestionBlockTypes::SolutionCode) 
-            return $this->renderBlock();
+            return $this->renderBlock($withSolution, $solutions);
 
         if ($type==assCodeQuestionBlockTypes::Canvas) 
             return $this->renderCanvas();
@@ -40,10 +47,22 @@ class codeBlockUI {
         return $html;
     }
 
-    private function renderBlock(){
+    private function renderBlock($withSolution=false, $solutions=NULL){
+        print_r($solutions);
+        print_r($withSolution);
         $html  = '<block ';
-        $html .= 'data-visible-lines="'.$this->model->getLines().'" ';
-        $html .= '>'.$this->model->getContent().'</block>';
+        $html .= 'data-visible-lines="'.$this->model->getLines().'" ';  
+        $html .= '>';
+        if ($withSolution) {
+            if (is_object($solutions)){
+                $nr = $this->model->getNr();
+                print_r($nr);
+                $html .= $solutions->$nr;
+            }
+        } else {
+            $html .= $this->model->getContent();            
+        }
+        $html .= '</block>';            
         return $html;
     }
 

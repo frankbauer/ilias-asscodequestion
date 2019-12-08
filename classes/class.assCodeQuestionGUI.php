@@ -187,19 +187,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return $value;
 	}
 
-	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
+	
+
+	private function prepareSolutionCode($value, $blockID){
 		if (empty($value)) return '';
 
 		$json = $this->object->decodeSolution($value);				
 		if (!empty($json)) $value = $json->$blockID;
 
 		$value = ilUtil::prepareFormOutput($value);
-
-		if ($toHTMLOutput){
-			$value = str_replace('[err]', '<span style="color:red">', $value);
-			$value = str_replace('[/err]', '</span>', $value);	
-		}
-
 		if ($forPrint) {
 			$value = $this->printableString($value);
 		}
@@ -224,24 +220,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->tpl->setVariable("FORMACTION", $formaction);
 	}*/
 
-	private function createRunHTMLCode($language, $questionID){
-		$runCode = "";
-		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
-		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
-		$runCode = $tplPrep->get();	
-
-		if ($this->object->blocks()->getAllowRun()) {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-			$tpl->setVariable("QUESTION_ID", $questionID);			
-			$tpl->setVariable("LANGUAGE", $language);
-			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
-			$runCode .= $tpl->get();			
-		}
-		return $runCode;
-	}
-
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -251,14 +229,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
-		//print_r("[getQuestionOutput $value1, $value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
+		print_r("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
-		$language = $this->getLanguage();		
-
-		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
-		//we can not run when we have multiple instances of the same question on screen
-		if ($active_id!=NULL || $print) $runCode='';
+		$language = $this->getLanguage();				
 
 		if ($template == NULL) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
@@ -266,12 +240,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
-			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
-			
-			/*$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
-			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
-			$questiontext = str_replace('[hl]', '<hl class="'.$language.'" usebr="no">', $questiontext);
-			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);*/
+			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);			
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
@@ -326,16 +295,17 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$script .= 'calls['.$questionID.']['.$i."]= ".$code."\n";
 			}
 		}*/
-		$template->setVariable("BLOCK_HTML", $this->object->blocks()->ui()->render(false));		
-		//$template->setVariable("CANVAS_SCRIPT", $script);	 
-		$template->setVariable("LANGUAGE", $language);
-		//$template->setVariable("RUN_CODE_HTML", $runCode);
 
+		//get the student solution
+		$solutions = $this->object->decodeSolution(empty($value1)?'{}':$value1);	
+		print_r($solutions);			
+		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions);
+
+		$template->setVariable("BLOCK_HTML", $html);		
+		$template->setVariable("LANGUAGE", $language);
+		
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
-
-		//$template->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
-		//$template->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
 
 		$questionoutput = $template->get();
 		return $questionoutput;
@@ -354,7 +324,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
-		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
+		print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
@@ -387,7 +357,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
-		//print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
+		print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
 		if( is_object($this->getPreviewSession()) )
 		{
 			$solution = $this->getPreviewSession()->getParticipantsSolution();
@@ -430,17 +400,20 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	)
 	{
 		print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); //die;
+
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
 
+		//this is requested through ajax and added to the already loaded DOM
 		if ($show_manual_scoring){
 			// always load jQuery
 			include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
 			iljQueryUtil::initjQuery($template);
 			iljQueryUtil::initjQueryUI($template);
+
 			$this->object->blocks()->ui()->prepareTemplate($template, self::URL_PATH);
 			$template->setCurrentBlock("DEFAULT");
 			$template->fillCssFiles();
@@ -455,6 +428,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
+			print_r($solutions);
 		}
 		else
 		{
@@ -497,12 +471,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
-		
-
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 
-		
 		$solutionoutput = $solutiontemplate->get();	
 		if(!$show_question_only)
 		{

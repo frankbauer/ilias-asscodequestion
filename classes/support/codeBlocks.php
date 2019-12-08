@@ -26,9 +26,9 @@ class codeBlocks implements ArrayAccess {
 			$this->additional_data['workerlibs'] = array();
 
 			$this->blocks = array();
-			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
-			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::SolutionCode, 'lines'=>'10', 'content'=>''), $this);
-			$this->blocks[] = new codeBlock(array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
+			$this->blocks[] = new codeBlock(0, array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
+			$this->blocks[] = new codeBlock(1, array('type'=>assCodeQuestionBlockTypes::SolutionCode, 'lines'=>'10', 'content'=>''), $this);
+			$this->blocks[] = new codeBlock(2, array('type'=>assCodeQuestionBlockTypes::StaticCode, 'content'=>''), $this);
 		} else {
 			$this->setJSONEncodedAdditionalData($json_data);
 		}
@@ -100,14 +100,14 @@ class codeBlocks implements ArrayAccess {
     }
     
     /**
-     * Loads the blocks structure from the 
+     * Loads the blocks structure from the internal attribute 'additional_data'
      */
 	private function loadBlocks($forecReload=false){
         $ct = count($this->additional_data['blocks']);
 		if ($forecReload || $this->blocks == null /*|| $ct!=count($this->blocks)*/){
 			$this->blocks = array();
 			for ($i=0; $i<$ct; $i++){
-				$this->blocks[] = new codeBlock($this->additional_data['blocks'][$i], $this);
+				$this->blocks[] = new codeBlock($i, $this->additional_data['blocks'][$i], $this);
 			}
 		}
 		return $this->blocks;
@@ -166,7 +166,7 @@ class codeBlocks implements ArrayAccess {
 		//handle blocks
 		$this->clearBlocks();
 		for ($i=0;$i<count($blocks); $i++){
-			$this->blocks[] = codeBlock::createFromPreparedPOST($blockOptions[$i], $blocks[$i], $this);
+			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $this);
 		}
 	}
 	
@@ -305,10 +305,6 @@ class codeBlocks implements ArrayAccess {
 	function clearBlocks(){
 		$this->additional_data['blocks'] = array();
 		$this->blocks = array();
-	}
-
-	function addBlock(){
-		$this->blocks[] = new codeBlock(null, $this);
 	}
 }
 

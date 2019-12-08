@@ -2,16 +2,18 @@
 
 class codeBlock {
     var $object = null;
-    var $block = null;    
+	var $block = null; 
+	var $nr = null;   
 
 	/**
 	 * $block - Data of this block or null if we should create a default set
 	 * $object - The paret codeBlocks Object
 	 */
-    public function __construct($block, $object)
+    public function __construct($nr, $block, $object)
 	{
         $object->getPlugin()->includeClass("./ui/codeBlockUI.php");
 		$this->object = $object;
+		$this->nr = $nr;
 		if ($block==null){
 			$this->block = array(				
 				'type' => assCodeQuestionBlockTypes::StaticCode,
@@ -29,6 +31,10 @@ class codeBlock {
 	function getRawData(){
 		return $this->block;
 	}
+	
+	function getNr(){
+		return $this->nr;
+	}
 
 	function tidyUnusedProperties(){
 		if ($this->getType()!=assCodeQuestionBlockTypes::SolutionCode){
@@ -42,7 +48,7 @@ class codeBlock {
 		}
 	}
 
-	public static function createFromPreparedPOST($options, $content, $object){		
+	public static function createFromPreparedPOST($nr, $options, $content, $object){		
 		$t = assCodeQuestionBlockTypes::StaticCode;
 		if ($options->type == 'BLOCK'){
 			if ($options->static==1 || $options->static=='true') 
@@ -67,7 +73,7 @@ class codeBlock {
 			'version' => $options->version
 		);
 		
-		$o = new codeBlock($data, $object);
+		$o = new codeBlock($nr, $data, $object);
 		$o->tidyUnusedProperties();
 		
 		return $o;
@@ -79,7 +85,15 @@ class codeBlock {
             $this->ui = new codeBlockUI($this);
         }
         return $this->ui;
-    }
+	}
+	
+	private function printableString($value){
+		$value = str_replace("\t", "  ",$value);
+		$value = str_replace(" ", "&nbsp;",$value);
+		$value = str_replace("\n", "<br />", $value);
+
+		return $value;
+	}
 
     function fixLoadedCode($str){
 		return str_replace('<', '&lt;', $str);
@@ -126,6 +140,10 @@ class codeBlock {
 
 	function getContent() {
 		return $this->fixLoadedCode($this->block['content']);
+	}
+
+	function getPrintableContent(){
+		return $this->printableString($this->getContent());
 	}
 
 	function setContent($value) {

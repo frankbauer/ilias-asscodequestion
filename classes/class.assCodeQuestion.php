@@ -335,6 +335,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	protected function getSolutionSubmit()
 	{		
 		$data = $_POST['block'][$this->getId()];
+
 		//$result = array('token'=>$this->guidv4());
 		$result = array();
 		for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){

@@ -9,8 +9,16 @@ class codeBlocksUI {
         $this->model = $model;        
     }
 
+    public function print(){
+        $html  = '<div>';
+        for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
+            $html .= $this->model[$i]->ui()->print();
+        }
+        $html .= '</div>';
+    }
+
     
-    public function render($editMode=false){
+    public function render($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL){
         $html  = '';
         $html .= '<div '.($editMode?'codeblockseditor ':'codeblocks ');
         $html .= 'data-id="'.$this->model->getId().'" '.
@@ -24,16 +32,16 @@ class codeBlocksUI {
                  'data-code-theme="'.$this->model->getROTheme().'" '.
                  "data-dom-libs='".json_encode($this->model->getDomLibs())."' ".
                  "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
+                 ($readOnly?'data-readonly':'').
                  '>';
 
         $html .= '<loading><div></div><div></div></loading>';
 
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
-            $html .= $this->model[$i]->ui()->render();
+            $html .= $this->model[$i]->ui()->render($withSolution, $solutions);
         }
-    
-        //$html .=  $editMode?'</codeblockseditor>':'</codeblocks>';
-        $html .=  '</div>';
+            
+        $html .= '</div>';
 
         return $html;
     }
