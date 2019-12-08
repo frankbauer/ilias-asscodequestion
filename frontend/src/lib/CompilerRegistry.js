@@ -121,7 +121,8 @@ compilerRegistry.register(GLSLCompilers);
 
 compilerRegistry.registerDOMLib(
     [
-        Vue.$CodeBlock.baseurl+'js/d3/5.3.8/d3.v5.min.js'
+        Vue.$CodeBlock.baseurl+'js/d3/5.3.8/d3.v5.min.js',
+        Vue.$CodeBlock.baseurl+'js/d3/5.3.8/helper.js'
     ], 
     'd3', 
     '5.13.4', 
@@ -134,7 +135,8 @@ compilerRegistry.registerDOMLib(
         Vue.$CodeBlock.baseurl+'js/three.js/r0/three.min.js',
         Vue.$CodeBlock.baseurl+'js/three.js/r0/controls/OrbitControls.js',
         Vue.$CodeBlock.baseurl+'js/three.js/r0/controls/TrackballControls.js',
-        Vue.$CodeBlock.baseurl+'js/three.js/r0/Detector.js'
+        Vue.$CodeBlock.baseurl+'js/three.js/r0/Detector.js',
+        Vue.$CodeBlock.baseurl+'js/three.js/helper.r0.js'
     ], 
     '3js', 
     'r0', 
