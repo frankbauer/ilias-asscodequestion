@@ -308,6 +308,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
+		print_r("[getQuestionOutput $value1, $value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();		
@@ -333,7 +334,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}			
 
 		$html = '';
-		$script = '';
+		/*$script = '';
 		//Add Code Blocks
 		for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
 			$questionID = $this->object->getId()*$qidf ;
@@ -345,6 +346,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 			$type = $this->object->blocks()[$i]->getType();
 
+			if ($print){}
 			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
 			$tpl->setVariable("NAME", $id);
 			$tpl->setVariable("BLOCK_ID", $i);
@@ -379,24 +381,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$script .= "if (calls[$questionID]===undefined) calls[$questionID]=[];\n";
 				$script .= 'calls['.$questionID.']['.$i."]= ".$code."\n";
 			}
-		}
-		$template->setVariable("BLOCK_HTML", $html);		
-		$template->setVariable("CANVAS_SCRIPT", $script);	 
-		$template->setVariable("LANGUAGE", $language);
-		$template->setVariable("RUN_CODE_HTML", $runCode);
+		}*/
+		$template->setVariable("BLOCK_HTML", $this->object->blocks()->ui()->render(false));		
+		//$template->setVariable("CANVAS_SCRIPT", $script);	 
+		//$template->setVariable("LANGUAGE", $language);
+		//$template->setVariable("RUN_CODE_HTML", $runCode);
 
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
-		$template->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
+		//$template->setVariable("MAX_CHARACTERS_VAL",$this->object->blocks()->getMaxChars());
+		//$template->setVariable("TIMEOUT_VAL",$this->object->blocks()->getTimeoutMS());
 
 		$questionoutput = $template->get();
 		return $questionoutput;
 	}
 
 	/**
-	 * Get the HTML output of the question for a test
+	 * Get the HTML output of the question for a test (The way students see the test)
 	 * (this function could be private)
 	 * 
 	 * @param integer $active_id			The active user id
@@ -408,6 +410,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
+		print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
@@ -433,13 +436,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	
 	/**
-	 * Get the output for question preview
+	 * Get the output for question preview ("Preview Button")
 	 * (called from ilObjQuestionPoolGUI)
 	 * 
 	 * @param boolean	show only the question instead of embedding page (true/false)
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
+		print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
 		if( is_object($this->getPreviewSession()) )
 		{
 			$solution = $this->getPreviewSession()->getParticipantsSolution();
@@ -455,7 +459,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	/**
-	 * Get the question solution output
+	 * Get the question solution output 
+	 * 	 - (When student views the "Result" of a test run)
+	 *   - (When in manual correction mode)
+	 *   - (When best solution is requested in preview)
 	 * @param integer $active_id             The active user id
 	 * @param integer $pass                  The test pass
 	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
@@ -478,7 +485,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		
+		print_r("getSolutionOutput $active_id $pass $graphicalOutput $result_output $show_question_only $show_feedback $show_correct_solution $show_manual_scoring $show_question_text"); //die;
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		// get the solution template

@@ -52,7 +52,7 @@ class codeBlockUI {
     }
 
     private function renderStaticBlock(){
-        return "<block data-static>".$this->model->getContent()."</block>";
+        return '<block data-static data-visible-lines="auto">'.$this->model->getContent()."</block>";
     }
 
     private function renderText(){

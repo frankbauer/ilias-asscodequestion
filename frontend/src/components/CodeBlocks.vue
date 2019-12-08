@@ -370,7 +370,8 @@
         background-image: linear-gradient(45deg, #ffffff 25%, #ebf2f5 25%, #ebf2f5 50%, #ffffff 50%, #ffffff 75%, #ebf2f5 75%, #ebf2f5 100%)
         background-size: 56.57px 56.57px
         
-    div.codeblocks            
+    div.codeblocks  
+        height: fit-content
         margin: 4px
         padding: 8px        
         .block
