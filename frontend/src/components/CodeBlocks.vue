@@ -49,7 +49,8 @@
                     v-else-if="block.type=='TEXT'" 
                     v-model="block.content" 
                     :editMode="editMode"
-                    :name="`block[${block.parentID}][${block.id}]`" />
+                    :name="`block[${block.parentID}][${block.id}]`"
+                    :language="language" />
         </CodeBlockContainer>
 
         <div class="row justify-end" v-if="editMode">

@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div v-if="!editMode" v-html="value"></div>
-        <TipTap v-else :value="value" @input="updatedContent" class="editor q-my-3" :name="name"/>
+        <div v-if="!editMode" v-html="value" v-highlight="language"></div>
+        <TipTap v-else :value="value" @input="updatedContent" class="editor q-my-3" :name="name" :language="language"/>
     </div>
 </template>
 
@@ -11,6 +11,7 @@ export default {
     name:"simpletext",
     components:{TipTap},
     props:{
+        language:undefined,
         value:"",
         name:"",
         'editMode': {

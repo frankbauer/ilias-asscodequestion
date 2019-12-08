@@ -14,7 +14,7 @@
         </div>
         <div class="col-xs-12 col-md-6 q-px-sm">    
             <div class="q-field__label no-pointer-events ellipsis text-caption wysiwyg">Preview</div>
-            <div v-html="text"></div>
+            <div v-html="text" v-highlight="language"></div>
         </div>
     </div>
 </template>
@@ -41,7 +41,8 @@
         },
         props: {
             value: '',
-            name: ''
+            name: '',
+            language:undefined
         }
     }
 </script>
