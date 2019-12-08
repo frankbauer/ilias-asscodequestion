@@ -15,8 +15,10 @@ import './plugins/codemirror';
 import './plugins/codeBlocks';
 import './plugins/compilerState';
 import './plugins/codemirror';
+import './plugins/highlight'
 import CodeBlocksManager from './lib/codeBlocksManager';
 
 
 Vue.config.productionTip = false
+Vue.$hljs.$vue.processElements();
 CodeBlocksManager.find(document).mount();

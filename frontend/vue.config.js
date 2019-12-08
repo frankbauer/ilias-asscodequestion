@@ -1,4 +1,4 @@
-var path = require("path");
+const path = require("path");
 
 module.exports = {
   publicPath: "Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/frontend/dist/",
@@ -14,5 +14,9 @@ module.exports = {
   transpileDependencies: [
     'quasar'
   ],
-	
+	configureWebpack: {
+    
+   
+    
+  }
 }

@@ -73,6 +73,14 @@
       <strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     
+    <p highlight="javascript">
+      This is just a <b>test</b>:
+    [code]update: function(text, json, canvasElement, outputElement) {
+        canvasElement.removeClass('hiddenBlock');
+        console.log("FOO", text, json);
+        return "New Text is here\n\n";
+    } //update[/code]
+    </p>
     
     <div id="app"></div>
     <div style="padding-left:50px;padding-right:50px">
@@ -222,7 +230,13 @@
 
       <block data-readonly data-static>}</block>  
       <block data-hidden>//Secret!!!</block>
-      <text>This was an example</text>   
+      <text>This [hl language=java]was an[/hl] [hl]was an[/hl] [hl]example code[/hl].
+
+[code language=java]
+public static void main(String[] args){
+}
+[/code]
+      </text>   
     </codeblockseditor>
     
     <codeblocks data-compiler="javascript" data-compiler-version="100" data-id="36">
