@@ -99,7 +99,7 @@ class ScriptBlock {
     }
 
     update(outputObject, canvasElement){
-      if (this.obj===undefined) return outputObject.initialOutput;
+      if (this.obj===undefined) return outputObject.output;
       try {        
         if (this.obj.update){  
           //console.log(this.obj.update.length, outputObject, this.obj);
@@ -110,7 +110,7 @@ class ScriptBlock {
               return this.obj.update(outputObject.processedOutput.json, canvasElement);
             } else {
               console.log("!!! UPDATE (org, text) !!!");
-              return this.obj.update(outputObject.initialOutput, canvasElement);
+              return this.obj.update(outputObject.output, canvasElement);
             }
           } else {
             console.log("!!! UPDATE ("+this.version+")!!!");
