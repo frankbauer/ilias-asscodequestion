@@ -182,14 +182,33 @@ export default {
         }
     },
     watch:{        
-        finalOutputObject: function (val) {            
+        finalOutputObject: function (val) {                    
             const initialOutput = val.output;
 
             if (this.block.obj){                
                 this.block.obj.err = [];
                 try {
-                    if (val.parseError!=null && typeof calls !== 'undefined'){
-                        block.obj.onParseError(initialOutput, val.parseError)                    
+                    if (val.parseError!=null){
+                        if (!this.block.obj.onParseError(initialOutput, val.parseError) && this.editMode){
+                            let jStr = initialOutput;
+                            if (val.parseError.parsedString){
+                                jStr = val.parseError.parsedString;
+                            }
+                            console.log(val, jStr);
+
+                           this.$q.dialog({
+                                title: 'Output is not a valid JSON-Object',
+                                message: '<span class="text-caption jsonErrTitle">Output:</span><div class="jsonErrObj">' + jStr + '</div>\n<span class="text-caption jsonErrTitle">Message:</span><div class="jsonErr">' + val.parseError + '</div>',
+                                html: true
+                            }).onOk(() => {
+                                // console.log('OK')
+                            }).onCancel(() => {
+                                // console.log('Cancel')
+                            }).onDismiss(() => {
+                                // console.log('I am triggered on both OK and Cancel')
+                            }) 
+                        }
+                        if (this.updateErrors()) return;                   
                     }
 
                     this.$nextTick(function () {
@@ -231,5 +250,22 @@ export default {
 .hiddenBlock    
     opacity: 0
     visibility: hidden
-
+</style>
+<style lang="stylus">
+@import '../styles/quasar.variables.styl'
+.jsonErrObj, .jsonErr
+    margin-left: 16px
+    font-weight: bold
+.jsonErrObj
+    padding-left: 4px
+    padding-right: 4px
+    font-family: monospace
+    margin-bottom: 20px
+    background-color:$amber-2
+.jsonErr
+    font-weight: bold
+    color: $deep-orange-14
+.jsonErrTitle
+    padding-left: 8px
+    text-transform: uppercase
 </style>

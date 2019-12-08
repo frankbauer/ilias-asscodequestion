@@ -64,12 +64,21 @@ Vue.prototype.$CodeBlock = {
       const idx = outputObject.indexOf(magicString);    
       if (idx >= 0) {
           const str = outputObject.substr(0, idx);
-          const json = JSON.parse(outputObject.substr(idx+magicString.length)); 
-      
+          const json = undefined;
+          const pString = outputObject.substr(idx+magicString.length);
+          try {
+            json = JSON.parse(pString); 
+          } catch (e){
+            e.parsedString = pString;
+            console.log("catch")
+            throw e;
+          }
+                
           return {
               type:'dual',
               json:json,
-              text:str
+              text:str,
+              err:err
           };
       } else if (outputObject.indexOf('[')!=-1 || outputObject.indexOf('{')!=-1) {
           return {
