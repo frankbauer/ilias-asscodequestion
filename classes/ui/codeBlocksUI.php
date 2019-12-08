@@ -41,11 +41,11 @@ class codeBlocksUI {
     public function prepareTemplate($tpl, $basePath){
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
-			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *{
+			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{
 				display:none;        
 			  }
 			  
-			  codeblockseditor, codeblocks, .code{
+			  codeblockseditor, codeblocks, [codeblockseditor], [codeblocks], .code{
 				display: block;
 				position:relative;
 				text-align: center;
@@ -56,7 +56,7 @@ class codeBlocksUI {
 				margin-bottom:50px;
 				font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 			  }			  
-			  codeblockseditor::before, codeblocks::before {
+			  codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {
 				content:\"loading...\"
 			  }			  			  
 			  loading {
