@@ -12,7 +12,7 @@ class codeBlocksUI {
     
     public function render($editMode=false){
         $html  = '';
-        $html .= $editMode?'<codeblockseditor ':'<codeblocks ';
+        $html .= '<div '.($editMode?'codeblockseditor ':'codeblocks ');
         $html .= 'data-id="'.$this->model->getId().'" '.
                  'data-compiler="'.$this->model->getCompilerLanguage().'" '.
                  'data-compiler-version="'.$this->model->getCompilerVersion().'" '.
@@ -32,7 +32,8 @@ class codeBlocksUI {
             $html .= $this->model[$i]->ui()->render();
         }
     
-        $html .=  $editMode?'</codeblockseditor>':'</codeblocks>';
+        //$html .=  $editMode?'</codeblockseditor>':'</codeblocks>';
+        $html .=  '</div>';
 
         return $html;
     }
