@@ -6,7 +6,10 @@ const compilerRegistry = new Vue({
     data: function(){
         return {
             compilers:{},
-            libraries:[]
+            libraries:[],
+            loadedURIs:[],
+            afterLoadFinished:[],
+            isLoadingLibs:false
         }
     },
     computed:{  
@@ -52,7 +55,7 @@ const compilerRegistry = new Vue({
             if (c===undefined) return ['none'];
             return c.versions.map(v => v.version);
         },
-        registerDOMLib(uri, name, version, displayName, utility=false){
+        registerDOMLib(uri, name, version, displayName, utility=false, order=0){
             this.libraries.push({
                 key:name+"-"+version,
                 uri:uri,
@@ -60,7 +63,8 @@ const compilerRegistry = new Vue({
                 version:version,
                 displayName:displayName,
                 didLoad:false,
-                utility:utility
+                utility:utility,
+                order:order
             })
         },
         getLibObjects(domLibs){
@@ -70,9 +74,10 @@ const compilerRegistry = new Vue({
             const libs = this.getLibObjects(domLibs);
             const uris = libs
                 .filter(l=> !l.didLoad)
+                .sort((a, b) => a.order < b.order ? 1 : -1)
                 .map(l => l.uri)                
                 .reduce((p, c) => c.concat(p), []);
-            
+
             return uris;
         },
         loadLibraries(domLibraries, whenLoaded){            
@@ -82,19 +87,73 @@ const compilerRegistry = new Vue({
                 dlibs.forEach(l => l.didLoad = true)
                 whenLoaded();
             }.bind(this))
-        }, 
-        loadURIs(libs, whenLoaded){
-            let loadLib = function(uris, idx){
-                if (idx>=uris.length) {
+        },
+        loadURIsIter(libs, whenLoaded){ 
+            console.log(libs);
+            let loadCount = 0;
+            let didLoad = (u) => {
+                loadCount++;
+                if (loadCount == libs.length){
                     whenLoaded();
+                }
+            }
+            libs.forEach(uri => {
+                if (this.loadedURIs.indexOf(uri)>=0){
+                    didLoad(uri);
                     return;
                 }
+                this.loadedURIs.push(uri);
 
-                const uri = uris[idx];
                 let script = document.createElement('script');
                 script.src = uri;
                 console.log("[Loading Library from " + uri+"]")
-                script.onload = function () {                    
+                script.onload = function () {  
+                    console.log("[Loaded " + uri+"]")
+                    didLoad(uri);
+                };
+                document.head.appendChild(script);
+            })
+        },
+        loadURIs(libs, whenLoaded){
+            //make sure we serialize all loads !!!
+            if (this.isLoadingLibs){
+                //queue the load
+                this.afterLoadFinished.push(()=>{
+                    this.loadURIs(libs, whenLoaded);
+                })
+                return;
+            }
+            this.isLoadingLibs = true;
+
+            const self = this;
+            
+            let loadLib = function(uris, idx){
+                if (idx>=uris.length) {
+                    whenLoaded();
+
+                    //something tried to queue another load
+                    // => dequeu it and run it now
+                    self.isLoadingLibs = false;
+                    if (self.afterLoadFinished.length>0){
+                        let next = self.afterLoadFinished.shift();
+                        next();
+                    }
+                    return;
+                }
+
+                const uri = uris[idx];  
+
+                //already loaded
+                if (self.loadedURIs.indexOf(uri)>=0) {
+                    loadLib(uris, idx+1);
+                    return;
+                }
+                self.loadedURIs.push(uri);              
+                
+                let script = document.createElement('script');
+                script.src = uri;
+                console.log("[Loading Library from " + uri+"]")
+                script.onload = function () {  
                     loadLib(uris, idx+1);
                 };
                 document.head.appendChild(script);
@@ -126,7 +185,9 @@ compilerRegistry.registerDOMLib(
     ], 
     'd3', 
     '5.13.4', 
-    'D3'
+    'D3',
+    false,
+    1000
 )
 
 
@@ -140,7 +201,9 @@ compilerRegistry.registerDOMLib(
     ], 
     '3js', 
     'r0', 
-    'Three.JS'
+    'Three.JS',
+    false,
+    2000
 )
 export default compilerRegistry;
 
