@@ -41,58 +41,8 @@ class codeBlocksUI {
     public function prepareTemplate($tpl, $basePath){
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
-			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{
-				display:none;        
-			  }
-			  
-			  codeblockseditor, codeblocks, [codeblockseditor], [codeblocks], .code{
-				display: block;
-				position:relative;
-				text-align: center;
-				margin:auto;
-				width:90%;
-				height:150px;
-				border:1px solid rgba(0,0,0,0.2);
-				margin-bottom:50px;
-				font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
-			  }			  
-			  codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {
-				content:\"loading...\"
-			  }			  			  
-			  loading {
-				display: inline-block;
-				position: relative;
-				top: 35px;
-				width: 80px;
-				height: 80px;
-			  }
-			  loading div {
-				position: absolute;
-				border: 4px solid rgb(43, 44, 50);
-				opacity: 1;
-				border-radius: 50%;
-				animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-			  }
-			  loading div:nth-child(2) {
-				animation-delay: -0.5s;
-			  }
-			  @keyframes lds-ripple {
-				0% {
-				  top: 36px;
-				  left: 36px;
-				  width: 0;
-				  height: 0;
-				  opacity: 1;
-				}
-				100% {
-				  top: 0px;
-				  left: 0px;
-				  width: 72px;
-				  height: 72px;
-				  opacity: 0;
-				}
-			  }");
-			//$tpl->addCss($basePath.'/frontend/dist/css/materialdesignicons.css');
+			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
+			$tpl->addCss($basePath.'/frontend/dist/css/loader.css');
 			$tpl->addCss($basePath.'/frontend/dist/css/roboto.css');
 			$tpl->addCss($basePath.'/frontend/dist/css/main.css');
 			$tpl->addCss($basePath.'/frontend/dist/css/app.css');
