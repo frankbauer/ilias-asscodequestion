@@ -105,64 +105,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$qidf = $negativeQuestionID?-1:1;
 		$lngData = $this->getLanguageData();
 		
-		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);
-
-		if (!$this->tpl->didPrepare) {
-			$tm = $this->object->blocks()->getROTheme();
-			if ($tm =='default') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='base16-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='base16-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='duotone-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='duotone-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='xq-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='xq-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='blackborard') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='mbo') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='mdn-like') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='midnight') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='neo') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='solarized light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='solarized dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='yeti') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
-		}		
-
-		if (!$this->didPrepare) {			
-			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");			
-		}
+		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);			
 	}
 
 	/**
@@ -324,10 +267,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
-			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
+			//$questiontext = str_replace('<br>', '', $questiontext);
+			/*$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
 			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
 			$questiontext = str_replace('[hl]', '<hl class="'.$language.'" usebr="no">', $questiontext);
-			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);
+			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);*/
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
@@ -384,7 +328,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}*/
 		$template->setVariable("BLOCK_HTML", $this->object->blocks()->ui()->render(false));		
 		//$template->setVariable("CANVAS_SCRIPT", $script);	 
-		//$template->setVariable("LANGUAGE", $language);
+		$template->setVariable("LANGUAGE", $language);
 		//$template->setVariable("RUN_CODE_HTML", $runCode);
 
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
@@ -569,7 +513,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mbo.css" media="screen" />
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/mdn-like.css" media="screen" />
 				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized-dark.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
 				
 				
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
@@ -583,15 +526,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
 				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/java2.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/python.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/glsl.js'.self::URL_SUFFIX.'"></script>';
-
+				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>';
+								
 				$this->didAddLinksToSolutions = true;
 
 				$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
@@ -600,8 +536,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				
 				$solutionoutput .= $tplPrep->get();
 			}
-
-			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("hl[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
+			
 		}
 		
 		
