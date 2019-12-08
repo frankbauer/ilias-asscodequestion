@@ -29,6 +29,7 @@ export default {
 
             this.$compilerRegistry.loadLibraries(this.block.domLibs, function(){  
                 this.obj.init($(this.canvas));
+                this.$emit('did-init', this.canvas);
             }.bind(this));          
             
         }

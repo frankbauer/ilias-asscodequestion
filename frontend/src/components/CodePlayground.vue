@@ -6,6 +6,7 @@
             :key="runCount" 
             :block="block" 
             @canvas-change="onCanvasChange" 
+            @did-init="onDidInit"
         />
         <CodeBlock 
             v-if="editMode" 
@@ -100,12 +101,15 @@ export default {
             lastRun:0,
             runCount:0,
             canvas:undefined,
-            needsCodeRebuild:false            
+            needsCodeRebuild:false,
+            initAndRebuildErrors:[]           
         }
     },
     methods:{
         updateErrors(){
             this.block.errors = [];
+            
+            this.block.obj.err = this.block.obj.err.concat(this.initAndRebuildErrors)
             this.block.obj.err.forEach(e => {
                 let err = {
                     start : { line: e.line, column:e.column},
@@ -133,10 +137,20 @@ export default {
         },
         resetBeforeRun(){
             if (this.editMode && this.needsCodeRebuild){
+                this.initAndRebuildErrors = [];
+
                 //console.log("Code", this.block.content);
-                this.block.obj.rebuild(this.block.content);
-                
-                if (this.updateErrors()) return;
+                this.block.obj.rebuild(this.block.content);                
+                if (this.updateErrors()) {
+                    this.initAndRebuildErrors = this.block.obj.err;
+                    return;
+                }
+
+                this.block.obj.init($(this.canvas));                
+                if (this.updateErrors()) {
+                    this.initAndRebuildErrors = this.block.obj.err;
+                    return;
+                }
             }
             if (this.block && this.block.obj){
                 if (this.block && this.block.obj && this.block.obj.shouldAutoReset()) {
@@ -162,13 +176,16 @@ export default {
             if (this.editMode){
                 this.needsCodeRebuild = true;
             }
+        },
+        onDidInit(){
+            this.updateErrors();
         }
     },
     watch:{        
         finalOutputObject: function (val) {            
             const initialOutput = val.output;
 
-            if (this.block.obj){
+            if (this.block.obj){                
                 this.block.obj.err = [];
                 try {
                     if (val.parseError!=null && typeof calls !== 'undefined'){
@@ -177,6 +194,8 @@ export default {
 
                     this.$nextTick(function () {
                         let result = this.block.obj.update(val, $(this.canvas)); 
+                        if (this.updateErrors()) return;
+
                         //construct a split output object
                         if (result === undefined && val.processedOutput.type!='text'){
                             result = val.processedOutput.text
