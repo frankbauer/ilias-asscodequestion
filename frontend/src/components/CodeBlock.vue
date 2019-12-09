@@ -137,6 +137,8 @@
                         }
                     );
                 })
+
+                this.$nextTick(()=>Vue.$tagger.hoockClick(this.$refs.codeBox.$el))                
             },
             updateDiagnosticDisplay(){
                 const val = this.errors;

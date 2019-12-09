@@ -10,9 +10,7 @@ Vue.$tagger = {
     },
 
     getMarkers(s){
-        
         let lines = s.split("\n");
-        console.log(lines)
         let markers = []
         let m;
         for (let i=0; i<lines.length; i++){
@@ -21,7 +19,6 @@ Vue.$tagger = {
             while ((m = regex.exec(lines[i])) !== null) {
                if (m.index === regex.lastIndex)  regex.lastIndex++;                
             
-               console.log(m)
                markers.push({
                    start:{line:i, ch:m.index},
                    end:{line:i, ch:regex.lastIndex},
@@ -39,12 +36,26 @@ Vue.$tagger = {
             this.processElement(el);
         })
     },
-    processElement: function(el){
-        
+    processElement: function(el){        
         el.innerHTML = el.innerHTML.replace(randomAndTemplateTag, (m0, m1, m2)=>{
             const className = m1===':'?this.className.rnd:this.className.templ;
             return `<span class="q-mb-xs ${className}">` + m0 + '</span>';
         });
+        this.hoockClick(el);
+    },
+    hoockClick: function(el){
+        let tags = el.querySelectorAll('.'+this.className.templ);
+        tags.forEach(tag => {
+            let name = tag.innerText.replace(randomAndTemplateTag, (m0, m1, m2)=>{
+                return m2
+            })
+            console.log(tag, tag.innerText, name);
+            
+            tag.onclick = () => {this.clickFunction(name, tag)};
+        })
+    },
+    clickFunction: function(name, tagEl){
+        console.log('click', name)
     }
 }
 
