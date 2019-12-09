@@ -30,167 +30,341 @@
     
     <div id="app"></div>
     <div style="padding-left:50px;padding-right:50px">
-      <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
-        <loading><div></div><div></div></loading>
-    <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
-    
-  },
-  shouldAutoReset: function() {return true;},
-  update: function(text, json, canvasElement, outputElement) {
-    let html_str = d3DomProxyToSaveInnerHTMLString(json);
-    canvasElement.html(html_str)    
-  }
-}
-    </playground>
-<block>var data = JSON.parse(`[{"year":2006,"books":54},{"year":2007,"books":43},{"year":2008,"books":41},{"year":2009,"books":44},{"year":2010,"books":35}]`);
+     
+        <div data-readonly codeblockseditor data-id="78" data-compiler="javascript" data-compiler-version="100" data-language="javascript" data-execution-timeout="500" ddata-max-characters="6000" data-run-code="true" data-solution-theme="solarized light" data-code-theme="xq-light" data-dom-libs='["d3-5.13.4"]' data-worker-libs='[]' data-output-parser="auto" ><loading><div></div><div></div></loading><playground data-version="101" width="100%" height="200px" align="left" >{
+            graph : {  
+                    nodes: [
+                        {name:'A', id:0},
+                        {name:'B', id:1},
+                        {name:'C', id:2},
+                        {name:'D', id:3},
+                        {name:'E', id:4},
+                        {name:'F', id:5},
+                        {name:'G', id:6},
+                    ],
+                    edges : [
+                        {source:0, target:5, w:7.0},
+                        {source:0, target:6, w:1.0},
+                        {source:0, target:1, w:7.0},
+                        {source:1, target:2, w:1.0},
+                        {source:1, target:3, w:5.0},
+                        {source:1, target:5, w:3.0},
+                        {source:1, target:6, w:8.0},
+                        {source:2, target:5, w:1.0},
+                        {source:3, target:6, w:15.0},
+                        {source:4, target:0, w:2.0},
+                        {source:4, target:5, w:8.0},                
+                        {source:1, target:6, w:1.0}
+                    ]
+            },	
+            showRows:[[-1, -1, -1, -1, 0, -1, -1]],
+            solution:undefined,
+            ui:undefined, 
+            readonly:false,
+            translate: function(val, infty){
+                if (val === undefined || val&lt;0) return infty || '&infin;';
+                return Math.round(val);
+            },
+          init: function (canvasElement) {
+                const width = 400;
+                const height = 400;
+                const graph = this.graph;         
+        
+                //if (this.findUIElements===undefined){
+                    function findUIElements(canvasElement){
+                        let res = {};
+                        res.questionID = canvasElement.attr('data-question')
+                        res.container = canvasElement.parents('.codeblocks')
+                        res.runContainer = res.container.find("div.runner")
+                        res.textEdit = res.container.find(".codeblock.block-block textarea[name]")
+                        res.stateBox = res.runContainer.find(".runnerState")
+                        res.runButton = res.runContainer.find("button")
+                        console.log(res.container.hasClass('block-readonly'))
+                        if (res.textEdit!==undefined) {
+                            res.editor = res.container.find('.codeblock.block-block .CodeMirror').get(0).CodeMirror;
+                        } else {
+                            res.editor = undefined;
+                        } 
+                        return res;
+                    }
+        
+                    function hideUIElements(canvasElement){
+                        let res = findUIElements(canvasElement);
+                        if (res.container.hasClass("editmode")) return res; 
 
-
-  // data accessing functions:
-  const xValue = d => d.books;
-  const yValue = d => d.year;
-
-  // draw area constants
-  const W = 600;
-  const H = 200;
-  const margin = { left: 80, right: 10, bottom: 30, top: 10 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-
-  const maxX = d3.max(data, xValue);
-  const minX = d3.min(data, xValue);
-
-  const xScale = d3.scaleLinear()
-    .domain([0, maxX])
-    .range([0, iW]);
-  const yScale = d3.scaleBand()
-    .domain(data.map(yValue))
-    .range([0, iH])
-    .padding(0.1);
-
-  const colorScaleX = d3.scaleSequential(d3.interpolateYlGn)
-    .domain([minX, maxX]);
-  const colorScaleY = d3.scaleOrdinal(d3.schemeAccent)
-    .domain(data.map(yValue));
-
-  const svg = d3.select("#content")
-    .append("svg")
-    .attr("width", W)
-    .attr("height", H);
-
-  const g = svg.append('g')
-    .attr('transform', "translate(" + margin.left + "," + margin.top + ")");
-
-  // axes for each scale
-  g.append('g')
-    .call(d3.axisLeft(yScale));
-  g.append('g')
-    .call(d3.axisBottom(xScale))
-    .attr('transform', "translate(0," + iH + ")");
-
-  // bars:  svg - rect
-  g.selectAll(".bar")
-    .data(data)
-    .enter()
-    .append("rect")
-    .attr("class", "bar")
-    .attr("width", d => xScale(xValue(d)))
-    .attr("height", yScale.bandwidth())
-    .attr("y", d => yScale(yValue(d)))
-    .attr("fill", d => colorScaleX(xValue(d)))
-    //.attr("fill", d => colorScaleY(yValue(d)))
-    .attr("stroke", "black")
-
-
-
-  console.log("\n\n&lt;JSON>\n" + document.__getD3ResultJSON());</block>
-</div>
-
-    <codeblockseditor data-compiler="python3" data-compiler-version="101" data-id="35" data-dom-libs='["d3-5.13.4","3js-r0"]' data-execution-timeout="10000" data-max-characters="40000" data-run-code="true">
-        <loading><div></div><div></div></loading>
-        <playground data-version="101" width="25%" height="100px" align="center">{init: function(canvasElement) {
-          //canvasElement.addClass('hiddenBlock');
-          //console.log("foo");
-  },
-  shouldAutoReset: function(){return true;},
-  update: function(text, json, canvasElement, outputElement) {
-  }
-}
-</playground>
-<block>print(2)</block>
-</codeblockseditor>
-
-    <codeblocks data-compiler="python3" data-compiler-version="101" data-id="35">
-
-    <loading><div></div><div></div></loading>
-        <playground data-version="101">{init: function(canvasElement) {
-            //console.log("INIT", canvasElement);
-            canvasElement.addClass('hiddenBlock');
-            //console.log(document.querySelector('#app'));
-        }, //init
-
-        getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i &lt; 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        },
-        shouldAutoReset: function(){return true;},
-        update: function(text, json, canvasElement, outputElement) {
-            canvasElement.removeClass('hiddenBlock');
-            canvasElement.css('background-color', this.getRandomColor());
-            console.log("FOO", text, json);
-            return "New Text is here\n\n";
-        } //update
-    }</playground>
-      <block>print(round(16.5))</block>
-      <block data-readonly data-static>for i in range(3, 5):
-    print(i)
-      </block>
-      <block data-hidden>print("Hello World")</block>
-      <text>This was a python 3 example</text> 
-    </codeblocks>
-
-    <codeblockseditor data-compiler="javascript" data-compiler-version="100" data-id="34">
-        <loading><div></div><div></div></loading>
-      <playground data-version="101">{init: function(canvasElement) {
-              //console.log("INIT", canvasElement);
-              canvasElement.addClass('hiddenBlock');
-              //console.log(document.querySelector('#app'));
-          }, //init
-  
-          update: function(text, json, canvasElement, outputElement) {
-              canvasElement.removeClass('hiddenBlock');
-              console.log("FOO", text, json);
-              return "New Text is here\n\n";
-          } //update
-      }</playground>
-      <block data-readonly data-static>public class Foo {</block>
-      <block data-visible-lines="10">public static void main(String[] args){
-  int a;System.out.println("Hello World!");
-  System.err.println("Hello World!");
-  System.out.print("\n\n&lt;JSON&gt;\n");
-  System.out.println("[1, 2, 3]");
-}</block>
-
-      <block data-readonly data-static>}</block>  
-      <block data-hidden>//Secret!!!</block>
-      <text>This [hl language=java]was an[/hl] [hl]was an[/hl] [hl]example code[/hl].
-
-[code language=java]
-public static void main(String[] args){
-}
-[/code]
-      </text>   
-    </codeblockseditor>
-    
-    <codeblocks data-compiler="javascript" data-compiler-version="100" data-id="36">
-        <block>console.log("Hello From Javascript");
-            console.error("e");
-        </block>
-      </codeblocks>
-    </div>
+                        if (res.editor===undefined){
+                            console.error("Could not find a valid answer Element");
+                        } else {
+                            $(res.editor.getWrapperElement()).hide();
+                            res.runButton.hide();
+                            res.stateBox.hide();
+                            if (res.runContainer) res.runContainer.hide();
+                        }
+                        return res;
+                    }
+                //}
+        
+                //this.ui = findUIElements(canvasElement);
+                this.ui = hideUIElements(canvasElement);
+                this.readonly = this.ui.container.hasClass('block-readonly');
+                canvasElement.css("background-color", 'unset');
+                canvasElement.css("border", 'unset');
+                canvasElement.css("height", 'unset');
+        
+                const styles = document.createElement('style');
+                styles.append('.links line {stroke: #BC8958;}');
+                styles.append('.links text {pointer-events: none;font: 12px sans-serif;font-weight:bold}');
+                styles.append('.lineLabelBox {fill:#fff; stroke:#BC8958}');
+                styles.append('.nodes text {pointer-events: none;font: 18px sans-serif;font-weight:bold;fill:white}');
+                styles.append('.nodes circle {pointer-events: all;stroke: white;stroke-width: 3px;fill:#437094}');
+                styles.append('.container {background-color:#ffff; border:1px dashed rgba(128, 48, 48, 0.66);margin:0px;padding:0px}');
+                styles.append('#dijkstra {background-color:#fff;margin-left:20px}')
+                styles.append('#dijkstra tr td, #dijkstra tr th{border:1px solid #437094;width:64px;text-align:center}');
+                styles.append('#dijkstra tr td{height:25px;vertical-align:center;padding-top:3px;padding-bottom:3px}');
+                styles.append('#dijkstra tr td.static{background-color:rgba(255, 255, 255, 0.8)}');
+                styles.append('#dijkstra tr th{background-color:#437094;color:white}');
+                styles.append('#dijkstra tr td input {background-color:#FCF6E5}');
+                styles.append('#dijkstra tr td input.none {background-color:#FCF6E522}');
+                canvasElement.append(styles);
+        
+                canvasElement.append('&lt;table>&lt;tr>&lt;td id="fblayout0">&lt;/td>&lt;td id="fblayout1">&lt;/td>&lt;/tr>&lt;/table>');
+                
+                const container = $(document.createElement('div'));
+                container.addClass('container');
+                container.width(width);
+                container.height(height);
+        
+                $('#fblayout0').append(container);
+                const t = $('#fblayout1');
+                
+                //if (!this.ui.container.hasClass("editmode")) 
+                {
+                  try {
+                      const old = JSON.parse(this.ui.textEdit.val());
+                      
+                      this.solution = old.solution;
+                  } catch (e){
+                      console.error(e);
+                  }
+                }
+        
+            
+                let s = '&lt;table id="dijkstra">';
+                s += '&lt;tr>';
+                $.each(graph.nodes, (i, n) => {
+                    s += '&lt;th>';
+                    s += n.name;
+                    s += '&lt;/th>';
+              graph.nodes[n.id].mapped = i;
+                });
+                s += '&lt;/tr>';
+        
+            $.each(graph.edges, (i, e) => {
+              e.source = graph.nodes[e.source].mapped;
+              e.target = graph.nodes[e.target].mapped;
+            });
+                const buildSolution = this.solution === undefined;
+                if (buildSolution) this.solution = [];
+                $.each(graph.nodes, (row, n) => {
+                    s += '&lt;tr>';
+                        if (buildSolution) this.solution[row] = [];
+                    $.each(graph.nodes, (col, n) => {
+                        if (row&lt;this.showRows.length) {
+                            s += '&lt;td class="static">';                    
+                            if (buildSolution) this.solution[row][col] = this.showRows[row][col];
+                            s += this.translate(this.solution[row][col]);
+                        } else {
+                            s += '&lt;td>';
+                                if (buildSolution) this.solution[row][col] = '';
+                            s += '&lt;input type="text" id="fbDijkstra_'+row+'_'+col+'" maxlength="4" size="3" value="'+this.solution[row][col]+'" '+((''+this.solution[row][col]).trim()==''?'class="none"':'')+(this.readonly?' readonly':'')+'>';                    
+                        }                
+                        s += '&lt;/td>';
+                    });            
+                    s += '&lt;/tr>';
+                });
+                s += '&lt;/table>'
+                t.append(s);
+        
+                const mdiv = document.createElement("div");
+                mdiv.innerHTML = this.translate(-1); 
+                const infty = (mdiv.textContent || mdiv.innerText);       
+        
+                let firstInput = true;
+                const self = this;
+                $.each(graph.nodes, (row, n) => {            
+                    $.each(graph.nodes, (col, n) => {
+                        if (row>=this.showRows.length) {
+                            const input = t.find('#fbDijkstra_'+row+'_'+col);
+                            if (firstInput){
+                                firstInput = false;
+                                input.focus();
+                            }
+                            input.keyup(()=>{
+                                let v = input.val().trim();
+                                if (v===infty) v = -1;
+                                
+                                if (v&lt;0) input.val(infty);
+                                if (v=='') input.addClass('none');
+                                else input.removeClass('none');
+                                self.solution[row][col] = v;
+                                this.storeResult()
+                            });
+                            input.on('change', ()=>{
+                                let v = input.val().trim();
+                                if (v===infty || v=='-') v = -1;
+                                if (v!='') v = this.translate(Number(v), infty);
+                                input.val(v);
+                                self.solution[row][col] = v;
+                                
+                                this.storeResult()
+                            });
+                        }
+                    });
+                });
+                
+                const svg = d3.select(container.get(0)).append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+                
+                const simulation = d3.forceSimulation(graph.nodes) 
+                    .force("charge", d3.forceManyBody().strength(-1000))
+                    .force("link", d3.forceLink(graph.Edges).distance(25))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collide', d3.forceCollide(25))            
+        
+                const link = svg.append("g")
+                    .attr("class", "links")
+                    .selectAll("line")
+                    .data(graph.edges)
+                    .enter()
+                    .append('g');
+                   
+                link.append("line")
+                    .attr('class', 'line');
+        
+                const labelGroup = link.append('g')
+                    .attr('class', 'labelGroup');
+                
+                labelGroup.append("text")
+                    .attr('class', 'lineLabel')            
+                    .attr('alignment-baseline', 'middle')
+                    .attr('text-anchor', 'middle')
+                    .text(d => d.w)                 
+        
+                link.selectAll("text").each(function(d, i) {
+                    d.bb = this.getBBox(); 
+                });  
+        
+                const padding = 3;
+                labelGroup.insert("rect", ":first-child")           
+                    .attr('class', 'lineLabelBox')  
+                    .attr("width", function(d) { return d.bb.width + 2*padding; })
+                    .attr("height", function(d) { return d.bb.height + 2*padding; })
+                    .attr("x", function(d) { return - d.bb.width/2 - padding; })
+                    .attr("y", function(d) { return - d.bb.height/2 - padding; });        
+        
+                var node = svg.append("g")
+                    .attr("class", "nodes")
+                    .selectAll(".nodes")
+                    .data(graph.nodes)
+                    .enter()
+                        .append('g')
+                        .attr("class", "node")
+                        .call(d3.drag()
+                            .on("start", dragstarted)
+                            .on("drag", dragged)
+                            .on("end", dragended));
+                    
+                node.append("circle")
+                    .attr('cx', 0)
+                    .attr('cy', 0)
+                    .attr("r", 16)                
+                            
+                node.append("text")
+                    .attr('class', 'nodeLabel')
+                    .attr('alignment-baseline', 'middle')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', 0)
+                    .attr('y', 1)
+                    .text(d => d.name);
+        
+        
+                simulation
+                    .nodes(graph.nodes)
+                    .on("tick", ticked);
+        
+                simulation.force("link")
+                    .links(graph.edges);
+        
+                function ticked() {
+                    link.selectAll('line')
+                        .attr("x1", function(d) { return d.source.x; })
+                        .attr("y1", function(d) { return d.source.y; })
+                        .attr("x2", function(d) { return d.target.x; })
+                        .attr("y2", function(d) { return d.target.y; });
+        
+                    link.selectAll('g')
+                        .attr('transform', d => 'translate('+
+                                                            (d.source.x + d.target.x)/2
+                                                            +', '+
+                                                            (d.source.y + d.target.y)/2
+                                                            +')'
+                        )                        
+                                        
+                    node.attr('transform', d => 'translate('+d.x+', '+d.y+')')              
+                }
+        
+                function dragstarted(d) {
+                    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                }
+        
+                function dragged(d) {
+                    d.fx = d3.event.x;
+                    d.fy = d3.event.y;
+                }
+        
+                function dragended(d) {
+                    if (!d3.event.active) simulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }
+        
+                this.storeResult();
+          },
+            storeResult: function(){
+                if (this.readonly) return;
+                const val = JSON.stringify({
+                    solution:this.solution,
+                    graph:{
+                        nodes:this.graph.nodes.map(n=>{return {n:n.name, id:n.id};}),
+                        edges:this.graph.edges.map(e=>{return {s:e.source, t:e.target, w:e.w};}),
+                    }
+                });
+                
+                if (this.ui.editor !== undefined) this.ui.editor.getDoc().setValue(val);
+                this.ui.textEdit.val(val);
+            },
+          shouldAutoReset: function(){
+            return true
+          },
+          update: function (text, json, canvasElement, outputElement) {
+            outputObject = processMixedOutput(outputObject, canvasElement)		
+            
+            if (outputObject.json) {	
+              const self = this;		
+                    
+              
+            } else {
+                    
+            } 
+                
+            return outputObject.text;
+                
+          } // update
+        }</playground><block data-visible-lines="10" >{"solution":[[-1,-1,-1,-1,0,-1,-1],[2,"∞","∞","∞","","8","∞"],["",9,"∞","∞","",8,3],["",4,"∞",18,"",8,""],["","",5,9,"",7,""],["","","",9,"",6,""],["","","",9,"","",""]]}</block></div>
+        
     <!-- built files will be auto injected -->
   </body>
 </html>

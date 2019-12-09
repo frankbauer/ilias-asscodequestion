@@ -6,6 +6,7 @@ class codeBlocksUI {
 
     public function __construct($model)
 	{
+		$model->getPlugin()->includeClass("./support/codeblocks-conf-0.1.0.php");
         $this->model = $model;        
     }
 
@@ -51,20 +52,20 @@ class codeBlocksUI {
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
 			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
-			$tpl->addCss($basePath.'/frontend/dist/css/loader.css');
-			$tpl->addCss($basePath.'/frontend/dist/css/roboto.css');
-			$tpl->addCss($basePath.'/frontend/dist/css/main.css');
-			$tpl->addCss($basePath.'/frontend/dist/css/app.css');
-            $tpl->addCss($basePath.'/frontend/dist/css/chunk-vendors.css');
+			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
+			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
+			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
+			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
+            $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
             $tpl->addCss($basePath.'/css/custom.css');
             if ($this->model->getMinCanvasVersion()<=100) {
                 $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
             }
 
-            $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . "/frontend/dist/\">');");
+            $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
 
-			$tpl->addOnLoadCode("import('" . $basePath . "/frontend/dist/js/chunk-vendors.js')");
-			$tpl->addOnLoadCode("import('" . $basePath . "/frontend/dist/js/app.js')");
+			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
+			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
 		}	
     }
 }
