@@ -61,7 +61,8 @@ Vue.prototype.$CodeBlock = {
    */
   processMixedOutput(outputObject, autoJSON, magicString) {
       if (magicString===undefined) magicString = '\n\n<JSON>\n';
-      const idx = outputObject.indexOf(magicString);    
+      const idx = outputObject.indexOf(magicString);
+      
       if (idx >= 0) {
           const str = outputObject.substr(0, idx);
           let json = undefined;
@@ -80,12 +81,15 @@ Vue.prototype.$CodeBlock = {
               text:str,
               err:err
           };
-      } else if (outputObject.indexOf('[')!=-1 || outputObject.indexOf('{')!=-1) {
-          return {
-              type:'json',
-              json:JSON.parse(outputObject),
-              text:""
-          };
+      } else {
+          const too = outputObject.trim();    
+          if (too.indexOf('[')==0 || too.indexOf('{')==0) {
+            return {
+                type:'json',
+                json:JSON.parse(outputObject),
+                text:""
+            }
+          }
       }
 
       return {
