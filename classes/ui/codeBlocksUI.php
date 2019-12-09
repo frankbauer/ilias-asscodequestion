@@ -57,7 +57,9 @@ class codeBlocksUI {
 			$tpl->addCss($basePath.'/frontend/dist/css/app.css');
             $tpl->addCss($basePath.'/frontend/dist/css/chunk-vendors.css');
             $tpl->addCss($basePath.'/css/custom.css');
-            $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
+            if ($this->model->getMinCanvasVersion()<=100) {
+                $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
+            }
 
             $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . "/frontend/dist/\">');");
 

@@ -131,6 +131,19 @@ class codeBlocks implements ArrayAccess {
 		return $this->additional_data['version'];
 	}
 
+	public function getMinCanvasVersion(){
+		$v = 999999;
+		foreach($this->blocks as $cbl){
+			if ($cbl->getType() == assCodeQuestionBlockTypes::Canvas){
+				$bv = (int)$cbl->getVersion();
+				if ($bv < $v) {
+					$v = $cbl->getVersion();
+				}
+			}
+		}
+		return $v;
+	}
+
 
 
 

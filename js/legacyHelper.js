@@ -1,3 +1,5 @@
+console.log("[Loading legacy Helpers]");
+
 function processMixedOutput(outputObject, canvasElement, magicString) {
     const qid = canvasElement.attr('data-question');
     const out = $('#'+qid+'Output');    
