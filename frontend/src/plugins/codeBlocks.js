@@ -83,7 +83,7 @@ Vue.prototype.$CodeBlock = {
           };
       } else {
           const too = outputObject.trim();    
-          if (too.indexOf('[')==0 || too.indexOf('{')==0) {
+          if (autoJSON && (too.indexOf('[')==0 || too.indexOf('{')==0)) {
             return {
                 type:'json',
                 json:JSON.parse(outputObject),
