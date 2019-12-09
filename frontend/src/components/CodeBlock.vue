@@ -208,11 +208,11 @@
         mounted() {
             this.updateHeight();
 
-            const buildIt = function(){
+            const buildIt = () => {
                 if (this.editMode) {
                     this.$emit("build");
                 }
-            }.bind(this);
+            };
 
             this.codemirror.addKeyMap({
                 "Cmd-B": function(cMirror) { buildIt() },
