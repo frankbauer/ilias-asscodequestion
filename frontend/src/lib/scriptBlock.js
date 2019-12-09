@@ -91,7 +91,7 @@ class ScriptBlock {
      * is called on the new object.
      * If the version of the playground-block is undefined or 100, or if the passed source-code does 
      * not define a shouldAutoReset method, this call will return false
-     * @return true if you want to reset the BEFOR each run. 
+     * @return true if you want to reset the canvas-DOM BEFOR each run. 
      */
     shouldAutoReset(){
       if (this.obj && this.obj.shouldAutoReset && !this.requestsOriginalVersion()){
