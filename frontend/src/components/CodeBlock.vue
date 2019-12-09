@@ -76,10 +76,22 @@
             }
         },
         methods: {
+            clearTagMarkers(){
+                let allMarks = this.codemirror.getDoc().getAllMarks();
+                allMarks.forEach(e => {
+                    if (e.className == Vue.$tagger.className.rnd || e.className == Vue.$tagger.className.templ){
+                        e.clear()
+                    }
+                })
+            },
             clearErrorDisplay(){
                 let allMarks = this.codemirror.getDoc().getAllMarks();
                 //console.log("marks", this.block.type, allMarks)
-                allMarks.forEach(e => e.clear())                
+                allMarks.forEach(e => {
+                    if (e.className == 'red-wave'){
+                        e.clear()
+                    }
+                })
 
                 this.codemirror.getDoc().clearGutter('diagnostics');                
             },
@@ -101,6 +113,7 @@
                 tb.value = newCode
                 
                 this.block.content = newCode
+                this.updateTagDisplay();
                 if (this.editMode) this.$emit("code-changed-in-edit-mode", undefined);
             },
             updateHeight(){
@@ -109,6 +122,21 @@
                 } else {
                     this.codemirror.setSize(null, Math.round(20 * Math.max(1, this.visibleLines)) + 9);
                 }
+            },
+            updateTagDisplay(){
+                this.clearTagMarkers();
+                Vue.$tagger.getMarkers(this.block.content).forEach(m => {
+                    this.codemirror.getDoc().markText(
+                        m.start, 
+                        m.end, 
+                        {
+                            className:Vue.$tagger.className[m.type],
+                            inclusiveLeft:true,
+                            inclusiveRight:true,
+                            title:m.name
+                        }
+                    );
+                })
             },
             updateDiagnosticDisplay(){
                 const val = this.errors;
@@ -231,11 +259,12 @@
                 "Tab": function(cMirror) {
                     cMirror.execCommand("insertSoftTab");              
                 }
-            });            
+            });     
+            
+            this.updateTagDisplay();   
         }
     }
 </script>
-
 <style scoped lang="sass">
     .hiddenBox 
         display: none !important

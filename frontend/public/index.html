@@ -22,174 +22,25 @@
       <strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     
-    <p highlight="javascript">
-      This is just a <b>test</b>:
-    [code]update: function(text, json, canvasElement, outputElement) {<br />        canvasElement.removeClass('hiddenBlock');<br />        console.log("FOO", text, json);
-        return "New Text is here\n\n";<br />    } //update[/code]
-    </p>
     
-    <div id="app"></div>
     <div style="padding-left:50px;padding-right:50px">
       <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
         <loading><div></div><div></div></loading>
     <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
-    
+        console.log("{:init} with {!template}")
   },
   shouldAutoReset: function() {return true;},
   update: function(text, json, canvasElement, outputElement) {
-    let html_str = d3DomProxyToSaveInnerHTMLString(json);
-    canvasElement.html(html_str)    
+    console.log("{:randomized} from {!init}")
+    canvasElement.css('background-color', "{:color}")
   }
 }
     </playground>
-<block>var data = JSON.parse(`[{"year":2006,"books":54},{"year":2007,"books":43},{"year":2008,"books":41},{"year":2009,"books":44},{"year":2010,"books":35}]`);
-
-
-  // data accessing functions:
-  const xValue = d => d.books;
-  const yValue = d => d.year;
-
-  // draw area constants
-  const W = 600;
-  const H = 200;
-  const margin = { left: 80, right: 10, bottom: 30, top: 10 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-
-  const maxX = d3.max(data, xValue);
-  const minX = d3.min(data, xValue);
-
-  const xScale = d3.scaleLinear()
-    .domain([0, maxX])
-    .range([0, iW]);
-  const yScale = d3.scaleBand()
-    .domain(data.map(yValue))
-    .range([0, iH])
-    .padding(0.1);
-
-  const colorScaleX = d3.scaleSequential(d3.interpolateYlGn)
-    .domain([minX, maxX]);
-  const colorScaleY = d3.scaleOrdinal(d3.schemeAccent)
-    .domain(data.map(yValue));
-
-  const svg = d3.select("#content")
-    .append("svg")
-    .attr("width", W)
-    .attr("height", H);
-
-  const g = svg.append('g')
-    .attr('transform', "translate(" + margin.left + "," + margin.top + ")");
-
-  // axes for each scale
-  g.append('g')
-    .call(d3.axisLeft(yScale));
-  g.append('g')
-    .call(d3.axisBottom(xScale))
-    .attr('transform', "translate(0," + iH + ")");
-
-  // bars:  svg - rect
-  g.selectAll(".bar")
-    .data(data)
-    .enter()
-    .append("rect")
-    .attr("class", "bar")
-    .attr("width", d => xScale(xValue(d)))
-    .attr("height", yScale.bandwidth())
-    .attr("y", d => yScale(yValue(d)))
-    .attr("fill", d => colorScaleX(xValue(d)))
-    //.attr("fill", d => colorScaleY(yValue(d)))
-    .attr("stroke", "black")
-
-
-
-  console.log("\n\n&lt;JSON>\n" + document.__getD3ResultJSON());</block>
+    <block>console.log("{:randomized})"</block>
+    <block data-static>console.log("color is {:color}")</block>
+    <text>This is just some sample Text with a [hl]given {:color}[/hl] for your exercicse.</text>
 </div>
 
-    <codeblockseditor data-compiler="python3" data-compiler-version="101" data-id="35" data-dom-libs='["d3-5.13.4","3js-r0"]' data-execution-timeout="10000" data-max-characters="40000" data-run-code="true">
-        <loading><div></div><div></div></loading>
-        <playground data-version="101" width="25%" height="100px" align="center">{init: function(canvasElement) {
-          //canvasElement.addClass('hiddenBlock');
-          //console.log("foo");
-  },
-  shouldAutoReset: function(){return true;},
-  update: function(text, json, canvasElement, outputElement) {
-  }
-}
-</playground>
-<block>print(2)</block>
-</codeblockseditor>
-
-    <codeblocks data-compiler="python3" data-compiler-version="101" data-id="35">
-
-    <loading><div></div><div></div></loading>
-        <playground data-version="101">{init: function(canvasElement) {
-            //console.log("INIT", canvasElement);
-            canvasElement.addClass('hiddenBlock');
-            //console.log(document.querySelector('#app'));
-        }, //init
-
-        getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i &lt; 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        },
-        shouldAutoReset: function(){return true;},
-        update: function(text, json, canvasElement, outputElement) {
-            canvasElement.removeClass('hiddenBlock');
-            canvasElement.css('background-color', this.getRandomColor());
-            console.log("FOO", text, json);
-            return "New Text is here\n\n";
-        } //update
-    }</playground>
-      <block>print(round(16.5))</block>
-      <block data-readonly data-static>for i in range(3, 5):
-    print(i)
-      </block>
-      <block data-hidden>print("Hello World")</block>
-      <text>This was a python 3 example</text> 
-    </codeblocks>
-
-    <codeblockseditor data-compiler="javascript" data-compiler-version="100" data-id="34">
-        <loading><div></div><div></div></loading>
-      <playground data-version="101">{init: function(canvasElement) {
-              //console.log("INIT", canvasElement);
-              canvasElement.addClass('hiddenBlock');
-              //console.log(document.querySelector('#app'));
-          }, //init
-  
-          update: function(text, json, canvasElement, outputElement) {
-              canvasElement.removeClass('hiddenBlock');
-              console.log("FOO", text, json);
-              return "New Text is here\n\n";
-          } //update
-      }</playground>
-      <block data-readonly data-static>public class Foo {</block>
-      <block data-visible-lines="10">public static void main(String[] args){
-  int a;System.out.println("Hello World!");
-  System.err.println("Hello World!");
-  System.out.print("\n\n&lt;JSON&gt;\n");
-  System.out.println("[1, 2, 3]");
-}</block>
-
-      <block data-readonly data-static>}</block>  
-      <block data-hidden>//Secret!!!</block>
-      <text>This [hl language=java]was an[/hl] [hl]was an[/hl] [hl]example code[/hl].
-
-[code language=java]
-public static void main(String[] args){
-}
-[/code]
-      </text>   
-    </codeblockseditor>
-    
-    <codeblocks data-compiler="javascript" data-compiler-version="100" data-id="36">
-        <block>console.log("Hello From Javascript");
-            console.error("e");
-        </block>
-      </codeblocks>
     </div>
     <!-- built files will be auto injected -->
   </body>
