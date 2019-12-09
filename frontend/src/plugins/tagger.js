@@ -75,7 +75,6 @@ Vue.$tagger = new Vue({
             })
         },
         clickFunction: function(name, tagEl){
-            console.log('click', name)
             Vue.prototype.$q.dialog({
                 title: 'Confirm Tag Replacement',
                 message: 'Do you really want to replace <b>all</b> occurances of the <span class="template-tag-placeholder-noclick">'+name+'</span> Template with the below value?',
@@ -96,8 +95,6 @@ Vue.$tagger = new Vue({
                 },
                 persistent: true
             }).onOk((data) => {
-                console.log(name, "=>", data)
-                console.log($(tagEl).parents(".codeblocks"))
                 this.replaceTemplateTag($(tagEl).parents(".codeblocks").get(0), name, data)
                 this.$emit('replace-template-tag', {
                     name:name,
