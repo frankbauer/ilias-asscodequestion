@@ -1,5 +1,5 @@
 <template>
-    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-sm q-mb-md`">  
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-sm q-mb-md`" :data-question="blockInfo.id">  
         <CodeBlocksSettings 
             v-if="editMode" 
             :options="options" 

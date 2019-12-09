@@ -123,6 +123,9 @@
                     this.codemirror.setSize(null, Math.round(20 * Math.max(1, this.visibleLines)) + 9);
                 }
             },
+            replaceTemplateTags(o){
+                this.block.content = Vue.$tagger.replaceTemplateTagInString(this.block.content, o.name, o.newValue)
+            },
             updateTagDisplay(){
                 this.clearTagMarkers();
                 Vue.$tagger.getMarkers(this.block.content).forEach(m => {
@@ -263,7 +266,11 @@
                 }
             });     
             
+            Vue.$tagger.$on('replace-template-tag', this.replaceTemplateTags);
             this.updateTagDisplay();   
+        },
+        beforeDestroy(){
+            Vue.$tagger.$off('replace-template-tag', this.replaceTemplateTags);
         }
     }
 </script>

@@ -10,7 +10,8 @@
                 label="HTML Source"
                 background-color="blue-grey darken-3"                                
                 v-model="text"
-                class="plain accqstXmlInput noRTEditor">
+                class="plain accqstXmlInput noRTEditor"
+                >
             </q-input>
         </div>
         <div class="col-xs-12 col-md-6 q-px-sm">    
@@ -32,7 +33,9 @@
         computed: {
             text:{
                 get() { return this.value},
-                set(v) { this.updatedContent(v)}
+                set(v) { 
+                    this.updatedContent(v)
+                }
             }
         },
         methods: {
