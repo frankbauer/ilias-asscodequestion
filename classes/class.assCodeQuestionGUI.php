@@ -588,7 +588,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$points->setValue($this->object->getPoints());
 		$form->addItem($points);
 	
-		$item = new ilCustomInputGUI('');		
+		$item = new ilCustomInputGUI('');
+		$item->setPostVar('codeblock');	
 		$item->setHTML($this->object->blocks()->ui()->render(true));
 		$form->addItem($item);
 

@@ -15,3 +15,7 @@ div.playground table td.fixed, div.ilc_question_Standard table td.fixed{
     display:table-cell !important;
     position:relative;
 }
+
+div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
+    width:100%
+}
