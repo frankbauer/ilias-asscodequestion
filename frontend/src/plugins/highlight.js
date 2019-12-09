@@ -53,7 +53,7 @@ hljs.$vue = {
         
         el.innerHTML = el.innerHTML.replace(reg_code, function(m1, m2, m3, m4, m5){
             const lang = m3===undefined?inLang:m3;
-            m4 = m4.replace(/<br( +\/)?>/g, "\n");
+            m4 = m4.replace(/<br( +\/)?>/g, "\n").replace(/&nbsp;/g, " ");
             if (lang) return '<pre is-code>'+hljs.highlight(lang, m4).value + '</pre>';
             else return '<spprean is-code>'+hljs.highlightAuto(m4).value + '</pre>';
         });
