@@ -1,6 +1,6 @@
 <template>
-    <div class="row ma-0 pa-0"><div :class="`col-12 text-${block.align}`">
-        <div ref="innerPlaygroundContainer" class="playground" :style="`width:${block.width};height:${block.height}`">{{output}}</div>        
+    <div class="row ma-0 pa-0 block-playground" :data-question="block.parentID" :data-nr="block.id"><div :class="`col-12 text-${block.align}`">
+        <div ref="innerPlaygroundContainer" class="playground" :style="`width:${block.width};height:${block.height}`" :data-question="block.parentID" :data-nr="block.id">{{output}}</div>        
     </div></div>
 </template>
 

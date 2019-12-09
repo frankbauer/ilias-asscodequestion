@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="`codeblock block-${typeName}`">
         <codemirror ref="codeBox" :value="code" :options="options" :class="`accqstXmlInput noRTEditor ${boxClass}`" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange" :name="`block[${block.parentID}][${block.id}]`">
         </codemirror>        
@@ -174,6 +174,11 @@
                 if (this.block.readonly || this.readonly) cl += "readonlyBox "
                 if (this.block.static) cl += "staticBox "                
                 return cl;
+            },
+            typeName(){
+                if (this.block.hidden) return 'hidden'
+                if (this.block.static) return 'static'
+                return 'block';
             },
             code() {
                 return this.block.content;

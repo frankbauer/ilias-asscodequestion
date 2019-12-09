@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :data-question="block.parentID" :data-nr="block.id" class="block-text">
         <div v-if="!editMode" v-html="value" v-highlight="language"></div>
         <TipTap v-else :value="value" @input="updatedContent" class="editor q-my-3" :name="name" :language="language"/>
     </div>
