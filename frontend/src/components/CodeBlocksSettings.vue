@@ -1,7 +1,7 @@
 <template>
     <div class="row q-pa-none q-mb-md">
             <div class="col-xs-12 col-sm-4">
-                <q-card class="q-mr-sm-xs">
+                <q-card class="q-mb-sm q-mr-sm-xs">
                     <q-card-section class="text-overline">Language</q-card-section>
                     <q-card-section class="q-ml-md">                        
                         <div class="row">
@@ -22,6 +22,14 @@
                                     label="Version"    
                                 />                      
                             </div>
+                            <div class="col-12" v-if="runCode">
+                                <q-input
+                                    v-model="maxRuntime"
+                                    :rules="[validNumber]"
+                                    label="Max. Runtime in ms."                            
+                                    maxlength="6"
+                                />
+                            </div> 
                         </div>                        
                     </q-card-section>
                 </q-card>
@@ -30,24 +38,23 @@
             <div class="col-xs-12 col-sm-4">
                 <q-slide-transition>
                     <q-card class="q-mb-sm q-mr-sm-xs" v-if="runCode">
-                        <q-card-section class="text-overline">Restrictions</q-card-section>
+                        <q-card-section class="text-overline">Output</q-card-section>
                         <q-card-section class="q-ml-md">
                             <div class="row">                               
-                                <div class="col-xs-12 col-md-6 q-pr-md-sm">
-                                    <q-input
-                                        v-model="maxRuntime"
-                                        :rules="[validNumber]"
-                                        label="Max. Runtime in ms."                            
-                                        maxlength="6"
-                                    />
-                                </div> 
-                                <div class="col-xs-12 col-md-6">
+                               <div class="col-xs-12 col-md-6 col-12 q-pr-md-sm">
                                     <q-input
                                         v-model="maxCharacters"
                                         :rules="[validNumber]"
                                         label="Max. Output Characters"                            
                                         maxlength="6"
                                     />
+                                </div> 
+                                <div class="col-xs-12 col-md-6">
+                                    <q-select
+                                        :options="outputParsers"
+                                        v-model="outputParser"  
+                                        label="Output Parser"
+                                    /> 
                                 </div> 
                             </div>
                         </q-card-section>
@@ -135,6 +142,12 @@ export default {
                 {label:"neo", value:"neo"},
                 {label:"mbo", value:"mbo"},
                 {label:"mdn like", value:"mdn-like"}
+            ],
+            outputParsers:[
+                {label:"Automatic", value:"auto"},
+                {label:"Text Passthrough", value:"text"},
+                {label:"JSON", value:"json"},
+                {label:"Text+JSON", value:"magic"}
             ]
         }
     },
@@ -261,6 +274,14 @@ export default {
                     solution:this.options.solutionTheme,
                     code:v.value
                 })
+            }
+        },
+        outputParser:{
+            get(){
+                return this.outputParsers.find(t => t.value == this.options.outputParser);
+            },
+            set(v){
+                this.$emit('output-parser-change', v.value)                
             }
         }
     }

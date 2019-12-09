@@ -79,6 +79,10 @@ class CodeBlocksManager {
             }
         }
 
+        if (data.outputParser===undefined){
+            data.outputParser = 'auto';
+        } 
+
         if (data.workerLibs===undefined){
             data.workerLibs = []
         } else {

@@ -12,6 +12,7 @@
             @worker-libs-change="onWorkerLibChange"
             @dom-libs-change="onDomLibChange" 
             @theme-change="onThemeChange" 
+            @output-parser-change="onOutputParserChange" 
         />
         <CodeBlockContainer 
             :block="block" 
@@ -125,7 +126,8 @@
                     workerLibs:this.workerLibraries,
                     id:this.blockInfo.id,
                     codeTheme:this.codeTheme,
-                    solutionTheme:this.solutionTheme
+                    solutionTheme:this.solutionTheme,
+                    outputParser:this.outputParser
                 }
             },
             blocks() { return this.blockInfo.blocks },
@@ -140,6 +142,7 @@
             solutionTheme() { return this.blockInfo.solutionTheme},
             codeTheme() { return this.blockInfo.codeTheme},
             readonly() { return this.blockInfo.readonly},
+            outputParser() { return this.blockInfo.outputParser},
             
             editMode() {
                 return false;
@@ -206,6 +209,7 @@
             onWorkerLibChange(v){},
             onDomLibChange(v){},
             onThemeChange(nfo){},
+            onOutputParserChange(v){},
             moveUp(idx){},
             moveDown(idx){},
             removeBlock(idx){},
@@ -302,7 +306,7 @@
                 
                 if (output !== undefined && this.playgrounds.length>0){  
                     try {
-                        processed = this.$CodeBlock.processMixedOutput(output, true);
+                        processed = this.$CodeBlock.processMixedOutput(output, this.outputParser);
                     } catch (e) {
                         parseError = e;        
                     }

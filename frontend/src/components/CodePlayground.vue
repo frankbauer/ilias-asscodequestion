@@ -191,9 +191,10 @@ export default {
                     if (val.parseError!=null){
                         if (!this.block.obj.onParseError(initialOutput, val.parseError) && this.editMode){
                             let jStr = initialOutput;
-                            if (val.parseError.parsedString){
+                            if (val.parseError.parsedString !== undefined){
                                 jStr = val.parseError.parsedString;
                             }
+                            jStr = jStr.replace(/</g, '&lt;');
                             console.log(val, jStr);
 
                            this.$q.dialog({

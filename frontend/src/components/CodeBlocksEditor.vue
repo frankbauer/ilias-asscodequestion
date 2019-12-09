@@ -95,6 +95,9 @@ export default {
         removeBlock(idx){
             this.blockInfo.removeBlock(idx);
         },
+        onOutputParserChange(v){
+            this.blockInfo.outputParser = v;
+        },
     }
 }
 </script>
