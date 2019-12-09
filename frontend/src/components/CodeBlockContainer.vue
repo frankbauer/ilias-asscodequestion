@@ -363,6 +363,14 @@ export default {
                 });
             }
         }
+    },
+    mounted(){
+        console.log("Mounted", this.block.id);
+        this.block.mountCount++;
+        this.$emit("mounted", {});
+    },
+    beforeDestroy(){
+        this.block.mountCount--;
     }
 }
 </script>
