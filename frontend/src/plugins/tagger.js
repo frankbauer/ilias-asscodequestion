@@ -31,5 +31,30 @@ Vue.$tagger = {
             }
         }
         return markers;
+    },
+    processElements: function(scope){
+        if (scope === undefined) scope = document        
+        const elements = document.querySelectorAll('[tagged]');
+        elements.forEach(el => {
+            this.processElement(el);
+        })
+    },
+    processElement: function(el){
+        
+        el.innerHTML = el.innerHTML.replace(randomAndTemplateTag, (m0, m1, m2)=>{
+            const className = m1===':'?this.className.rnd:this.className.templ;
+            return `<span class="q-mb-xs ${className}">` + m0 + '</span>';
+        });
     }
 }
+
+Vue.directive('tagged', {
+    deep: true,
+    bind: function (el, binding) {
+        Vue.$tagger.processElement(el, binding.value);
+    },
+    componentUpdated: function (el, binding) {
+        //console.log("DIRECTIVE - update", el, binding)
+        Vue.$tagger.processElement(el, binding.value);
+    }
+})

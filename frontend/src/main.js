@@ -22,8 +22,11 @@ import CodeBlocksManager from './lib/codeBlocksManager';
 
 Vue.config.productionTip = false
 Vue.$hljs.$vue.processElements();
+Vue.$tagger.processElements();
 CodeBlocksManager.find(document).mount();
+
 window.mountInElement = function(element){
   Vue.$hljs.$vue.processElements(element);
+  Vue.$tagger.processElements(element);
   CodeBlocksManager.find(element).mount();
 }

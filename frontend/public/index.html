@@ -22,6 +22,11 @@
       <strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     
+    <p highlight="javascript" tagged>
+      This is {:init} just a <b>test</b>:
+    [code]update: function(text, json, canvasElement, outputElement) {<br />        canvasElement.removeClass('hiddenBlock');<br />        console.log("FOO", text, json);
+        return "New Text is here\n\n";<br />    } //update[/code]
+    </p>
     
     <div style="padding-left:50px;padding-right:50px">
       <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
