@@ -16,8 +16,7 @@
         />
         <CodeBlockContainer 
             :block="block" 
-            :editMode="editMode" 
-            class="block" 
+            :editMode="editMode"              
             v-for="block in blocks" 
             :key="block.id"
             @type-change="onTypeChange"
