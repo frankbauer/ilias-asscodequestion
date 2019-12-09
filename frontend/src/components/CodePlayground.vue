@@ -5,6 +5,7 @@
             :obj="block.obj" 
             :key="runCount" 
             :block="block" 
+            :eventHub="eventHub"
             @canvas-change="onCanvasChange" 
             @did-init="onDidInit"
         />

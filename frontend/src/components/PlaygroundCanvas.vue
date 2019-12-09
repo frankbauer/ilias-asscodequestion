@@ -15,6 +15,10 @@ export default {
         block:{
             type:Object,
             required:true
+        },
+        'eventHub': {
+            type: Object,
+            required: false            
         }
     },
     computed:{
@@ -22,18 +26,33 @@ export default {
             return this.$refs.innerPlaygroundContainer;           
         }
     },
-    mounted(){
-        //console.log("MOUNTED");
-        if (this.obj){
-            //console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));  
+    methods:{
+        whenMounted(o){
+            //console.log("MOUNTED");
+            if (this.obj){
+                //console.log("Will Init", this.canvas, $(this.canvas).css('background-color'));  
 
-            this.$compilerRegistry.loadLibraries(this.block.domLibs, function(){  
-                this.obj.init($(this.canvas));
-                this.$emit('did-init', this.canvas);
-            }.bind(this));          
-            
+                this.$compilerRegistry.loadLibraries(this.block.domLibs, () => {  
+                    this.$nextTick( () => {
+                        this.obj.init($(this.canvas));
+                        this.$emit('did-init', this.canvas);
+                    })
+                });          
+                
+            }
         }
+    },
+    mounted(){
+        if (this.eventHub)
+            this.eventHub.$on('all-mounted', this.whenMounted);
+        else
+            this.whenMounted()
+        
         this.$emit('canvas-change', this.canvas);
+    },
+    beforeDestroy() {
+        if (this.eventHub)
+            this.eventHub.$off('all-mounted');
     }
 }
 </script>

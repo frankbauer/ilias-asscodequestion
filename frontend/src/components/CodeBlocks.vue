@@ -25,7 +25,8 @@
             @script-version-change="onScriptVersionChange"
             @move-up="moveUp"
             @move-down="moveDown"
-            @remove-block="removeBlock">              
+            @remove-block="removeBlock"
+            @mounted="didMountChild">              
             
                 <CodeBlock 
                     v-if="block.hasCode" 
@@ -185,6 +186,15 @@
             }
         },
         methods: {
+            didMountChild(){
+                let mountCount = this.blockInfo.blocks.map(b => b.mountCount).reduce((p,c) => p+c, 0);
+                console.log("mounted Blocks", mountCount)
+                if (mountCount == this.blockInfo.blocks.length){
+                    this.$nextTick(()=>{
+                        this.eventHub.$emit('all-mounted', {  })
+                    })
+                }
+            },
             themeForBlock(bl){
                 if (bl.static || bl.readonly || bl.hidden) {
                     return this.blockInfo.codeTheme;
