@@ -170,7 +170,7 @@ class codeBlock {
 	}
 
 	function getAlign(){
-		if (!isset($this->block['align'])) return 'center';
+		if (!isset($this->block['align'])) return 'left';
 		return $this->block['align'];
 	}
 }
