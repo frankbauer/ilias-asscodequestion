@@ -179,6 +179,7 @@
             addonClass() {
                 let cl = "";
                 if (this.editMode) cl += "editmode ";
+                if (this.readonly) cl += "block-readonly ";
                 return cl;
             },
             backgroundColorClass(){
