@@ -22,7 +22,7 @@
 </template>
 
 <script>
-    
+    import Vue from 'vue'
     export default {
         components: {
             
@@ -32,7 +32,9 @@
         }),
         computed: {
             text:{
-                get() { return this.value},
+                get() { 
+                    return this.value
+                },
                 set(v) { 
                     this.updatedContent(v)
                 }
@@ -41,6 +43,9 @@
         methods: {
             updatedContent(v) {
                 this.$emit('input', v);
+            },
+            replaceTemplateTags(o){
+                this.updatedContent(Vue.$tagger.replaceTemplateTagInString(this.text, o.name, o.newValue))
             }
         },
         props: {
@@ -52,7 +57,11 @@
             //we need this for StudON to make sure tinyMCE is not taking over :D
             this.$refs.editBox.$el.querySelectorAll('textarea[name]').forEach(el => {
                 el.className = (el.className + " accqstXmlInput noRTEditor").trim();
-            })    
+            })             
+            Vue.$tagger.$on('replace-template-tag', this.replaceTemplateTags);
+        },
+        beforeDestroy(){
+            Vue.$tagger.$off('replace-template-tag', this.replaceTemplateTags);
         }
     }
 </script>

@@ -41,12 +41,15 @@ Vue.$tagger = new Vue({
             })
         },
         processElement: function(el){        
-            el.innerHTML = el.innerHTML.replace(randomAndTemplateTag, (m0, m1, m2)=>{
+            el.innerHTML = this.processString(el.innerHTML);
+            this.hoockClick(el);
+        }, 
+        processString: function(str){        
+            return str.replace(randomAndTemplateTag, (m0, m1, m2)=>{
                 const className = m1===':'?this.className.rnd:this.className.templ;
                 return `<span class="q-mb-xs ${className}">` + m0 + '</span>';
-            });
-            this.hoockClick(el);
-        },        
+            });            
+        },       
         hoockClick: function(el){
             let tags = el.querySelectorAll('.'+this.className.templ);
             tags.forEach(tag => {
