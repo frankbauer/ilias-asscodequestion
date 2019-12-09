@@ -9,15 +9,29 @@
             @canvas-change="onCanvasChange" 
             @did-init="onDidInit"
         />
+        <div class="row justify-end">
+            <q-btn 
+                icon
+                color="secondary" 
+                small 
+                flat round   
+                style="margin-right:-9px; margin-bottom:-10px"                     
+                @click="toggleExpanded">
+                    <q-icon :name="expanded?'expand_less':'expand_more'" size="24" />
+            </q-btn>
+        </div>
+        <q-slide-transition>
         <CodeBlock 
             v-if="editMode" 
             :block="block" 
             :theme="options.theme" 
             :mode="options.mode"
-            visibleLines="auto" 
+            :visibleLines="visibleLinesNow" 
             :editMode="this.editMode" 
+            
             @code-changed-in-edit-mode="onCodeChange"
         />
+        </q-slide-transition>
     </div>
 </template>
 
@@ -82,6 +96,10 @@ export default {
                     firstLineNumber: 1,
                     gutters: ["diagnostics", "CodeMirror-linenumbers"]
                 }
+        },
+        visibleLinesNow(){
+            if (!this.expanded) return "5.2";
+            return 'auto'
         }
     },
     created(){
@@ -103,10 +121,14 @@ export default {
             runCount:0,
             canvas:undefined,
             needsCodeRebuild:false,
-            initAndRebuildErrors:[]           
+            initAndRebuildErrors:[],
+            expanded:true          
         }
     },
     methods:{
+        toggleExpanded(){
+            this.expanded = !this.expanded;
+        },
         updateErrors(){
             this.block.errors = [];
             
