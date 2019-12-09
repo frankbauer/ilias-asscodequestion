@@ -162,6 +162,7 @@ class codeBlocks implements ArrayAccess {
 		$this->setAllowRun( $settings->runCode == 1 || $settings->runCode == 'true' );
 		$this->setTheme( $settings->solutionTheme );
 		$this->setROTheme( $settings->codeTheme );
+		$this->setOutputParser( $settings->outputParser );
 
 		//handle blocks
 		$this->clearBlocks();
@@ -259,6 +260,14 @@ class codeBlocks implements ArrayAccess {
 	
 	function setROTheme($newValue) {
 		$this->additional_data['themeRO'] = ''.$newValue;
+	}
+
+	function getOutputParser() {
+		return isset($this->additional_data['outputParser']) ? $this->additional_data['outputParser'] : 'auto'; 
+	}
+
+	function setOutputParser($newValue) {
+		$this->additional_data['outputParser'] = $newValue;
 	}
 
 	public function __get($property) {

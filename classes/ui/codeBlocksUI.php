@@ -33,6 +33,7 @@ class codeBlocksUI {
                  "data-dom-libs='".json_encode($this->model->getDomLibs())."' ".
                  "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
                  ($readOnly?'data-readonly':'').
+                 'data-output-parser="'.$this->model->getOutputParser().'" '.
                  '>';
 
         $html .= '<loading><div></div><div></div></loading>';
