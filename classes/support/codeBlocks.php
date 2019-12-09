@@ -48,7 +48,11 @@ class codeBlocks implements ArrayAccess {
             $this->ui = new codeBlocksUI($this);
         }
         return $this->ui;
-    }
+	}
+	
+	function updateWithJSONEncodedAdditionalData($data){
+		$this->setJSONEncodedAdditionalData($data);
+	}
 
     private function setJSONEncodedAdditionalData($data) {
         $this->additional_data = json_decode($data, true);   
