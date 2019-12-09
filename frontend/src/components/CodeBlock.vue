@@ -90,6 +90,8 @@
                     el.className = (el.className + " accqstXmlInput noRTEditor").trim();
                 })
                 this.updateDiagnosticDisplay();
+                this.onCodeChange(this.block.content);
+                console.log("codeReady", this.block.id)
             },
             onCodeFocus(editor) {
 
@@ -176,9 +178,10 @@
                 return cl;
             },
             typeName(){
-                if (this.block.hidden) return 'hidden'
-                if (this.block.static) return 'static'
-                return 'block';
+                let s = this.block.type.toLowerCase()
+                if (this.block.hidden) s += '-hidden'
+                if (this.block.static) s += '-static'
+                return s;
             },
             code() {
                 return this.block.content;
