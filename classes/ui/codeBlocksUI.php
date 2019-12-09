@@ -55,7 +55,8 @@ class codeBlocksUI {
 			$tpl->addCss($basePath.'/frontend/dist/css/roboto.css');
 			$tpl->addCss($basePath.'/frontend/dist/css/main.css');
 			$tpl->addCss($basePath.'/frontend/dist/css/app.css');
-			$tpl->addCss($basePath.'/frontend/dist/css/chunk-vendors.css');
+            $tpl->addCss($basePath.'/frontend/dist/css/chunk-vendors.css');
+            $tpl->addCss($basePath.'/css/custom.css');
 
             $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . "/frontend/dist/\">');");
 
