@@ -70,6 +70,15 @@ class CodeBlocksManager {
             data.domLibs = JSON.parse(data.domLibs);
         }
 
+        if (data.readonly===undefined){
+            data.readonly = false;
+        } else {
+            if (data.editMode) data.readonly = false;
+            else {
+                data.readonly = data.readonly=='true' || data.readonly=='1' || data.readonly=='';
+            }
+        }
+
         if (data.workerLibs===undefined){
             data.workerLibs = []
         } else {

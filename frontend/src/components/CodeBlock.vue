@@ -45,6 +45,10 @@
     export default {
         name: 'CodeBlock',
         props: {
+            'readonly':{
+                type: Boolean,
+                default: false
+            },
             'visibleLines': {
                 type: String,
                 default: 'auto'
@@ -167,7 +171,7 @@
             boxClass() {
                 let cl = "";
                 if (this.block.hidden && !this.editMode) cl += "hiddenBox "
-                if (this.block.readonly) cl += "readonlyBox "
+                if (this.block.readonly || this.readonly) cl += "readonlyBox "
                 if (this.block.static) cl += "staticBox "                
                 return cl;
             },
@@ -184,7 +188,7 @@
                     tabSize: 4,
                     indentUnit: 4,
                     autoCloseBrackets: true,
-                    readOnly: !this.editMode && (this.block.readonly || this.block.static || this.block.hidden),
+                    readOnly: !this.editMode && (this.block.readonly || this.block.static || this.block.hidden || this.readonly),
                     firstLineNumber: this.block.firstLine,
                     gutters: ["diagnostics", "CodeMirror-linenumbers"]
                 }

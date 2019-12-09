@@ -34,6 +34,7 @@
                     :mode="mimeType"
                     :visibleLines="block.visibleLines" 
                     :editMode="editMode" 
+                    :readonly="readonly"
                     @build="run" />
 
                 <CodePlayground 
@@ -138,6 +139,7 @@
             workerLibraries() { return this.blockInfo.workerLibs},
             solutionTheme() { return this.blockInfo.solutionTheme},
             codeTheme() { return this.blockInfo.codeTheme},
+            readonly() { return this.blockInfo.readonly},
             
             editMode() {
                 return false;
