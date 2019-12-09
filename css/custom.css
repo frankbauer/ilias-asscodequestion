@@ -6,3 +6,12 @@ div#mainspacekeeper > div.row {
     display:block;
     flex-wrap: nowrap;
 }
+
+div.playground table td.block, div.ilc_question_Standard table td.block{
+    display:table-cell !important;
+}
+
+div.playground table td.fixed, div.ilc_question_Standard table td.fixed{
+    display:table-cell !important;
+    position:relative;
+}
