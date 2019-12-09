@@ -23,7 +23,7 @@ const jsErrorParser = function(e){
   
   if (line !== undefined){
     line--;
-    if (line==1) column -= 21;        
+    if (line==1) column -= 24;        
   }
   return {line:line, column:column, msg:e.message};
 }
@@ -49,10 +49,13 @@ class ScriptBlock {
           this.err = []
           console.log("!!! REBUILDING !!!");
           this.src = code
+
+          //wrap the users code in a helper object, otherwise 
+          //evaluating would fail if the code does not start in the first line
           if (this.requestsOriginalVersion())
-            this.fkt = new Function('              return ' + code);    
+            this.fkt = new Function('              return {o:' + code + '}.o');    
           else
-            this.fkt = new Function('"use strict"; return ' + code);    
+            this.fkt = new Function('"use strict"; return {o:' + code + '}.o');    
           this.obj = this.fkt();
         } catch (e){
           this.pushError(e);
