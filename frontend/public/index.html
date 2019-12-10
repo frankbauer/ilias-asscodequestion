@@ -21,6 +21,7 @@
     <noscript>
       <strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <div style="padding-left:50px;padding-right:50px">
     <div id="master">
     
     <p highlight="javascript" tagged>
@@ -28,8 +29,8 @@
     [code]update: function(text, json, canvasElement, outputElement) {<br />        canvasElement.removeClass('hiddenBlock');<br />        console.log("FOO", text, json);
         return "New Text is here\n\n";<br />    } //update[/code]
     </p>
-    <div style="padding-left:50px;padding-right:50px">
-      <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true" data-scope-selector="#mastera">
+  
+      <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-question="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true" data-scope-selector="#master">
         <loading><div></div><div></div></loading>
     <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
         console.log("{:init} with {!template}")
@@ -45,8 +46,12 @@
     <block data-static>console.log("color is {:color} with {!init}")</block>
     <text>This is just some sample Text with a [hl]given {:color} and {!init}[/hl] for your exercicse.</text>
 </div>
-
-    </div>
+</div>
+<div codeblocks data-compiler="python3" data-compiler-version="default" data-question="54" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true" data-scope-selector="#mastera">
+  <loading><div></div><div></div></loading>
+  <block>console.log("{:randomized}, {!init}, {!init})"</block>
+</div>
+    
   </div>
     <!-- built files will be auto injected -->
   </body>

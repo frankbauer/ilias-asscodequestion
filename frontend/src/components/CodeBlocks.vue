@@ -1,5 +1,6 @@
 <template>
-    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-sm q-mb-md`" :data-question="blockInfo.id">  
+    <div :class="`codeblocks ${addonClass}  ${backgroundColorClass} q-mx-sm q-mb-md`" :data-question="blockInfo.id"
+    :uuid="blockInfo.uuid">  
         <CodeBlocksSettings 
             v-if="editMode" 
             :options="options" 
@@ -52,6 +53,7 @@
                     v-model="block.content" 
                     :editMode="editMode"
                     :name="`block[${block.parentID}][${block.id}]`"
+                    :scopeUUID="block.scopeUUID"
                     :language="language" />
         </CodeBlockContainer>
 

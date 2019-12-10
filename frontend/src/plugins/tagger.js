@@ -33,30 +33,40 @@ Vue.$tagger = new Vue({
             }
             return markers;
         },
-        processElements: function(scope){
-            if (scope === undefined) scope = document        
+        processElements: function(scope){            
+            let uuid = undefined
+            if (scope === undefined) {
+                scope = document        
+            } else if (!scope.hasAttribute('uuid')) {
+                uuid = this.$uuid.v4()
+                scope.setAttribute('uuid', uuid)
+            } else {
+                uuid = scope.getAttribute('uuid')
+            }
+            
             const elements = scope.querySelectorAll('[tagged]');
+            console.log(elements)
             elements.forEach(el => {
-                this.processElement(el);
+                this.processElement(el, uuid);
             })
         },
-        processElement: function(el){        
-            el.innerHTML = this.processString(el.innerHTML);
-            this.hoockClick(el);
+        processElement: function(el, scopeUUID){        
+            el.innerHTML = this.processString(el.innerHTML, scopeUUID);
+            this.hookClick(el, scopeUUID);
         }, 
-        processString: function(str){        
+        processString: function(str, scopeUUID){        
             return str.replace(randomAndTemplateTag, (m0, m1, m2)=>{
                 const className = m1===':'?this.className.rnd:this.className.templ;
-                return `<span class="q-mb-xs ${className}">` + m0 + '</span>';
+                return `<span class="q-mb-xs ${className}" >` + m0 + '</span>';
             });            
         },       
-        hoockClick: function(el){
+        hookClick: function(el, scopeUUID){
             let tags = el.querySelectorAll('.'+this.className.templ);
             tags.forEach(tag => {
                 let name = tag.innerText.replace(randomAndTemplateTag, (m0, m1, m2)=>{
                     return m2
                 })
-                tag.onclick = () => {this.clickFunction(name, tag)};
+                tag.onclick = () => {this.clickFunction(name, tag, scopeUUID)};
             })
         },
         replaceTemplateTag(scope, name, newValue){
@@ -74,7 +84,7 @@ Vue.$tagger = new Vue({
                 return m0;
             })
         },
-        clickFunction: function(name, tagEl){
+        clickFunction: function(name, tagEl, scopeUUID){
             Vue.prototype.$q.dialog({
                 title: 'Confirm Tag Replacement',
                 message: 'Do you really want to replace <b>all</b> occurances of the <span class="template-tag-placeholder-noclick">'+name+'</span> Template with the below value?',
@@ -95,10 +105,13 @@ Vue.$tagger = new Vue({
                 },
                 persistent: true
             }).onOk((data) => {
-                this.replaceTemplateTag($(tagEl).parents(".codeblocks").get(0), name, data)
+                //this.replaceTemplateTag($(tagEl).parents(".codeblocks").get(0), name, data)
+                this.replaceTemplateTag($(`[uuid=${scopeUUID}]`).get(0), name, data)
+                console.log(scopeUUID)
                 this.$emit('replace-template-tag', {
                     name:name,
-                    newValue: data
+                    newValue: data, 
+                    scopeUUID: scopeUUID
                 })
             }).onCancel(() => {                
             }).onDismiss(() => {

@@ -1,5 +1,5 @@
 <template>
-    <div :class="`codeblock block-${typeName}`">
+    <div :class="`codeblock block-${typeName}`">        
         <codemirror ref="codeBox" :value="code" :options="options" :class="`accqstXmlInput noRTEditor ${boxClass}`" @ready="onCodeReady"
         @focus="onCodeFocus" @input="onCodeChange" :name="`block[${block.parentID}][${block.id}]`">
         </codemirror>        
@@ -124,11 +124,13 @@
                 }
             },
             replaceTemplateTags(o){
+                if (!this.editMode) return;
+                if (!o.scopeUUID != this.block.scopeUUID) return
                 this.block.content = Vue.$tagger.replaceTemplateTagInString(this.block.content, o.name, o.newValue)
             },
             updateTagDisplay(){
                 if (!this.editMode) return;
-                
+
                 this.clearTagMarkers();
                 Vue.$tagger.getMarkers(this.block.content).forEach(m => {
                     this.codemirror.getDoc().markText(
@@ -143,7 +145,7 @@
                     );
                 })
 
-                this.$nextTick(()=>Vue.$tagger.hoockClick(this.$refs.codeBox.$el))                
+                this.$nextTick(()=>Vue.$tagger.hookClick(this.$refs.codeBox.$el, this.block.scopeUUID))                
             },
             updateDiagnosticDisplay(){
                 const val = this.errors;

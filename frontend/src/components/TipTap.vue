@@ -16,7 +16,7 @@
         </div>
         <div class="col-xs-12 col-md-6 q-px-sm">    
             <div class="q-field__label no-pointer-events ellipsis text-caption wysiwyg">Preview</div>
-            <div v-html="text" v-highlight="language" v-tagged></div>
+            <div v-html="text" v-highlight="language" v-tagged="scopeUUID"></div>
         </div>
     </div>
 </template>
@@ -45,12 +45,15 @@
                 this.$emit('input', v);
             },
             replaceTemplateTags(o){
+                if (!this.editMode) return;
+                if (!o.scopeUUID != this.scopeUUID) return
                 this.updatedContent(Vue.$tagger.replaceTemplateTagInString(this.text, o.name, o.newValue))
             }
         },
         props: {
             value: '',
             name: '',
+            scopeUUID: '',
             language:undefined
         },
         mounted(){

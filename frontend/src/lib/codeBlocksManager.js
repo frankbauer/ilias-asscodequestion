@@ -3,6 +3,7 @@ import ScriptBlock from './scriptBlock'
 import Vue from 'vue'
 import App from '../App.vue'
 import AppEditor from '../AppEditor.vue'
+import { uuid } from 'vue-uuid';
 
 import CompilerRegistry from '../lib/CompilerRegistry'
 Vue.prototype.$compilerRegistry = CompilerRegistry;
@@ -37,10 +38,9 @@ class CodeBlocksManager {
         })
     }
     constructor(el) {
-        //console.log("Element", el.dataset);
         this.element = el;
         let data = {
-            ...el.dataset,
+            ...el.dataset,            
             editMode: el.tagName == 'CODEBLOCKSEDITOR' || el.hasAttribute("codeblockseditor"),
             blocks: []
         };
@@ -101,6 +101,13 @@ class CodeBlocksManager {
             data.codeTheme = 'xq-light';
         } 
 
+        if (el.hasAttribute('uuid')){
+            data.uuid = el.getAttribute('uuid')
+        } else {
+            data.uuid = uuid.v4()
+            el.setAttribute('uuid', data.uuid)
+        }
+
         data.id = Number(data.id);
 
         if (data.executionTimeout === undefined) data.executionTimeout = 5000
@@ -109,8 +116,6 @@ class CodeBlocksManager {
         if (data.maxCharacters === undefined) data.maxCharacters = 1000
         else data.maxCharacters = Number(data.maxCharacters);   
         
-        
-
         el.querySelectorAll("*").forEach(bl => {
             let block = {
                 ...bl.dataset,
@@ -118,7 +123,7 @@ class CodeBlocksManager {
                 type: bl.tagName,
                 content: bl.textContent,
                 id: data.blocks.length,
-                uid: data.blocks.length + '-' + (new Date()).getTime(),
+                uuid:uuid.v4(),
                 parentID: data.id,
                 expanded: true,
                 width: '100%',
@@ -195,7 +200,7 @@ class CodeBlocksManager {
                                         type: 'BLOCK',
                                         content: "",
                                         id: data.blocks.length,
-                                        uid: data.blocks.length + '-' + (new Date()).getTime(),
+                                        uuid: uuid.v4(),
                                         parentID: data.id,
                                         expanded: true,
                                         width: '100%',
@@ -227,14 +232,20 @@ export default {
         const allCodeBlockParents = scope.querySelectorAll("codeblocks, codeblockseditor, div[codeblocks], div[codeblockseditor]");
         let result = [];
         allCodeBlockParents.forEach(el => {
-            const cbm = new CodeBlocksManager(el);
-            let scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):undefined;
+            const cbm = new CodeBlocksManager(el);            
+            let scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):undefined
             if (scope === undefined || scope === null) scope = el;
             
             Vue.$hljs.$vue.processElements(scope);
             if (cbm.data.editMode) {
                 Vue.$tagger.processElements(scope);
+                cbm.data.scopeSelector = `[uuid=${scope.getAttribute('uuid')}]`
+                cbm.data.scopeUUID = scope.getAttribute('uuid');
+                cbm.data.blocks.forEach(b => {
+                    b.scopeUUID = cbm.data.scopeUUID
+                })
             }
+            
             result.push(cbm);
         });
 

@@ -12,7 +12,8 @@
     "highlight.js": "^9.16.2",
     "quasar": "^1.5.4",
     "vue": "^2.6.10",
-    "vue-codemirror": "^4.0.5"
+    "vue-codemirror": "^4.0.5",
+    "vue-uuid": "^1.1.1"
   },
   "devDependencies": {
     "@vue/cli-service": "^4.0.0",

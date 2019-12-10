@@ -1,5 +1,5 @@
 <template>
-  <div :data-question="block.parentID" :data-nr="block.id" class="block-container">
+  <div :data-question="block.parentID" :data-nr="block.id" :uuid="block.uuid" class="block-container">
     <q-card v-if="editMode" :class="`q-mx-none q-my-xs q-pa-none editModeBlockContainer ${colorClass} ${bgClass}`" >
         <q-card-section class="q-mb-none q-pb-sm q-pt-sm ">
             <div class="row q-my-none q-py-none" dense>
