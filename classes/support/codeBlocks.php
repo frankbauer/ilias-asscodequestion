@@ -151,6 +151,8 @@ class codeBlocks implements ArrayAccess {
 	public function setFromPOST($P){
 		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
+		$randomizer = $settings->randomizer;
+		print_r($randomizer);
 		$blocks = $P['block'][$this->getID()];
 		$blockOptions = $P['block_options'][$this->getID()];
 		for ($i=0;$i<count($blockOptions); $i++){
@@ -182,7 +184,10 @@ class codeBlocks implements ArrayAccess {
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
 
-		
+		$this->setRandomizerActive( $randomizer->active );
+		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
+		$this->setRandomizerTags( $randomizer->knownTags );
+		$this->setRandomizerSets( $randomizer->sets );
 
 		//handle blocks
 		$this->clearBlocks();
@@ -195,12 +200,41 @@ class codeBlocks implements ArrayAccess {
 				$abl = $P['alt_block'][$this->getID()][$i];
 			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
 		}
-		//die;
 	}
 	
 	
 
-	
+	function getRandomizerActive(){
+		return isset($this->additional_data['rndAct']) ? $this->additional_data['rndAct'] : false;
+	}
+
+	function setRandomizerActive($newValue){
+		$this->additional_data['rndAct'] = $newValue;
+	}
+
+	function getRandomizerPreviewIndex(){
+		return isset($this->additional_data['rndIdx']) ? $this->additional_data['rndIdx'] : 0;
+	}
+
+	function setRandomizerPreviewIndex($newValue){
+		$this->additional_data['rndIdx'] = $newValue;
+	}
+
+	function getRandomizerTags(){
+		return isset($this->additional_data['rndTags']) ? $this->additional_data['rndTags'] : array();
+	}
+
+	function setRandomizerTags($newValue){
+		$this->additional_data['rndTags'] = $newValue;
+	}
+
+	function getRandomizerSets(){
+		return isset($this->additional_data['rndSets']) ? $this->additional_data['rndSets'] : array();
+	}
+
+	function setRandomizerSets($newValue){
+		$this->additional_data['rndSets'] = $newValue;
+	}
 
 
 	function getDomLibs() {

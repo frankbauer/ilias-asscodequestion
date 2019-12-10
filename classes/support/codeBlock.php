@@ -92,9 +92,7 @@ class codeBlock {
 			'version' => $options->version,
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
 			'altContent' => $altContent
-		);
-		print_r($data);
-		
+		);				
 		
 		$o = new codeBlock($nr, $data, $object);
 		$o->tidyUnusedProperties();

@@ -33,8 +33,12 @@ class codeBlocksUI {
                  'data-code-theme="'.$this->model->getROTheme().'" '.
                  "data-dom-libs='".json_encode($this->model->getDomLibs())."' ".
                  "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
-                 ($readOnly?'data-readonly':'').
+                 ($readOnly?'data-readonly ':'').
                  'data-output-parser="'.$this->model->getOutputParser().'" '.
+                 'data-randomizer-active="'.$this->model->getRandomizerActive().'" '.
+                 'data-randomizer-preview-index="'.$this->model->getRandomizerPreviewIndex().'" '.
+                 "data-randomizer-known-tags='".json_encode($this->model->getRandomizerTags())."' ".
+                 "data-randomizer-sets='".json_encode($this->model->getRandomizerSets())."' ".
                  '>';
 
         $html .= '<loading><div></div><div></div></loading>';
