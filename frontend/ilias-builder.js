@@ -20,6 +20,7 @@ const vuecli = exec('vue-cli-service build --dest ' + dest, function(code, stdou
     shell.echo('define("CODEBLOCKS_VERSION",     "'+conf.version+'");').toEnd(conffile)
     shell.echo('define("CODEBLOCKS_BASE_URI",     "./'+vueconf.publicPath+'");').toEnd(conffile)
     shell.echo('define("CODEBLOCKS_REL_PATH",     "'+path.join('codeblocks', conf.version)+'/");').toEnd(conffile)
+    shell.echo('define("CODEBLOCKS_TAG_REGEX",     "/\{:([\w]+)}/g");').toEnd(conffile)
     shell.echo('?> ').toEnd(conffile)
 
     const targetconf = path.join('..', 'classes', 'support', 'codeblocks-conf-'+conf.version+'.php')
