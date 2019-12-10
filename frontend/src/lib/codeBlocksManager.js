@@ -230,9 +230,11 @@ export default {
             const cbm = new CodeBlocksManager(el);
             let scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):undefined;
             if (scope === undefined || scope === null) scope = el;
-            console.log(scope)
+            
             Vue.$hljs.$vue.processElements(scope);
-            Vue.$tagger.processElements(scope);
+            if (cbm.data.editMode) {
+                Vue.$tagger.processElements(scope);
+            }
             result.push(cbm);
         });
 

@@ -127,6 +127,8 @@
                 this.block.content = Vue.$tagger.replaceTemplateTagInString(this.block.content, o.name, o.newValue)
             },
             updateTagDisplay(){
+                if (!this.editMode) return;
+                
                 this.clearTagMarkers();
                 Vue.$tagger.getMarkers(this.block.content).forEach(m => {
                     this.codemirror.getDoc().markText(
