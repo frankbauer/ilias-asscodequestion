@@ -254,7 +254,15 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 ## Version History
 ### Version 1.2.0
-* Refactoring UI Code
+* Move most of the CodeBlocks editor/Display logic to client side javascript App
+* Refactor Code Structure to a MVC-like style
+* Add support for Template, and Random-Tags.
+  * Template-Tag: Used in Prefabs to simplify code reuse. You can use `{!<name>}` (for example `{!Version}`) to add a TemplateTag to a prefab. The Editor UI will allow the user to click the tags and replace every occurance with a single value.
+  * Randomized-Tag: Used in source code and text blocks for elements that can be replaced with randomized values when the code is executed (in EditMode) or displayed (in regular Mode). You can use `{:<name>}` to reference a Randomized Tag with a given name (for example `{:Type}`)
+#### ToDo
+* Add Support for Prefabs
+* Add UI to define random values
+* Add support to replace random tags
   
   
 ### Version 1.1.10
