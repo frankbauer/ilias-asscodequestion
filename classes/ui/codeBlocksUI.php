@@ -22,7 +22,7 @@ class codeBlocksUI {
     public function render($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL){
         $html  = '';
         $html .= '<div '.($editMode?'codeblockseditor ':'codeblocks ');
-        $html .= 'data-id="'.$this->model->getId().'" '.
+        $html .= 'data-question="'.$this->model->getId().'" '.
                  'data-compiler="'.$this->model->getCompilerLanguage().'" '.
                  'data-compiler-version="'.$this->model->getCompilerVersion().'" '.
                  'data-language="'.$this->model->getLanguage().'" '.

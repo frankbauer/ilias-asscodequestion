@@ -45,6 +45,10 @@ class CodeBlocksManager {
             blocks: []
         };
 
+        if (data.question!==undefined){
+            data.id = data.question
+        }
+
         if (data.compiler===undefined){
             data.runCode = false
         } else {
