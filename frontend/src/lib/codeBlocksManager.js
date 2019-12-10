@@ -224,7 +224,8 @@ export default {
         let result = [];
         allCodeBlockParents.forEach(el => {
             const cbm = new CodeBlocksManager(el);
-            const scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):document;
+            let scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):undefined;
+            if (scope === undefined || scope === null) scope = el;
             console.log(scope)
             Vue.$hljs.$vue.processElements(scope);
             Vue.$tagger.processElements(scope);
