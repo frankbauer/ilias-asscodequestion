@@ -149,6 +149,7 @@ class codeBlocks implements ArrayAccess {
 
 
 	public function setFromPOST($P){
+		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$blocks = $P['block'][$this->getID()];
 		$blockOptions = $P['block_options'][$this->getID()];
@@ -181,15 +182,25 @@ class codeBlocks implements ArrayAccess {
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
 
+		
+
 		//handle blocks
 		$this->clearBlocks();
 		for ($i=0;$i<count($blocks); $i++){
-			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $this);
+			$abl = '';
+			if (isset($P['alt_block']) 
+				&& isset($P['alt_block'][$this->getID()]) 
+				&& isset($P['alt_block'][$this->getID()][$i])
+			) 
+				$abl = $P['alt_block'][$this->getID()][$i];
+			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
 		}
+		//die;
 	}
 	
 	
 
+	
 
 
 	function getDomLibs() {

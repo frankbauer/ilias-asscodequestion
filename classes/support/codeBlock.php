@@ -36,9 +36,27 @@ class codeBlock {
 		return $this->nr;
 	}
 
+	function getHasAlternativeContent(){
+		return isset($this->block['hasAltContent'])?$this->block['hasAltContent']:false;
+	}
+
+	function setHasAlternativeContent($newValue){
+		$this->block['hasAltContent'] = (bool)$newValue;
+	}
+
+	function getAlternativeContent(){
+		return isset($this->block['altContent'])?$this->block['altContent']:'';
+	}
+
+	function setAlternativeContent($newValue){
+		$this->block['altContent'] = $newValue;
+	}
+
 	function tidyUnusedProperties(){
 		if ($this->getType()!=assCodeQuestionBlockTypes::SolutionCode){
 			unset($this->block['lines']);
+			unset($this->block['altContent']);
+			unset($this->block['hasAltContent']);
 		}
 		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
 			unset($this->block['width']);
@@ -48,7 +66,7 @@ class codeBlock {
 		}
 	}
 
-	public static function createFromPreparedPOST($nr, $options, $content, $object){		
+	public static function createFromPreparedPOST($nr, $options, $content, $altContent, $object){		
 		$t = assCodeQuestionBlockTypes::StaticCode;
 		if ($options->type == 'BLOCK'){
 			if ($options->static==1 || $options->static=='true') 
@@ -62,7 +80,8 @@ class codeBlock {
 		} else if ($options->type == 'TEXT'){
 			$t = assCodeQuestionBlockTypes::Text;
 		}
-
+		
+		
 		$data = array(
 			'type' => $t,
 			'content' => $content,
@@ -70,8 +89,12 @@ class codeBlock {
 			'width' => $options->width,
 			'height' => $options->height,
 			'align' => $options->align,
-			'version' => $options->version
+			'version' => $options->version,
+			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
+			'altContent' => $altContent
 		);
+		print_r($data);
+		
 		
 		$o = new codeBlock($nr, $data, $object);
 		$o->tidyUnusedProperties();

@@ -48,10 +48,11 @@ class codeBlockUI {
     }
 
     private function renderBlock($withSolution=false, $solutions=NULL){
-        print_r($solutions);
-        print_r($withSolution);
         $html  = '<block ';
-        $html .= 'data-visible-lines="'.$this->model->getLines().'" ';  
+        $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
+        if ($this->model->getHasAlternativeContent()) 
+            $html .= 'data-alternative-content="'.$this->model->getAlternativeContent().'" ';  
+
         $html .= '>';
         if ($withSolution) {
             if (is_object($solutions)){
