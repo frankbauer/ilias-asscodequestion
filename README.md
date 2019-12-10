@@ -12,12 +12,11 @@
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
 (create subdirectories, if neccessary):
 `Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion`
-
-2. Go to Administration > Plugins
-
-3. Choose **Update** for the `assCodeQuestion` plugin
-4. Choose **Activate** for the `assCodeQuestion` plugin
-5. Choose **Refresh** for the `assCodeQuestion` plugin languages
+2. When in production you should remove or exclude the `__dev/`-Folder. You will not need to pull the submodules from `__dev/`! 
+3. Go to Administration > Plugins
+4. Choose **Update** for the `assCodeQuestion` plugin
+5. Choose **Activate** for the `assCodeQuestion` plugin
+6. Choose **Refresh** for the `assCodeQuestion` plugin languages
 
 There is nothing to configure for this plugin.
 
