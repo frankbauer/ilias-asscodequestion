@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import hljs from 'highlight.js'
+import hljs from 'highlight.js/lib/highlight'
 import 'highlight.js/styles/ocean.css'
 import '../styles/highlight.styl'
 
