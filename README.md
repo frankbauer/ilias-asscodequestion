@@ -254,7 +254,7 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 ## Version History
 ### Version 1.2.0
-* Move most of the CodeBlocks editor/Display logic to client side javascript App
+* Move most of the CodeBlocks editor/Display logic to client side javascript App (https://github.com/frankbauer/codeblocks-js/). Should make adaption to learning-modules easier.
 * Refactor Code Structure to a MVC-like style
 * Add support for Template, and Random-Tags.
   * Template-Tag: Used in Prefabs to simplify code reuse. You can use `{!<name>}` (for example `{!Version}`) to add a TemplateTag to a prefab. The Editor UI will allow the user to click the tags and replace every occurance with a single value.
