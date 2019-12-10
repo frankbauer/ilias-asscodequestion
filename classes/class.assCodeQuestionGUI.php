@@ -238,6 +238,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
+		$template->setVariable("UUID", $this->object->blocks()->ui()->getUUID());
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);			

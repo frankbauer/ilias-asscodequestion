@@ -3,11 +3,32 @@
 class codeBlocksUI {
     //a codeBlock instance
     var $model = null;
+    var $uuid = null;
 
     public function __construct($model)
 	{
+        $this->uuid = $this->guidv4().'-'.$model->getId();
 		$model->getPlugin()->includeClass("./support/codeblocks-conf-0.1.0.php");
         $this->model = $model;        
+    }
+
+    /**
+	 * Used to generate a token for each solution. 
+	 * We will use this when talking to a solution as a salt.
+	 */
+	private function guidv4()
+	{
+		if (function_exists('com_create_guid') === true)
+			return trim(com_create_guid(), '{}');
+
+		$data = openssl_random_pseudo_bytes(16);
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+    
+    public function getUUID(){
+        return $this->uuid;
     }
 
     public function print(){
@@ -39,6 +60,7 @@ class codeBlocksUI {
                  'data-randomizer-preview-index="'.$this->model->getRandomizerPreviewIndex().'" '.
                  "data-randomizer-known-tags='".json_encode($this->model->getRandomizerTags())."' ".
                  "data-randomizer-sets='".json_encode($this->model->getRandomizerSets())."' ".
+                 'data-scope-selector="[id=\''.$this->getUUID().'\']" '.
                  '>';
 
         $html .= '<loading><div></div><div></div></loading>';

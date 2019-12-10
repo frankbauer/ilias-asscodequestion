@@ -15,13 +15,14 @@
 <script type="text/javascript" src="{JS_FILE}"></script>
 <!-- END js_file -->
 
-<div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
-<p>
-    <b>{LABEL_VALUE1}</b>
-    <br>
-    {BLOCK_HTML}
-</p>
-
+<div id="{UUID}">
+    <div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
+    <p>
+        <b>{LABEL_VALUE1}</b>
+        <br>
+        {BLOCK_HTML}
+    </p>
+</div>
 <!-- BEGIN on_load_code -->
 <script type="text/javascript">
     il.Util.addOnLoad(function() {

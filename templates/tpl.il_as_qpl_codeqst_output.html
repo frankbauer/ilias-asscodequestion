@@ -1,9 +1,11 @@
-<div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
-<div>
-    <textarea style="display:none" id="question{QUESTION_ID}result1" name="question{QUESTION_ID}result1">{RESULT1}</textarea>
-    <br>
-    <label for="question{QUESTION_ID}value1">
-        <b>{LABEL_VALUE1}</b>
-    </label>
-    {BLOCK_HTML}
+<div id="{UUID}">
+    <div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
+    <div>
+        <textarea style="display:none" id="question{QUESTION_ID}result1" name="question{QUESTION_ID}result1">{RESULT1}</textarea>
+        <br>
+        <label for="question{QUESTION_ID}value1">
+            <b>{LABEL_VALUE1}</b>
+        </label>
+        {BLOCK_HTML}
+    </div>
 </div>
