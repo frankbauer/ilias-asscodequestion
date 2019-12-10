@@ -296,9 +296,25 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}*/
 
+		//populate the solution field with the alternative code (if available)
+		if (empty($value1)){
+			$initialSolution = array();
+			for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
+				if ($this->object->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
+					$initialSolution[$i] = $this->object->blocks()[$i]->getAlternativeContent();
+				}
+			}
+			// show the correct solution
+			$value1 = json_encode($initialSolution);
+			$value2 = '...';
+		}
 		//get the student solution
 		$solutions = $this->object->decodeSolution(empty($value1)?'{}':$value1);	
-		print_r($solutions);			
+		echo "Empty?".empty($value1)."\n";
+		print_r($solutions);	
+		echo "\n\n";		
+		print_r($value1);			
+
 		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions);
 
 		$template->setVariable("BLOCK_HTML", $html);		
