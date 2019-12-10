@@ -27,9 +27,9 @@
     [code]update: function(text, json, canvasElement, outputElement) {<br />        canvasElement.removeClass('hiddenBlock');<br />        console.log("FOO", text, json);
         return "New Text is here\n\n";<br />    } //update[/code]
     </p>
-    
+    <div id="master">
     <div style="padding-left:50px;padding-right:50px">
-      <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true">
+      <div codeblockseditor data-compiler="javascript" data-compiler-version="default" data-id="53" data-dom-libs='[]' data-worker-libs='["d3-101"]' data-execution-timeout="10000" data-max-characters="4000" data-run-code="true" data-scope-selector="#master">
         <loading><div></div><div></div></loading>
     <playground data-version="101" width="600px" height="200px" align="center">{init: function(canvasElement) {
         console.log("{:init} with {!template}")
@@ -47,6 +47,7 @@
 </div>
 
     </div>
+  </div>
     <!-- built files will be auto injected -->
   </body>
 </html>

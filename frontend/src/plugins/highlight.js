@@ -30,7 +30,7 @@ const reg_code=/(\[code\]|\[code\s+language="?(.*?)"?\])(.*?)(\[\/code\])/gms
 hljs.$vue = {
     processElements: function(scope, inLang){
         if (scope === undefined) scope = document        
-        const elements = document.querySelectorAll('[highlight]');
+        const elements = scope.querySelectorAll('[highlight]');
         elements.forEach(el => {
             if (inLang === undefined && el.hasAttribute('highlight')){
                 inLang = el.getAttribute('highlight');

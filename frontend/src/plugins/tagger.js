@@ -35,7 +35,7 @@ Vue.$tagger = new Vue({
         },
         processElements: function(scope){
             if (scope === undefined) scope = document        
-            const elements = document.querySelectorAll('[tagged]');
+            const elements = scope.querySelectorAll('[tagged]');
             elements.forEach(el => {
                 this.processElement(el);
             })

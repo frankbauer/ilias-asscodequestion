@@ -223,7 +223,12 @@ export default {
         const allCodeBlockParents = scope.querySelectorAll("codeblocks, codeblockseditor, div[codeblocks], div[codeblockseditor]");
         let result = [];
         allCodeBlockParents.forEach(el => {
-            result.push(new CodeBlocksManager(el));
+            const cbm = new CodeBlocksManager(el);
+            const scope = cbm.data.scopeSelector?document.querySelector(cbm.data.scopeSelector):document;
+            console.log(scope)
+            Vue.$hljs.$vue.processElements(scope);
+            Vue.$tagger.processElements(scope);
+            result.push(cbm);
         });
 
         result.mount = function(){
