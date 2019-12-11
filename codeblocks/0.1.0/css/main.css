@@ -37,3 +37,7 @@ codeblocks>block, codeblocks>text{
 .gutter-warning {
     color: #F9A825 !important;
 }
+
+div.CodeMirror.cm-s-solarized{
+    box-shadow:none
+}
