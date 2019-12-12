@@ -83,6 +83,8 @@ class codeBlock {
 		
 		
 		$data = array(
+			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
+			'codeExpanded' => $options->codeExpanded == 1 || $options->codeExpanded == 'true',
 			'type' => $t,
 			'content' => $content,
 			'lines' => $options->visibleLines,
@@ -150,6 +152,24 @@ class codeBlock {
 
 	function setLines($value) {
 		$this->block['lines'] = $value;
+	}
+
+	function getExpanded() {
+		if (!isset($this->block['expanded'])) return true;
+		return $this->block['expanded'];		
+	}
+
+	function setExpanded($value) {
+		$this->block['expanded'] = $value;
+	}
+
+	function getCodeExpanded() {
+		if (!isset($this->block['codeExpanded'])) return true;
+		return $this->block['codeExpanded'];		
+	}
+
+	function setCodeExpanded($value) {
+		$this->block['codeExpanded'] = $value;
 	}
 
 	function getShouldAutoReset() {
