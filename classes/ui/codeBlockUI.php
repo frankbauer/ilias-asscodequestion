@@ -57,7 +57,7 @@ class codeBlockUI {
         if ($withSolution) {
             if (is_object($solutions)){
                 $nr = $this->model->getNr();
-                print_r($nr);
+                //print_r($nr);
                 $html .= $solutions->$nr;
             }
         } else {

@@ -152,7 +152,7 @@ class codeBlocks implements ArrayAccess {
 		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
-		print_r($randomizer);
+		//print_r($randomizer);
 		$blocks = $P['block'][$this->getID()];
 		$blockOptions = $P['block_options'][$this->getID()];
 		for ($i=0;$i<count($blockOptions); $i++){
