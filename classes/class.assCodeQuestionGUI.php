@@ -229,7 +229,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
-		print_r("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
+		//("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();				
@@ -311,10 +311,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 		//get the student solution
 		$solutions = $this->object->decodeSolution(empty($value1)?'{}':$value1);	
-		echo "Empty?".empty($value1)."\n";
-		print_r($solutions);	
-		echo "\n\n";		
-		print_r($value1);			
+		//echo "Empty?".empty($value1)."\n";
+		//print_r($solutions);	
+		//echo "\n\n";		
+		//print_r($value1);			
 
 		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions);
 
@@ -341,7 +341,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
-		print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
+		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
@@ -374,7 +374,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
-		print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
+		//print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
 		if( is_object($this->getPreviewSession()) )
 		{
 			$solution = $this->getPreviewSession()->getParticipantsSolution();
@@ -416,7 +416,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); //die;
+		//print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); //die;
 
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
@@ -445,7 +445,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValues($active_id, $pass);
-			print_r($solutions);
+			//print_r($solutions);
 		}
 		else
 		{
