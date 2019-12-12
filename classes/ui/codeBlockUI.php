@@ -40,6 +40,7 @@ class codeBlockUI {
     private function renderCanvas(){
         $html  = '<playground ';
         $html .= 'data-version="'.$this->model->getVersion().'" '.
+                 ($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : ''.
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'" ';

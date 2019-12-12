@@ -90,6 +90,7 @@ class codeBlock {
 			'height' => $options->height,
 			'align' => $options->align,
 			'version' => $options->version,
+			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
 			'altContent' => $altContent
 		);				
@@ -149,6 +150,15 @@ class codeBlock {
 
 	function setLines($value) {
 		$this->block['lines'] = $value;
+	}
+
+	function getShouldAutoReset() {
+		if (!isset($this->block['autoreset'])) return false;
+		return $this->block['autoreset'];		
+	}
+
+	function setShouldAutoReset($value) {
+		$this->block['autoreset'] = $value;
 	}
 
     function getType() {
