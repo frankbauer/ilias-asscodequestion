@@ -305,7 +305,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
-		$solutions = $this->object->getSolutionValues($active_id, $pass);
+		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, false);
 
 		// there may be more tham one solution record
 		// the last saved wins
@@ -402,7 +402,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($showStudentResults)
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
-			$solutions = $this->object->getSolutionValues($active_id, $pass);
+			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, false);
 			//print_r($solutions);
 		}
 		else

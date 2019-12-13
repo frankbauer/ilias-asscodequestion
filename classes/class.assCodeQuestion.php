@@ -305,21 +305,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		parent::syncWithOriginal();
 	}
 
-	/**
-	 * Used to generate a token for each solution. 
-	 * We will use this when talking to a solution as a salt.
-	 */
-	private function guidv4()
-	{
-		if (function_exists('com_create_guid') === true)
-			return trim(com_create_guid(), '{}');
-
-		$data = openssl_random_pseudo_bytes(16);
-		$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-		$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-	}
-
 
 	/**
 	 * Get a submitted solution array from $_POST
@@ -336,7 +321,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	{		
 		$data = $_POST['block'][$this->getId()];
 
-		//$result = array('token'=>$this->guidv4());
 		$result = array();
 		for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){
 			if ($this->blocks[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
@@ -349,6 +333,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		);
 	}
 
+	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false){
+		$this->getSolutionValues($active_id, $pass, $authorized);
+	}
 	/**
 	 * Calculate the reached points from a solution array
 	 *
@@ -396,7 +383,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// get the answers of the learner from the tst_solution table
 		// the data is saved by saveWorkingData() in this class
-		$solutions = $this->getSolutionValues($active_id, $pass);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
 
 		// there may be more solutions stored due to race conditions
 		// the last saved solution record wins
@@ -625,7 +612,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 
 		
-		$solutions = $this->getSolutionValues($active_id, $pass);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
 
 		if (is_array($solutions))
 		{
@@ -779,7 +766,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
-		$solutions = $this->getSolutionValues($active_id, $pass);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
 		if (count($solutions)>0) return $solutions[count($solutions)-1];
 
 		return NULL;
