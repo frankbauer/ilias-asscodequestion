@@ -318,7 +318,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit()
-	{		
+	{				
 		$data = $_POST['block'][$this->getId()];
 
 		$result = array();
@@ -328,7 +328,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 		return array(
-			'value1' => $result,
+			'value1' => $this->decodeSolution($result),
 			'value2' => ''
 		);
 	}
@@ -348,7 +348,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}	
 		
-		return array('value1' => $initialSolution, 'value2' => $state);
+		return array(
+			'value1' => $this->decodeSolution($initialSolution), 
+			'value2' => $this->decodeSolution($state)
+		);
 	}
 
 	public function getPreviewValuesOrInit($previewSession, $init_solution=false){
@@ -367,22 +370,25 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return $solution;
 	}
 
-	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false){
-		if (is_null($authorized))
+	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false, $save=true){
+		if(is_null($pass))
 		{
-			// assAccountingQuestionGUI::getTestOutput() takes the latest storage
-			$rows = $this->getUserSolutionPreferingIntermediate($active_id, $pass);
-		}
-		else
-		{
-			// other calls should explictly indicate whether to use the authorized or intermediate solutions			
-			$rows = $this->getSolutionValues($active_id, $pass, $authorized);
+			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
+		// other calls should explictly indicate whether to use the authorized or intermediate solutions			
+		$rows = $this->getSolutionValues($active_id, $pass, $authorized);
+		
+
+		//print_r($rows); die;
 		if ($init_solution && count($rows)==0){
 			$res = $this->buildInitialSolution();
-			$value1 = array();
-			$value = $res['value2'];
+			$value1 = $res['value1'];
+			$value2 = $res['value2'];
+			if ($save) {
+				$this->mylog("saveCurrentSolution");
+				$this->saveCurrentSolution($active_id, $pass, 'TState', json_encode($value2), true);
+			}
 			return $res;
 		} else {
 			$value1 = '';
@@ -390,8 +396,17 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 			foreach ($rows as $solution)
 			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : array();			
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : array();			
+				$v1 = isset($solution["value1"]) ? $solution["value1"] : '{}';
+				$v2 = isset($solution["value2"]) ? $solution["value2"] : '{}';
+				$f = strlen($v1)>0 ? $v1[0] : '';
+				if ($f!='T') { //original style
+					$value1 = $this->decodeSolution($v1);
+					$value2 = $this->decodeSolution('{}');
+				} else if ($v1=='TSolution') {
+					$value1 = $this->decodeSolution($v2);
+				} else if ($v1=='TState') {
+					$value2 = $this->decodeSolution($v2);
+				}	
 			}
 
 			return array('value1' => $value1, 'value2' => $value2);
@@ -445,7 +460,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// get the answers of the learner from the tst_solution table
 		// the data is saved by saveWorkingData() in this class
-		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, $authorizedSolution, false);
 
 		// there may be more solutions stored due to race conditions
 		// the last saved solution record wins
@@ -490,6 +505,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// save the answers of the learner to tst_solution table
 		// this data is question type specific
 		// it is used used by calculateReachedPointsForSolution() in this class
+		$this->mylog("saveWorkingDataInner");
 
 		$result = $ilDB->queryF("SELECT solution_id FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
 			array('integer','integer','integer'),
@@ -537,6 +553,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		};
 	}
 
+	private function mylog($s){
+		/*$fp = fopen('/opt/iliasdata/assCodeQuestion.log', 'a');
+		fwrite($fp, $s);
+		fwrite($fp, '---');
+		fclose($fp);*/
+	}
+
 	/**
 	 * Saves the learners input of the question to the database
 	 *
@@ -559,57 +582,51 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// get the submitted solution
 		$solution = $this->getSolutionSubmit();
 
+		//interested in randomized values, which are allways authorized
+		$initialSolution = $this->getSolutionValuesOrInit($active_id, $pass, true, true, false); 
 
-		if (method_exists($this->getProcessLocker(), 'executeUserSolutionUpdateLockOperation')){ //ilias 5.2
-			$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-				$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
-			});
-		} else { // ilias 5.1
-			// lock to prevent race conditions
-			$this->getProcessLocker()->requestUserSolutionUpdateLock();
-
-			$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
-
-			// unlock
-			$this->getProcessLocker()->releaseUserSolutionUpdateLock();
-		}
+		$solution['value1'] = json_encode($solution['value1']);
+		$solution['value2'] = json_encode($initialSolution['value2']);
+		$sol = print_r($solution, true);
+		$this->mylog($sol);
 		
 
-		// Check if the user has entered something
-		// Then set entered_values accordingly
-		if (!empty($solution["points"]))
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+			$this->removeCurrentSolution($active_id, $pass, $authorized);
+			//$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
+			$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], $authorized);
+		});
+		
+		// log the saving, we assume that values have been entered
+		if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 		{
-			$entered_values = TRUE;
+			$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 		}
-
-		if ($entered_values)
-		{
-			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-			}
-		}
-		else
-		{
-			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-			}
-		}
-
 		return true;
+	}
+
+	/**
+	 * Calculate the points a user has reached in a preview session
+	 * @param ilAssQuestionPreviewSession $previewSession
+	 * @return float
+	 */
+	public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession)
+	{
+        $solution = (array) $previewSession->getParticipantsSolution();
+		
+        return 0;
 	}
 
 
 	/**
-	 * Reworks the allready saved working data if neccessary
+	 * Reworks the already saved working data if neccessary
 	 *
+	 * @abstract
 	 * @access protected
 	 * @param integer $active_id
 	 * @param integer $pass
 	 * @param boolean $obligationsAnswered
+	 * * @param boolean $authorized
 	 */
 	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
@@ -624,17 +641,18 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function removeCurrentSolution($active_id, $pass, $authorized = true)
     {
+		$this->mylog("removeCurrentSolution");
         global $ilDB;
         if($this->getStep() !== NULL)
         {
             $query = "
-				UPDATE tst_solutions
-				SET value1 = '{}'
+				DELETE FROM tst_solutions
 				WHERE active_fi = %s
 				AND question_fi = %s
 				AND pass = %s
 				AND step = %s
 				AND authorized = %s
+				AND value1 <> 'TState'
 			";
             return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer', 'integer'),
                 array($active_id, $this->getId(), $pass, $this->getStep(), (int)$authorized)
@@ -643,13 +661,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
         else
         {
             $query = "
-				UPDATE tst_solutions
-				SET value1 = '{}'
+				DELETE FROM tst_solutions
 				WHERE active_fi = %s
 				AND question_fi = %s
 				AND pass = %s
 				AND authorized = %s
-				AND value1 <> 'accqst_vars'
+				AND value1 <> 'TState'
 			";
             return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer'),
                 array($active_id, $this->getId(), $pass, (int)$authorized)
@@ -664,14 +681,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function removeExistingSolutions($activeId, $pass)
     {
+		$this->mylog("removeExistingSolutions");
         global $ilDB;
         $query = "
-			UPDATE tst_solutions
-			SET value1 = '{}'
+			DELETE FROM tst_solutions
 			WHERE active_fi = %s
 			AND question_fi = %s
 			AND pass = %s
-			AND value1 <> 'accqst_vars'
+			AND value1 <> 'TState'
 		";
         if( $this->getStep() !== NULL )
         {
@@ -689,7 +706,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function lookupForExistingSolutions($activeId, $pass)
     {
-
+		$this->mylog("lookupForExistingSolutions");
         /** @var $ilDB \ilDBInterface  */
         global $ilDB;
         $return = array(
@@ -702,7 +719,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			WHERE active_fi = %s
 			AND question_fi = %s
 			AND pass = %s
-			AND LENGTH(value1) > 4
+			AND value1 <> 'TState'
 		";
         if( $this->getStep() !== NULL )
         {
@@ -725,6 +742,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
         return $return;
     }
+
 
 
 	/**
@@ -784,14 +802,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 
 		
-		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
 
 		if (is_array($solutions))
 		{
 			foreach ($solutions as $solution)
 			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";				
+				$value1 = isset($solution["value1"]) ? $solution["value1"] : $this->decodeSolution(array());
+				$value2 = isset($solution["value2"]) ? $solution["value2"] : $this->decodeSolution(array());				
 			}
 		}
 
@@ -938,14 +956,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
-		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, null, false);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
 		if (count($solutions)>0) return $solutions[count($solutions)-1];
 
 		return NULL;
 	}
 
 	public function decodeSolution($value){
-		$res = json_decode($value);
+		$res = is_string($value)?json_decode($value):$value;
 		if (is_array($res)){
 			$alt = new \stdClass();
 			foreach ($res as $i=>$val){

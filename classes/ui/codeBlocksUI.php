@@ -65,7 +65,7 @@ class codeBlocksUI {
 
         $html .= '<loading><div></div><div></div></loading>';
 
-        $set = ($this->model->getRandomizerActive() && $state!=NULL)?$this->model->getRandomSet($state['rid']):NULL;
+        $set = ($this->model->getRandomizerActive() && $state!=NULL)?$this->model->getRandomSet($state->rid):NULL;
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
             $html .= $this->model[$i]->ui()->render($withSolution, $solutions, $set);
         }

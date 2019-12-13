@@ -205,9 +205,21 @@ class codeBlocks implements ArrayAccess {
 	function getRandomSet($setNr){
 		$set = $this->getRandomizerSets();
 		if ($setNr>=0 && $setNr < count($set)) $set = $set[$setNr];
+		else if ($this->getRandomizerPreviewIndex()>=0 && $this->getRandomizerPreviewIndex() < count($set)) $set = $set[$this->getRandomizerPreviewIndex()];
+		else if ( 0 < count($set)) $set = $set[0];
 		else $set = NULL;
 
 		return $set;
+	}
+
+	function getBestRandomSolution($setNr){
+		$res = array();
+		$set = ($this->getRandomizerActive())?$this->getRandomSet($setNr):NULL;
+
+		for ($i=0; $i<count($this->blocks); $i++){
+			$res[$i] = $this[$i]->getContentForSet($set);			
+		}
+		return $res;
 	}
 	
 

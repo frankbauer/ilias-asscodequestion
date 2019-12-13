@@ -290,7 +290,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
-		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, true);
+		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, true);
 
 		$questionoutput = $this->getQuestionOutput($solutions['value1'], $solutions['value2']);
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
@@ -349,6 +349,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
+		echo "showStudentResults=".$showStudentResults."<br>";
 		
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
@@ -361,6 +362,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			iljQueryUtil::initjQueryUI($template);
 
 			$this->object->blocks()->ui()->prepareTemplate($template, self::URL_PATH);
+
+			//we need this for the manual scoring view, otherwise the boxes have to get clicked
+			$template->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+
 			$template->setCurrentBlock("DEFAULT");
 			$template->fillCssFiles();
 			$template->fillInlineCss();
@@ -373,21 +378,20 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($showStudentResults)
 		{
 			// get the answers of the user for the active pass or from the last pass if allowed
-			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, false);
-			//print_r($solutions);
+			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);			
 		}
 		else
-		{
-			$bestSolution = array();
-			for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
-				if ($this->object->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
-					$bestSolution[$i] = $this->object->blocks()[$i]->getContent();
-				}
-			}
+		{		
+			$stored = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);
+			$rid = -1;
+			if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
+			$solutions = $this->object->blocks()->getBestRandomSolution($rid);		
+			$stored['value2']->blocks = $solutions;
+
 			// show the correct solution
 			$solutions = array(
-				"value1" => $bestSolution,
-				"value2" => NULL
+				"value1" => $solutions,
+				"value2" => $stored['value2']
 			);			
 		}
 

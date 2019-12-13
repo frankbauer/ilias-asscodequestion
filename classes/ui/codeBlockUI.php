@@ -59,15 +59,10 @@ class codeBlockUI {
 
         $html .= '>';
         if ($withSolution) {
-            if (is_object($solutions)){
-                print_r("OBJECT???");
-                die;
-                $nr = $this->model->getNr();
-                //print_r($nr);
+            $nr = $this->model->getNr();
+            if (is_object($solutions)){                
                 $html .= $solutions->$nr;
             } else if (is_array($solutions)){
-                $nr = $this->model->getNr();
-                //print_r($nr);
                 $html .= $solutions[$nr];
             }
         } else {
