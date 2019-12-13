@@ -16,7 +16,8 @@ class codeBlocks implements ArrayAccess {
 		$this->plugin = $plugin;
 		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
-        $this->getPlugin()->includeClass("./support/codeBlock.php");
+		$this->getPlugin()->includeClass("./support/codeBlock.php");
+		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.1.0.php");
 
 		if ($json_data == null){
 			$this->additional_data = array();
@@ -200,7 +201,29 @@ class codeBlocks implements ArrayAccess {
 			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
 		}	
 	}
+
+	function getRandomSet($setNr){
+		$set = $this->getRandomizerSets();
+		if ($setNr>=0 && $setNr < count($set)) $set = $set[$setNr];
+		else $set = NULL;
+
+		return $set;
+	}
 	
+
+	function getRandomBlocks($setNr){
+		$res = array();
+		$set = ($this->getRandomizerActive())?$this->getRandomSet($setNr):NULL;
+
+		for ($i=0; $i<count($this->blocks); $i++){
+			if ($this[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
+				$res[$i] = $this[$i]->getAlternativeContentForSet($set);
+			} else {
+				$res[$i] = $this[$i]->getContentForSet($set);
+			}
+		}
+		return $res;
+	}
 	
 
 	function getRandomizerActive(){

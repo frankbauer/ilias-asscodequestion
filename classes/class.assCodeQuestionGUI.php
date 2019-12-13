@@ -198,7 +198,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	private function prepareSolutionCode($value, $blockID){
 		if (empty($value)) return '';
 
-		$json = $this->object->decodeSolution($value);				
+		$json = $value;				
 		if (!empty($json)) $value = $json->$blockID;
 
 		$value = ilUtil::prepareFormOutput($value);
@@ -255,26 +255,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$html = '';
 
-		//populate the solution field with the alternative code (if available)
-		if (empty($value1)){
-			$initialSolution = array();
-			for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
-				if ($this->object->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
-					$initialSolution[$i] = $this->object->blocks()[$i]->getAlternativeContent();
-				}
-			}
-			// show the correct solution
-			$value1 = json_encode($initialSolution);
-			$value2 = '...';
-		}
+		
 		//get the student solution
-		$solutions = $this->object->decodeSolution(empty($value1)?'{}':$value1);	
-		//echo "Empty?".empty($value1)."\n";
-		//print_r($solutions);	
-		//echo "\n\n";		
-		//print_r($value1);			
+		$solutions = $value1;					
 
-		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions);
+		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $value2);
 
 		$template->setVariable("BLOCK_HTML", $html);		
 		$template->setVariable("LANGUAGE", $language);
@@ -299,26 +284,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
-		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); //die;
+		print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); 
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
-		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, false);
+		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, null, true);
 
-		// there may be more tham one solution record
-		// the last saved wins
-		if (is_array($solutions))
-		{
-			foreach ($solutions as $solution)
-			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";
-			}
-		}
-
-		$questionoutput = $this->getQuestionOutput($value1, $value2);		
+		$questionoutput = $this->getQuestionOutput($solutions['value1'], $solutions['value2']);
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
@@ -333,11 +307,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
 		//print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
-		if( is_object($this->getPreviewSession()) )
-		{
-			$solution = $this->getPreviewSession()->getParticipantsSolution();
-		}
-
+		$solution = (array) $this->object->getPreviewValuesOrInit($this->getPreviewSession(), true);
+			
 		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
 		if(!$show_question_only)
 		{
@@ -374,7 +345,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		//print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); //die;
+		print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); 
 
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
@@ -414,20 +385,15 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				}
 			}
 			// show the correct solution
-			$solutions = array(array(
-				"value1" => json_encode($bestSolution),
-				"value2" => "..."
-			));			
+			$solutions = array(
+				"value1" => $bestSolution,
+				"value2" => NULL
+			);			
 		}
 
-		// loop through the saved values if more records exist
-		// the last record wins
-		// adapt this to your structure of answers
-		foreach ($solutions as $solution)
-		{
-			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
-			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
-		}	
+		$value1 = $solutions['value1'];
+		$value2 = $solutions['value2'];
+		
 			
 		if ($showStudentResults)
 		{

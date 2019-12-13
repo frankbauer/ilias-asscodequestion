@@ -48,6 +48,17 @@ class codeBlock {
 		return isset($this->block['altContent'])?$this->block['altContent']:'';
 	}
 
+	function getAlternativeContentForSet($set){
+		if ($set==NULL) return $this->getAlternativeContent();
+		return preg_replace_callback(
+			CODEBLOCKS_TAG_REGEX,
+			function ($treffer)  use ($set) {
+				return $set[$treffer[1]];
+			},
+			$this->getAlternativeContent()
+		);
+	}
+
 	function setAlternativeContent($newValue){
 		$this->block['altContent'] = $newValue;
 	}
@@ -192,6 +203,17 @@ class codeBlock {
 
 	function getContent() {
 		return $this->fixLoadedCode($this->block['content']);
+	}
+
+	function getContentForSet($set){
+		if ($set==NULL) return $this->getContent();
+		return preg_replace_callback(
+			CODEBLOCKS_TAG_REGEX,
+			function ($treffer)  use ($set) {
+				return $set[$treffer[1]];
+			},
+			$this->getContent()
+		);
 	}
 
 	function getPrintableContent(){

@@ -328,14 +328,76 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 		return array(
-			'value1' => json_encode($result),
+			'value1' => $result,
 			'value2' => ''
 		);
 	}
 
-	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false){
-		$this->getSolutionValues($active_id, $pass, $authorized);
+	private function buildInitialSolution(){
+		$ct = count($this->blocks()->getRandomizerSets());
+		$rid = ($ct>0)?random_int(0, $ct-1):0;
+		$state = array(
+			"rid" => $rid,
+			"blocks" => $this->blocks()->getRandomBlocks($rid)
+		);
+
+		$initialSolution = array();
+		for ($i=0; $i<$this->blocks()->getNumberOfBlocks(); $i++){
+			if ($this->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
+				$initialSolution[$i] = $state["blocks"][$i];
+			}
+		}	
+		
+		return array('value1' => $initialSolution, 'value2' => $state);
 	}
+
+	public function getPreviewValuesOrInit($previewSession, $init_solution=false){
+		$solution = array();
+		if( is_object($previewSession) )
+		{
+			$solution = (array) $previewSession->getParticipantsSolution();
+		}
+
+		if ($init_solution && count($solution)==0){
+			$res = $this->buildInitialSolution();
+			$previewSession->setParticipantsSolution($res);
+			return $res;
+		}
+
+		return $solution;
+	}
+
+	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false){
+		if (is_null($authorized))
+		{
+			// assAccountingQuestionGUI::getTestOutput() takes the latest storage
+			$rows = $this->getUserSolutionPreferingIntermediate($active_id, $pass);
+		}
+		else
+		{
+			// other calls should explictly indicate whether to use the authorized or intermediate solutions			
+			$rows = $this->getSolutionValues($active_id, $pass, $authorized);
+		}
+
+		if ($init_solution && count($rows)==0){
+			$res = $this->buildInitialSolution();
+			$value1 = array();
+			$value = $res['value2'];
+			return $res;
+		} else {
+			$value1 = '';
+			$value2 = '';
+
+			foreach ($rows as $solution)
+			{
+				$value1 = isset($solution["value1"]) ? $solution["value1"] : array();			
+				$value2 = isset($solution["value2"]) ? $solution["value2"] : array();			
+			}
+
+			return array('value1' => $value1, 'value2' => $value2);
+		}		
+	}
+
 	/**
 	 * Calculate the reached points from a solution array
 	 *
