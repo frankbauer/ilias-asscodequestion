@@ -551,8 +551,118 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 */
 	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
-		// normally nothing needs to be reworked
+		// nothing to rework!
 	}
+
+    /**
+     * Remove the current user solution
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function removeCurrentSolution($active_id, $pass, $authorized = true)
+    {
+        global $ilDB;
+        if($this->getStep() !== NULL)
+        {
+            $query = "
+				UPDATE tst_solutions
+				SET value1 = '{}'
+				WHERE active_fi = %s
+				AND question_fi = %s
+				AND pass = %s
+				AND step = %s
+				AND authorized = %s
+			";
+            return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer', 'integer'),
+                array($active_id, $this->getId(), $pass, $this->getStep(), (int)$authorized)
+            );
+        }
+        else
+        {
+            $query = "
+				UPDATE tst_solutions
+				SET value1 = '{}'
+				WHERE active_fi = %s
+				AND question_fi = %s
+				AND pass = %s
+				AND authorized = %s
+				AND value1 <> 'accqst_vars'
+			";
+            return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer'),
+                array($active_id, $this->getId(), $pass, (int)$authorized)
+            );
+        }
+    }
+    /**
+     * Remove authorized and intermediate solution for a user in the test pass
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function removeExistingSolutions($activeId, $pass)
+    {
+        global $ilDB;
+        $query = "
+			UPDATE tst_solutions
+			SET value1 = '{}'
+			WHERE active_fi = %s
+			AND question_fi = %s
+			AND pass = %s
+			AND value1 <> 'accqst_vars'
+		";
+        if( $this->getStep() !== NULL )
+        {
+            $query .= " AND step = " . $ilDB->quote((int)$this->getStep(), 'integer') . " ";
+        }
+        return $ilDB->manipulateF($query, array('integer', 'integer', 'integer'),
+            array($activeId, $this->getId(), $pass)
+        );
+    }
+    /**
+     * Lookup if an authorized or intermediate solution exists
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function lookupForExistingSolutions($activeId, $pass)
+    {
+
+        /** @var $ilDB \ilDBInterface  */
+        global $ilDB;
+        $return = array(
+            'authorized' => false,
+            'intermediate' => false
+        );
+        $query = "
+			SELECT authorized, COUNT(*) cnt
+			FROM tst_solutions
+			WHERE active_fi = %s
+			AND question_fi = %s
+			AND pass = %s
+			AND LENGTH(value1) > 4
+		";
+        if( $this->getStep() !== NULL )
+        {
+            $query .= " AND step = " . $ilDB->quote((int)$this->getStep(), 'integer') . " ";
+        }
+        $query .= "
+			GROUP BY authorized
+		";
+        $result = $ilDB->queryF($query, array('integer', 'integer', 'integer'), array($activeId, $this->getId(), $pass));
+        while ($row = $ilDB->fetchAssoc($result))
+        {
+            if ($row['authorized']) {
+                $return['authorized'] = $row['cnt'] > 0;
+            }
+            else
+            {
+                $return['intermediate'] = $row['cnt'] > 0;
+            }
+		}
+
+        return $return;
+    }
 
 
 	/**
