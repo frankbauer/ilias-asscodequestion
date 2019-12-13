@@ -19,3 +19,8 @@ div.playground table td.fixed, div.ilc_question_Standard table td.fixed{
 div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
     width:100%
 }
+
+.cm-s-solarized div.CodeMirror-gutter.CodeMirror-linenumbers{
+    width:29px !important;
+    border-right: 1px solid #d8d2c0
+}

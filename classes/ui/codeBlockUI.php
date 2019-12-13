@@ -18,7 +18,6 @@ class codeBlockUI {
 
     public function render($withSolution=false, $solutions=NULL){
         $type = $this->model->getType();
-        echo ($this->model->getExpanded()?'true':'false')."\n";
             
         if ($type==assCodeQuestionBlockTypes::StaticCode) 
             return $this->renderStaticBlock();
