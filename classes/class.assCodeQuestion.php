@@ -356,14 +356,15 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	public function getPreviewValuesOrInit($previewSession, $init_solution=false){
 		$solution = array();
-		if( is_object($previewSession) )
-		{
+		if( is_object($previewSession)) {
 			$solution = (array) $previewSession->getParticipantsSolution();
 		}
 
 		if ($init_solution && count($solution)==0){
 			$res = $this->buildInitialSolution();
-			$previewSession->setParticipantsSolution($res);
+			if( is_object($previewSession) ) {
+				$previewSession->setParticipantsSolution($res);
+			}
 			return $res;
 		}
 
