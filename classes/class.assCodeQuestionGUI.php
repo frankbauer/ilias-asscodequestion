@@ -38,6 +38,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @var assCodeQuestion	The question object
 	 */
 	var $object = NULL;
+
+	var $lang_user = 'en';
 	
 	/**
 	* Constructor
@@ -57,6 +59,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		{
 			$this->object->loadFromDb($id);
 		}		
+		global $DIC;
+		
+		$this->lang_user = $this->plugin->txt('used_lang');
+		if ('-qpl_qst_codeqst_used_lang-' == $this->lang_user) $this->lang_user = 'en';		
 	}
 
 	function getLanguage() {
@@ -248,54 +254,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}			
 
 		$html = '';
-		/*$script = '';
-		//Add Code Blocks
-		for ($i=0; $i<$this->object->blocks()->getNumberOfBlocks(); $i++){
-			$questionID = $this->object->getId()*$qidf ;
-			$code = $this->object->blocks()[$i]->getContent();
-			if ($print) $code = $this->printableString($code);
-			$id = 'block['.$questionID.']['.$i.']';
-			if ($active_id!=NULL){
-				$id .= '['.$active_id.']';
-			}
-			$type = $this->object->blocks()[$i]->getType();
-
-			if ($print){}
-			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
-			$tpl->setVariable("NAME", $id);
-			$tpl->setVariable("BLOCK_ID", $i);
-			$tpl->setVariable("BLOCK_TYPE", $type);
-			$tpl->setVariable("QUESTION_ID", $questionID);				
-			$tpl->setVariable("SHOW_LINES", $this->object->blocks()[$i]->getLines());
-			$tpl->setVariable("THEME", $this->object->blocks()->getTheme());
-			$tpl->setVariable("ROTHEME", $this->object->blocks()->getROTheme());
-			if ($readOnly)
-				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
-			else 
-				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
-
-		
-			if ((trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) && $type!=assCodeQuestionBlockTypes::SolutionCode) {
-				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';
-			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
-				$tpl->setVariable("CONTENT", $code);
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
-				$tpl->setVariable("CONTENT", $this->prepareSolutionCode($value1, $i));
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
-				//$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';
-				
-				$tpl->setVariable("CONTENT", $code);
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
-				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
-				$html .= '<playground id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></playground>';	
-				//$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
-				$script .= "if (calls[$questionID]===undefined) calls[$questionID]=[];\n";
-				$script .= 'calls['.$questionID.']['.$i."]= ".$code."\n";
-			}
-		}*/
 
 		//populate the solution field with the alternative code (if available)
 		if (empty($value1)){
