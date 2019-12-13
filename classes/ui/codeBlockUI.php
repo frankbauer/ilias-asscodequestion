@@ -18,6 +18,7 @@ class codeBlockUI {
 
     public function render($withSolution=false, $solutions=NULL){
         $type = $this->model->getType();
+        echo ($this->model->getExpanded()?'true':'false')."\n";
             
         if ($type==assCodeQuestionBlockTypes::StaticCode) 
             return $this->renderStaticBlock();
@@ -37,12 +38,12 @@ class codeBlockUI {
         return '';
     }
 
-    private function renderCanvas(){
+    private function renderCanvas(){        
         $html  = '<playground ';
         $html .= 'data-version="'.$this->model->getVersion().'" '.
-                 ($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : ''.
-                 (!$this->model->getExpanded()) ? 'data-expanded=0 ' : ''.
-                 (!$this->model->getCodeExpanded()) ? 'data-code-expanded=0 ' : ''.
+                 (($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : '').
+                 ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
+                 ((!$this->model->getCodeExpanded()) ? 'data-code-expanded=0 ' : '').
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'" ';
@@ -53,6 +54,7 @@ class codeBlockUI {
     private function renderBlock($withSolution=false, $solutions=NULL){
         $html  = '<block ';
         $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
+        if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
         if ($this->model->getHasAlternativeContent()) 
             $html .= 'data-alternative-content="'.$this->model->getAlternativeContent().'" ';  
 
@@ -71,15 +73,16 @@ class codeBlockUI {
     }
 
     private function renderHiddenBlock(){
-        return "<block data-hidden>".$this->model->getContent()."</block>";
+
+        return "<block data-hidden".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->model->getContent()."</block>";
     }
 
     private function renderStaticBlock(){
-        return '<block data-static data-visible-lines="auto">'.$this->model->getContent()."</block>";
+        return '<block data-static data-visible-lines="auto"'.(!$this->model->getExpanded() ? ' data-expanded=0' : '').'>'.$this->model->getContent()."</block>";
     }
 
     private function renderText(){
-        return "<text>".$this->model->getContent()."</text>";
+        return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->model->getContent()."</text>";
     }
 }
 

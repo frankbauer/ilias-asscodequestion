@@ -63,6 +63,7 @@ class codeBlock {
 			unset($this->block['height']);
 			unset($this->block['version']);
 			unset($this->block['align']);
+			unset($this->block['codeExpanded']);
 		}
 	}
 

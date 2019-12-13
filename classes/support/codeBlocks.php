@@ -149,10 +149,9 @@ class codeBlocks implements ArrayAccess {
 
 
 	public function setFromPOST($P){
-		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
-		//print_r($randomizer);
+		
 		$blocks = $P['block'][$this->getID()];
 		$blockOptions = $P['block_options'][$this->getID()];
 		for ($i=0;$i<count($blockOptions); $i++){
@@ -199,7 +198,7 @@ class codeBlocks implements ArrayAccess {
 			) 
 				$abl = $P['alt_block'][$this->getID()][$i];
 			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
-		}
+		}	
 	}
 	
 	
