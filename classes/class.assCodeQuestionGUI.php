@@ -284,7 +284,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
-		print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); 
+		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); 
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
@@ -345,11 +345,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); 
+		//print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); 
 
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
-		echo "showStudentResults=".$showStudentResults."<br>";
+		//echo "showStudentResults=".$showStudentResults."<br>";
 		
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
