@@ -1,8 +1,10 @@
 console.log("[Loading legacy Helpers]");
 
 function processMixedOutput(outputObject, canvasElement, magicString) {
-    const qid = canvasElement.attr('data-question');
-    const out = $('#'+qid+'Output');    
+    const parent = canvasElement.parents(".codeblocks");
+    const qid = parent.attr('data-question');
+    //const out = $('#'+qid+'Output');    
+    const out = parent.find("div.runner pre.output");
 
     if (magicString===undefined) magicString = '\n\n<JSON>\n';
     const idx = outputObject.indexOf(magicString);    
