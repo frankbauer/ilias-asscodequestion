@@ -85,15 +85,19 @@ class codeBlocksUI {
 			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
             $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
             $tpl->addCss($basePath.'/css/custom.css');
-            if ($this->model->getMinCanvasVersion()<=100) {
-                $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
-            }
 
             $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
 
 			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
 			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
-		}	
+        }	
+        
+        if (!$tpl->hasLegacyHelpers) {
+            if ($this->model->getMinCanvasVersion()<=100) {
+                $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
+                $tpl->hasLegacyHelpers = true;
+            }
+        }
     }
 }
 
