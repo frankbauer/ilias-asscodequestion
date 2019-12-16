@@ -500,60 +500,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
-	private function saveWorkingDataInner ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-		global $ilDB;
-		global $ilUser;
-		// save the answers of the learner to tst_solution table
-		// this data is question type specific
-		// it is used used by calculateReachedPointsForSolution() in this class
-		$this->mylog("saveWorkingDataInner");
-
-		$result = $ilDB->queryF("SELECT solution_id FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-			array('integer','integer','integer'),
-			array($active_id, $this->getId(), $pass)
-		);
-
-		$row = $ilDB->fetchAssoc($result);
-		if ($row)
-		{
-			$affectedRows = $ilDB->update("tst_solutions",
-				array(
-					"active_fi"   => array("integer", $active_id),
-					"question_fi" => array("integer", $this->getId()),
-					"pass"        => array("integer", $pass),
-					"tstamp"      => array("integer", time()),
-
-					// points, value1 and value2 are multi-purpose fields
-					// store here what you want from the POST data
-					// in our example we allow to enter these values directly
-					"value1"      => array("clob", $solution["value1"]),
-					"value2"      => array("clob", $solution["value2"]),					
-				),
-				array (
-					"solution_id" => array("integer", $row['solution_id']),
-				)
-			);
-		}
-		else
-		{
-			$next_id = $ilDB->nextId('tst_solutions');
-			$affectedRows = $ilDB->insert("tst_solutions",
-				array(
-					"solution_id" => array("integer", $next_id),
-					"active_fi"   => array("integer", $active_id),
-					"question_fi" => array("integer", $this->getId()),
-					"pass"        => array("integer", $pass),
-					"tstamp"      => array("integer", time()),
-
-					// points, value1 and value2 are multi-purpose fields
-					// store here what you want from the POST data
-					// in our example we allow to enter these values directly
-					"value1"      => array("clob", $solution["value1"]),
-					"value2"      => array("clob", $solution["value2"]),
-			));
-		};
-	}
-
 	private function mylog($s){
 		/*$fp = fopen('/opt/iliasdata/assCodeQuestion.log', 'a');
 		fwrite($fp, $s);
@@ -594,8 +540,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
 			$this->removeCurrentSolution($active_id, $pass, $authorized);
-			//$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
-			$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], $authorized);
+		$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], true/*$authorized*/);
 		});
 		
 		// log the saving, we assume that values have been entered
