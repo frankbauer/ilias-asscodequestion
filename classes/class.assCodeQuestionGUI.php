@@ -284,13 +284,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
-		// print_r($this->getPreviewSession());
-		// echo "\n-------";
-		// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
-		
+		 	// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
+			// print_r($this->getPreviewSession()->getParticipantsSolution());
 		$solution = (array) $this->object->getPreviewValuesOrInit($this->getPreviewSession(), true, true);
-		// print_r($this->getPreviewSession());	
-		// die;
+		//  print_r($this->getPreviewSession());	
+		//  print_r($solution);
+		//  echo "count:".count($solution)."\n";	
+		//  die;
+
 		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
 		if(!$show_question_only)
 		{
@@ -358,7 +359,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
 		if ($showStudentResults)
-		{
+		{			
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);			
 		}
@@ -367,7 +368,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$stored = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);
 			$rid = -1;
 			if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
-			$solutions = $this->object->blocks()->getBestRandomSolution($rid);		
+			$solutions = $this->object->blocks()->getBestRandomSolution($rid);	
+			
 			$stored['value2']->blocks = $solutions;
 
 			// show the correct solution

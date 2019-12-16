@@ -358,11 +358,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$solution = array();
 		if( is_object($previewSession)) {
 			$solution = (array) $previewSession->getParticipantsSolution();
+			if (isset($solution['value2']) && !isset($solution['value2']->rid)){
+				$solution = array();
+			}
 		}
 
 		if ($init_solution && count($solution)==0){			
 			if( is_object($previewSession) ) {
-				$res = $this->buildInitialSolution();
+				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
 				$previewSession->setParticipantsSolution($res);				
 			} else {
 				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
@@ -393,7 +396,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			return $res;
 		} else {
 			$value1 = '';
-			$value2 = '';
+			$value2 = new \stdClass();;
 
 			foreach ($rows as $solution)
 			{
