@@ -193,39 +193,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return $value;
 	}
 
-	
-
-	private function prepareSolutionCode($value, $blockID){
-		if (empty($value)) return '';
-
-		$json = $value;				
-		if (!empty($json)) $value = $json->$blockID;
-
-		$value = ilUtil::prepareFormOutput($value);
-		if ($forPrint) {
-			$value = $this->printableString($value);
-		}
-		return $value;
-	}
-	
-	/**
-	 * Show the question in Test mode
-	 * (called from ilTestOutputGUI)
-	 * 
-	 * @param string $formaction			The action link for the form
-	 * @param integer $active_id			The active user id
-	 * @param integer $pass					The test pass
-	 * @param boolean $is_postponed			Question is postponed
-	 * @param boolean $use_post_solutions	Use post solutions
-	 * @param boolean $show_feedback		Show a feedback
-	 */
-	/*public function outQuestionForTest($formaction, $active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
-	{
-		$test_output = $this->getTestOutput($active_id, $pass, $is_postponed, $use_post_solutions, $show_feedback); 
-		$this->tpl->setVariable("QUESTION_OUTPUT", $test_output);
-		$this->tpl->setVariable("FORMACTION", $formaction);
-	}*/
-
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -235,7 +202,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
-		//print_r("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
+		//print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();				
@@ -244,6 +211,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
+		$oldUUID = $this->object->blocks()->ui()->getUUID();
+		if ($negativeQuestionID) {
+			$this->object->blocks()->ui()->setUUID("0-".$oldUUID);
+		}
 		$template->setVariable("UUID", $this->object->blocks()->ui()->getUUID());
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
@@ -268,6 +239,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
+		if ($negativeQuestionID) {
+			$this->object->blocks()->ui()->setUUID($oldUUID);
+		}
 		$questionoutput = $template->get();
 		return $questionoutput;
 	}
@@ -285,7 +259,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
-		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")"); 
+		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")");  die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
@@ -306,9 +280,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
-		//print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")"); 
-		$solution = (array) $this->object->getPreviewValuesOrInit($this->getPreviewSession(), true);
-			
+		// print_r($this->getPreviewSession());
+		// echo "\n-------";
+		// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
+		
+		$solution = (array) $this->object->getPreviewValuesOrInit($this->getPreviewSession(), true, true);
+		// print_r($this->getPreviewSession());	
+		// die;
 		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
 		if(!$show_question_only)
 		{

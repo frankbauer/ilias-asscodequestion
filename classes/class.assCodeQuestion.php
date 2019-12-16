@@ -333,9 +333,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		);
 	}
 
-	private function buildInitialSolution(){
+	private function buildInitialSolution($ridIn=NULL){
 		$ct = count($this->blocks()->getRandomizerSets());
-		$rid = ($ct>0)?random_int(0, $ct-1):0;
+		$rid = ($ridIn==NULL)?(($ct>0)?random_int(0, $ct-1):0):$ridIn;
 		$state = array(
 			"rid" => $rid,
 			"blocks" => $this->blocks()->getRandomBlocks($rid)
@@ -354,16 +354,18 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		);
 	}
 
-	public function getPreviewValuesOrInit($previewSession, $init_solution=false){
+	public function getPreviewValuesOrInit($previewSession, $init_solution=false, $inPreview=false){
 		$solution = array();
 		if( is_object($previewSession)) {
 			$solution = (array) $previewSession->getParticipantsSolution();
 		}
 
-		if ($init_solution && count($solution)==0){
-			$res = $this->buildInitialSolution();
+		if ($init_solution && count($solution)==0){			
 			if( is_object($previewSession) ) {
-				$previewSession->setParticipantsSolution($res);
+				$res = $this->buildInitialSolution();
+				$previewSession->setParticipantsSolution($res);				
+			} else {
+				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
 			}
 			return $res;
 		}
@@ -672,7 +674,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
         $query .= "
 			GROUP BY authorized
 		";
-        $result = $ilDB->queryF($query, array('integer', 'integer', 'integer'), array($activeId, $this->getId(), $pass));
+		$result = $ilDB->queryF($query, array('integer', 'integer', 'integer'), array($activeId, $this->getId(), $pass));
+		
         while ($row = $ilDB->fetchAssoc($result))
         {
             if ($row['authorized']) {

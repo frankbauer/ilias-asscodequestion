@@ -31,6 +31,10 @@ class codeBlocksUI {
         return $this->uuid;
     }
 
+    public function setUUID($newUUID){
+        $this->uuid = $newUUID;
+    }
+
     public function print(){
         $html  = '<div>';
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
