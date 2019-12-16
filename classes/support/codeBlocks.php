@@ -236,6 +236,15 @@ class codeBlocks implements ArrayAccess {
 		}
 		return $res;
 	}
+
+	function getCombinedBlocks($state=NULL, $withSolution=false, $solutions=NULL){
+		$res = array();
+		
+		for ($i=0; $i<count($this->blocks); $i++){
+			$res[$i] = $this[$i]->getCombinedContent($state, ($this[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode) && $withSolution, $solutions);
+		}
+		return $res;
+	}
 	
 
 	function getRandomizerActive(){
@@ -410,6 +419,12 @@ class codeBlocks implements ArrayAccess {
 	function clearBlocks(){
 		$this->additional_data['blocks'] = array();
 		$this->blocks = array();
+	}
+
+
+
+	function getCompleteCombinedCode($state=NULL, $withSolution=false, $solutions=NULL){
+		$blocks = $this->getCombinedBlocks($state, $withSolution, $solutions);
 	}
 }
 

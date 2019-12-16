@@ -201,6 +201,40 @@ class codeBlock {
 		$this->block['type'] = $value;
 	}
 
+
+    public function getCombinedContent($state=NULL, $withSolution=false, $solutions=NULL){
+		$nr = $this->getNr();
+		$altContent = NULL;
+		if ($state!=NULL ){
+			if ($state->blocks!=NULL) {
+				$altContent = $state->blocks[$nr];
+			} else if ($withSolution && !$this->getHasAlternativeContent()){
+				$altContent = $this->getContent();
+			}
+		}
+
+        if ($withSolution) {            
+            if (is_object($solutions)){                
+                return $solutions->$nr;
+            } else if (is_array($solutions)){
+                return $solutions[$nr];
+            }
+
+            if ($altContent != NULL) {
+                return $altContent;
+            } if ($this->getHasAlternativeContent()){
+                return $this->getAlternativeContent();
+            }
+            return '';
+        }
+
+        if ($altContent == NULL) {
+            return $this->getContent();
+        }
+
+        return $altContent;
+    }
+
 	function getContent() {
 		return $this->fixLoadedCode($this->block['content']);
 	}

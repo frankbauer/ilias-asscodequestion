@@ -16,28 +16,32 @@ class codeBlockUI {
         }
     }
 
-    public function render($withSolution=false, $solutions=NULL, $set=NULL){
+    public function getContent($state=NULL, $withSolution=false, $solutions=NULL){
+        return $this->model->getCombinedContent($state, $withSolution, $solutions);
+    }
+
+    public function render($withSolution=false, $solutions=NULL, $state=NULL){
         $type = $this->model->getType();
             
         if ($type==assCodeQuestionBlockTypes::StaticCode) 
-            return $this->renderStaticBlock($set);
+            return $this->renderStaticBlock($state);
 
         if ($type==assCodeQuestionBlockTypes::HiddenCode) 
-            return $this->renderHiddenBlock($set);
+            return $this->renderHiddenBlock($state);
 
         if ($type==assCodeQuestionBlockTypes::SolutionCode) 
-            return $this->renderBlock($withSolution, $solutions, $set);
+            return $this->renderBlock($withSolution, $solutions, $state);
 
         if ($type==assCodeQuestionBlockTypes::Canvas) 
-            return $this->renderCanvas($set);
+            return $this->renderCanvas($state);
 
         if ($type==assCodeQuestionBlockTypes::Text) 
-            return $this->renderText($set);
+            return $this->renderText($state);
 
         return '';
     }
 
-    private function renderCanvas($set=NULL){        
+    private function renderCanvas($state){        
         $html  = '<playground ';
         $html .= 'data-version="'.$this->model->getVersion().'" '.
                  (($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : '').
@@ -46,43 +50,34 @@ class codeBlockUI {
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'" ';
-        $html .= '>'.$this->model->getContentForSet($set)."</playground>";
+        $html .= '>'.$this->getContent($state)."</playground>";
         return $html;
     }
 
-    private function renderBlock($withSolution=false, $solutions=NULL, $set=NULL){
+    private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL){
         $html  = '<block ';
         $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
         if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
         if ($this->model->getHasAlternativeContent()) 
-            $html .= 'data-alternative-content="'.$this->model->getAlternativeContentForSet($set).'" ';  
+            $html .= 'data-alternative-content="'.$this->model->getAlternativeContent().'" ';  
 
         $html .= '>';
-        if ($withSolution) {
-            $nr = $this->model->getNr();
-            if (is_object($solutions)){                
-                $html .= $solutions->$nr;
-            } else if (is_array($solutions)){
-                $html .= $solutions[$nr];
-            }
-        } else {
-            $html .= $this->model->getContentForSet($set);            
-        }
+        $html .= $this->getContent($state, $withSolution, $solutions);                    
         $html .= '</block>';            
         return $html;
     }
 
-    private function renderHiddenBlock($set=NULL){
+    private function renderHiddenBlock($state=NULL){
 
-        return "<block data-hidden".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->model->getContentForSet($set)."</block>";
+        return "<block data-hidden".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</block>";
     }
 
-    private function renderStaticBlock($set=NULL){
-        return '<block data-static data-visible-lines="auto"'.(!$this->model->getExpanded() ? ' data-expanded=0' : '').'>'.$this->model->getContentForSet($set)."</block>";
+    private function renderStaticBlock($state=NULL){
+        return '<block data-static data-visible-lines="auto"'.(!$this->model->getExpanded() ? ' data-expanded=0' : '').'>'.$this->getContent($state)."</block>";
     }
 
-    private function renderText($set=NULL){
-        return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->model->getContentForSet($set)."</text>";
+    private function renderText($state=NULL){
+        return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
     }
 }
 

@@ -380,8 +380,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// other calls should explictly indicate whether to use the authorized or intermediate solutions			
 		$rows = $this->getSolutionValues($active_id, $pass, $authorized);
 		
-
-		//print_r($rows); die;
 		if ($init_solution && count($rows)==0){
 			$res = $this->buildInitialSolution();
 			$value1 = $res['value1'];
@@ -750,15 +748,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		
 		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
 
-		if (is_array($solutions))
-		{
-			foreach ($solutions as $solution)
-			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : $this->decodeSolution(array());
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : $this->decodeSolution(array());				
-			}
-		}
-
 		if ($il52){
 			// also see parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
 			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(0) . $startrow, $this->plugin->txt($this->getQuestionType()));
@@ -775,20 +764,20 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$stringEscaping = $worksheet->getStringEscaping();
 			$worksheet->setStringEscaping(false);
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, $value1);
+			$worksheet->setCell($startrow + $i, 1, $solutions['value1']);
 			$worksheet->setStringEscaping($stringEscaping);
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value1']));
 		}
 		$i++;
 
 		if ($il52){
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-			$worksheet->setCell($startrow + $i, 1, $value2);	
+			$worksheet->setCell($startrow + $i, 1, $solutions['value2']);	
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value2']));
 		}
 		
 		if ($il52){
@@ -867,6 +856,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if ($language=='objectivec') return 'm';
 		if ($language=='perl') return 'pl';
 		if ($language=='python') return 'py';
+		if ($language=='python3') return 'py';
 		if ($language=='r') return 'r';
 		if ($language=='ruby') return 'rb';
 
@@ -887,11 +877,15 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function getBestSolution(){
+		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], false);
+	
 		$res = '';
-		for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){
+		for ($i=0; $i<count($blocks); $i++){
 			$t = $this->blocks[$i]->getType();
-			if ($t == assCodeQuestionBlockTypes::SolutionCode || $t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode){
-				$res .= $this->blocks[$i]->getContent()."\n";
+			if ($t == assCodeQuestionBlockTypes::SolutionCode ) { 
+				$res .= $this->blocks[$i]->getContent()."\n";			
+			} else {
+				$res .= $blocks[$i];
 			}
 		}
 		return $res;
@@ -902,10 +896,16 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
-		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
-		if (count($solutions)>0) return $solutions[count($solutions)-1];
-
-		return NULL;
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false, false);		
+		$rows = $this->getSolutionValues($active_id, $pass, true);
+		foreach ($rows as $solution){
+			foreach ($solution as $k=>$v){
+				if ($k=="value1" || $k=="value2") continue;
+				$solutions[$k] = $v;
+			}
+		}
+		
+		return $solutions;
 	}
 
 	public function decodeSolution($value){
@@ -929,47 +929,24 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return '// '.$str;
 	}
 
-	public function prepareSolutionData($solution){
-		//in StudOn we sometimes have solutions without any data, 
-		//create a skleton solution that contains a special type of line comment
-		if(is_null($solution)){	
-			$res = '';
-			for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){
-				$t = $this->blocks[$i]->getType();
-				if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-					if ($res != '') {
-						$res .= ', ';
-					}
-					$res .= '"'.$i.'":"'.$this->createCommentedCodeLine('Student had no answer!').'"';
-				}
-			}		
-			$res = '{'.$res.'}';
-			$solution = array('value1'=>$res);
-		}
-		
-
-		$studentCode = $this->decodeSolution($solution['value1']);
-		return $studentCode;
-	}
-
 	public function getCompleteSource($solution, $withAnswerMarkers=false){	
-		$studentCode = $this->prepareSolutionData($solution);
+		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 	
 		$res = '';
-		for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){
+		for ($i=0; $i<count($blocks); $i++){
 			$t = $this->blocks[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				if ($withAnswerMarkers) {
 					$res .= $this->createCommentedCodeLine("---------- START: ANSWER ----------")."\n";
 				}
-				if (!empty($studentCode)){
-					$res .= $studentCode->$i."\n";
+				if (isset($blocks[$i])){
+					$res .= $blocks[$i]."\n";
 				}
 				if ($withAnswerMarkers) {
 					$res .= $this->createCommentedCodeLine("---------- END: ANSWER ----------")."\n";
 				}
 			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
-				$res .= $this->blocks[$i]->getContent()."\n";
+				$res .= $blocks[$i]."\n";
 			}
 		}
 		return $res;

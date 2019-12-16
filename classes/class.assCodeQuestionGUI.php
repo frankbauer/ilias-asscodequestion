@@ -235,7 +235,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
-		//("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
+		//print_r("[getQuestionOutput value1=$value1, value2=$value2, tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();				
@@ -256,10 +256,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$html = '';
 
 		
-		//get the student solution
-		$solutions = $value1;					
+		//get the student solution		
+		$solutions = $value1;
+		$state = $value2;					
 
-		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $value2);
+		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
 
 		$template->setVariable("BLOCK_HTML", $html);		
 		$template->setVariable("LANGUAGE", $language);
@@ -291,7 +292,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$pass = ilObjTest::_getPass($active_id);
 		}
 		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, true);
-
 		$questionoutput = $this->getQuestionOutput($solutions['value1'], $solutions['value2']);
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
