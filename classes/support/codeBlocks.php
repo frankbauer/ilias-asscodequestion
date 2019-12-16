@@ -202,6 +202,17 @@ class codeBlocks implements ArrayAccess {
 		}	
 	}
 
+	function processStringWithSet($str, $set){		
+		if ($set==NULL) return $str;
+		return preg_replace_callback(
+			CODEBLOCKS_TAG_REGEX,
+			function ($treffer)  use ($set) {
+				return $set[$treffer[1]];
+			},
+			$str
+		);		
+	}
+
 	function getRandomSet($setNr){
 		$set = $this->getRandomizerSets();
 		if ($setNr>=0 && $setNr < count($set)) $set = $set[$setNr];

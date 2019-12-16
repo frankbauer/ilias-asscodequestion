@@ -218,6 +218,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("UUID", $this->object->blocks()->ui()->getUUID());
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
+			$questiontext = $this->object->blocks()->processStringWithSet(
+				$questiontext, 
+				$this->object->blocks()->getRandomSet(($value2!=NULL && isset($value2->rid))?$value2->rid:-1)
+			);
 			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);			
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
