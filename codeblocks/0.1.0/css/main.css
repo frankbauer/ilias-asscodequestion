@@ -41,3 +41,7 @@ codeblocks>block, codeblocks>text{
 div.CodeMirror.cm-s-solarized{
     box-shadow:none
 }
+
+pre div#id{
+    margin:0px;
+}
