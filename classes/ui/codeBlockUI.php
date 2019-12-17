@@ -9,6 +9,11 @@ class codeBlockUI {
         $this->model = $model;        
     }
 
+    private function saveParamString($str){
+        $str = str_replace("\"", "&quot;",$str);
+        return $str;
+    }
+
     public function print(){
         if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
             return '<pre>' . $this->model->getPrintableContent() . '</pre>';
@@ -59,7 +64,7 @@ class codeBlockUI {
         $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
         if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
         if ($this->model->getHasAlternativeContent()) 
-            $html .= 'data-alternative-content="'.$this->model->getAlternativeContent().'" ';  
+            $html .= 'data-alternative-content="'.$this->saveParamString($this->model->getAlternativeContent()).'" ';  
 
         $html .= '>';
         $html .= $this->getContent($state, $withSolution, $solutions);                    

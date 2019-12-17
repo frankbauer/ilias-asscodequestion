@@ -52,7 +52,7 @@ class codeBlocksUI {
                  'data-compiler-version="'.$this->model->getCompilerVersion().'" '.
                  'data-language="'.$this->model->getLanguage().'" '.
                  'data-execution-timeout="'.$this->model->getTimeoutMS().'" '.
-                 'ddata-max-characters="'.$this->model->getMaxChars().'" '.
+                 'data-max-characters="'.$this->model->getMaxChars().'" '.
                  'data-run-code="'.($this->model->getAllowRun()?'true':'false').'" '.
                  'data-solution-theme="'.$this->model->getTheme().'" '.
                  'data-code-theme="'.$this->model->getROTheme().'" '.
