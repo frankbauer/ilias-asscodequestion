@@ -24,3 +24,12 @@ div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
     width:29px !important;
     border-right: 1px solid #d8d2c0
 }
+div.codeblocks.editmode{
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+
+div.editModeBlockContainer{
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1)
+}
