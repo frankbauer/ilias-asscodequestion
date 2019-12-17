@@ -8,7 +8,7 @@ class codeBlocksUI {
     public function __construct($model)
 	{
         $this->uuid = $this->guidv4().'-'.$model->getId();
-		$model->getPlugin()->includeClass("./support/codeblocks-conf-0.1.0.php");
+		$model->getPlugin()->includeClass("./support/codeblocks-conf-0.1.1.php");
         $this->model = $model;        
     }
 
