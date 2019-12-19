@@ -390,7 +390,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$value1 = $res['value1'];
 			$value2 = $res['value2'];
 			if ($save) {
-				$this->mylog("saveCurrentSolution");
 				$this->saveCurrentSolution($active_id, $pass, 'TState', json_encode($value2), true);
 			}
 			return $res;
@@ -536,10 +535,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$initialSolution = $this->getSolutionValuesOrInit($active_id, $pass, true, true, false); 
 
 		$solution['value1'] = json_encode($solution['value1']);
-		$solution['value2'] = json_encode($initialSolution['value2']);
-		$sol = print_r($solution, true);
-		$this->mylog($sol);
-		
+		$solution['value2'] = json_encode($initialSolution['value2']);		
 
 		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
 			$this->removeCurrentSolution($active_id, $pass, $authorized);
@@ -590,8 +586,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function removeCurrentSolution($active_id, $pass, $authorized = true)
     {
-		$this->mylog("removeCurrentSolution");
-        global $ilDB;
+		global $ilDB;
         if($this->getStep() !== NULL)
         {
             $query = "
@@ -630,8 +625,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function removeExistingSolutions($activeId, $pass)
     {
-		$this->mylog("removeExistingSolutions");
-        global $ilDB;
+		global $ilDB;
         $query = "
 			DELETE FROM tst_solutions
 			WHERE active_fi = %s
@@ -655,8 +649,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      */
     public function lookupForExistingSolutions($activeId, $pass)
     {
-		$this->mylog("lookupForExistingSolutions");
-        /** @var $ilDB \ilDBInterface  */
+		/** @var $ilDB \ilDBInterface  */
         global $ilDB;
         $return = array(
             'authorized' => false,

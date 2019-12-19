@@ -34,12 +34,13 @@ class codeBlocksUI {
         $this->uuid = $newUUID;
     }
 
-    public function print(){
+    public function print($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL, $state=NULL){
         $html  = '<div>';
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
-            $html .= $this->model[$i]->ui()->print();
+            $html .= $this->model[$i]->ui()->print($withSolution, $solutions, $state);
         }
         $html .= '</div>';
+        return $html;
     }
 
     

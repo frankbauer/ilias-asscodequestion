@@ -14,10 +14,11 @@ class codeBlockUI {
         return $str;
     }
 
-    public function print(){
+    public function print($withSolution=false, $solutions=NULL, $state=NULL){
         if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
-            return '<pre>' . $this->model->getPrintableContent() . '</pre>';
+            return '<pre>' . $this->model->printableString($this->getContent($state)) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
+            return $this->renderBlock($withSolution, $solutions, $state, true);
         }
     }
 
@@ -35,7 +36,7 @@ class codeBlockUI {
             return $this->renderHiddenBlock($state);
 
         if ($type==assCodeQuestionBlockTypes::SolutionCode) 
-            return $this->renderBlock($withSolution, $solutions, $state);
+            return $this->renderBlock($withSolution, $solutions, $state, false);
 
         if ($type==assCodeQuestionBlockTypes::Canvas) 
             return $this->renderCanvas($state);
@@ -59,16 +60,25 @@ class codeBlockUI {
         return $html;
     }
 
-    private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL){
-        $html  = '<block ';
-        $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
-        if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
-        if ($this->model->getHasAlternativeContent()) 
-            $html .= 'data-alternative-content="'.$this->saveParamString($this->model->getAlternativeContent()).'" ';  
+    private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
+        $html  = '<';
+        if (!$print){
+            $html .= 'block ';
+            $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
+            if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
+            if ($this->model->getHasAlternativeContent()) 
+                $html .= 'data-alternative-content="'.$this->saveParamString($this->model->getAlternativeContent()).'" '; 
+            
+            $html .= '>';
+            $html .= $this->getContent($state, $withSolution, $solutions);                    
+            $html .= '</block>';
+        } else {
+            $html .= 'pre>';
+            $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions));
+            $html .= '</pre>';
+        }
 
-        $html .= '>';
-        $html .= $this->getContent($state, $withSolution, $solutions);                    
-        $html .= '</block>';            
+        
         return $html;
     }
 

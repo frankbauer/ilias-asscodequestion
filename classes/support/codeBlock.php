@@ -123,7 +123,7 @@ class codeBlock {
         return $this->ui;
 	}
 	
-	private function printableString($value){
+	public function printableString($value){
 		$value = str_replace("\t", "  ",$value);
 		$value = str_replace(" ", "&nbsp;",$value);
 		$value = str_replace("\n", "<br />", $value);
@@ -248,10 +248,6 @@ class codeBlock {
 			},
 			$this->getContent()
 		);
-	}
-
-	function getPrintableContent(){
-		return $this->printableString($this->getContent());
 	}
 
 	function setContent($value) {

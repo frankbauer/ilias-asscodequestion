@@ -185,14 +185,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return 1;
 	}
 
-	private function printableString($value){
-		$value = str_replace("\t", "  ",$value);
-		$value = str_replace(" ", "&nbsp;",$value);
-		$value = str_replace("\n", "<br />", $value);
-
-		return $value;
-	}
-
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -235,7 +227,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutions = $value1;
 		$state = $value2;					
 
-		$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
+		if ($print){
+			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state);
+		} else {
+			$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
+		}
 
 		$template->setVariable("BLOCK_HTML", $html);		
 		$template->setVariable("LANGUAGE", $language);
