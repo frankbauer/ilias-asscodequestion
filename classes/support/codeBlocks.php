@@ -33,6 +33,21 @@ class codeBlocks implements ArrayAccess {
 		} else {
 			$this->setJSONEncodedAdditionalData($json_data);
 		}
+	}
+	
+	/**
+	 * Used to generate a token for each solution. 
+	 * We will use this when talking to a solution as a salt.
+	 */
+	function guidv4()
+	{
+		if (function_exists('com_create_guid') === true)
+			return trim(com_create_guid(), '{}');
+
+		$data = openssl_random_pseudo_bytes(16);
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
     public function getPlugin(){
@@ -119,6 +134,7 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	function getJSONEncodedAdditionalData(){
+		$this->additional_data['storageUUID'] = $this->guidv4();
 		$bls = array();
 		foreach($this->blocks as $cbl){
 			$cbl->tidyUnusedProperties();
@@ -130,6 +146,10 @@ class codeBlocks implements ArrayAccess {
 
 	public function getDataVersion(){		
 		return $this->additional_data['version'];
+	}
+
+	public function getStorageUUID(){
+		return $this->additional_data['storageUUID'];
 	}
 
 	public function getMinCanvasVersion(){

@@ -337,6 +337,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$ct = count($this->blocks()->getRandomizerSets());
 		$rid = ($ridIn==NULL)?(($ct>0)?random_int(0, $ct-1):0):$ridIn;
 		$state = array(
+			"storageUUID" => $this->blocks()->getStorageUUID(),
 			"rid" => $rid,
 			"blocks" => $this->blocks()->getRandomBlocks($rid)
 		);
@@ -358,7 +359,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$solution = array();
 		if( is_object($previewSession)) {
 			$solution = (array) $previewSession->getParticipantsSolution();
-			if (isset($solution['value2']) && !isset($solution['value2']->rid)){
+			if (isset($solution['value2']) && (!isset($solution['value2']->rid) || $solution['value2']->storageUUID!=$this->blocks()->getStorageUUID())){
 				$solution = array();
 			}
 		}
