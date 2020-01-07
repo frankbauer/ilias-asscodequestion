@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.1.10
+**Version**:  1.2.0
 
 **Company**:  Visual Computing Erlangen (FAU)
 
@@ -12,12 +12,11 @@
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
 (create subdirectories, if neccessary):
 `Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion`
-
-2. Go to Administration > Plugins
-
-3. Choose **Update** for the `assCodeQuestion` plugin
-4. Choose **Activate** for the `assCodeQuestion` plugin
-5. Choose **Refresh** for the `assCodeQuestion` plugin languages
+2. When in production you should remove or exclude the `__dev/`-Folder. You will not need to pull the submodules from `__dev/`! 
+3. Go to Administration > Plugins
+4. Choose **Update** for the `assCodeQuestion` plugin
+5. Choose **Activate** for the `assCodeQuestion` plugin
+6. Choose **Refresh** for the `assCodeQuestion` plugin languages
 
 There is nothing to configure for this plugin.
 
@@ -253,6 +252,18 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 1.2.0
+* Move most of the CodeBlocks editor/Display logic to client side javascript App (https://github.com/frankbauer/codeblocks-js/). Should make adaption to learning-modules easier.
+* Refactor Code Structure to a MVC-like style
+* Add support for Template, and Random-Tags.
+  * Template-Tag: Used in Prefabs to simplify code reuse. You can use `{!<name>}` (for example `{!Version}`) to add a TemplateTag to a prefab. The Editor UI will allow the user to click the tags and replace every occurance with a single value.
+  * Randomized-Tag: Used in source code and text blocks for elements that can be replaced with randomized values when the code is executed (in EditMode) or displayed (in regular Mode). You can use `{:<name>}` to reference a Randomized Tag with a given name (for example `{:Type}`)
+#### ToDo
+* Add Support for Prefabs
+* Add UI to define random values
+* Add support to replace random tags
+  
+  
 ### Version 1.1.10
 * Support for Ilias 5.4
 

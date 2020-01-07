@@ -1,16 +1,33 @@
-{QUESTIONTEXT}
-<p>
-    <b>{LABEL_VALUE1}</b>
-    <br>
-    {BLOCK_HTML}
-</p>
-<b>Result</b>
-<br>
-{RUN_CODE_HTML}
-<script type="text/javascript">
-if (typeof calls === "undefined") {
-    var calls = {}
-}
+<!-- BEGIN css_file -->
+<link rel="stylesheet" type="text/css" href="{CSS_FILE}" media="{CSS_MEDIA}" />
+<!-- END css_file -->
+<!-- BEGIN css_inline -->
+<style>
+    {CSS_INLINE}
+</style>
+<!-- END css_inline -->
 
-{CANVAS_SCRIPT}  
+<!-- BEGIN view_append_inline_css -->
+{APPEND_STYLES}
+<!-- END view_append_inline_css -->
+
+<!-- BEGIN js_file -->
+<script type="text/javascript" src="{JS_FILE}"></script>
+<!-- END js_file -->
+
+<div id="{UUID}" class="blockParent">
+    <div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
+    <p>
+        <b>{LABEL_VALUE1}</b>
+        <br>
+        {BLOCK_HTML}
+    </p>
+</div>
+<!-- BEGIN on_load_code -->
+<script type="text/javascript">
+    il.Util.addOnLoad(function() {
+        <!-- BEGIN on_load_code_inner -->{OLCODE}
+        <!-- END on_load_code_inner -->
+    });
 </script>
+<!-- END on_load_code -->

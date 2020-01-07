@@ -30,6 +30,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	/* custom data we need to store fpr this question type. This array is serialized to json and stored in the db */
 	var $additional_data = array();
 
+	/* store the block-access objects. Data is allways stored in $additional_data, but the block-objects provide the Model for the data */
+	var $blocks = null;
+
 	/**
 	 * Constructor
 	 *
@@ -44,159 +47,15 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$author = "",
 		$owner = -1,
 		$question = ""
+		
 	)
-	{
+	{		
 		// needed for excel export
 		$this->getPlugin()->loadLanguageModule();
+		$this->getPlugin()->includeClass("./support/codeBlocks.php");
 
+		$this->blocks = new codeBlocks($this->getPlugin(), null, $question);
 		parent::__construct($title, $comment, $author, $owner, $question);
-	}
-
-	function fixLoadedCode($str){
-		return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
-	}
-
-	function fixSentCode($str){
-		return str_replace('<', '&lt;', $str);
-	}
-
-	function getLanguage() {
-		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'python';
-	}
-
-	function setLanguage($newLanguage) {
-		$this->additional_data['language'] = $newLanguage;
-	}
-
-	function getAllowRun() {
-		return isset($this->additional_data['allowRun']) ? $this->additional_data['allowRun'] : true;
-	}
-
-	function setAllowRun($newValue) {
-		$this->additional_data['allowRun'] = (bool)$newValue;
-	}
-
-	function getTimeoutMS() {
-		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 500; 
-	}
-
-	function setTimeoutMS($newValue) {
-		$this->additional_data['timeoutMS'] = (int)$newValue;
-	}
-
-	function getMaxChars() {
-		return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000; 
-	}
-	
-	function setMaxChars($newValue) {
-		$this->additional_data['maxChars'] = (int)$newValue;
-	}
-
-	function getTheme() {
-		return isset($this->additional_data['theme']) ? $this->additional_data['theme'] : 'solarized light'; 
-	}
-	
-	function setTheme($newValue) {
-		$this->additional_data['theme'] = ''.$newValue;
-	}
-
-	function getROTheme() {
-		return isset($this->additional_data['themeRO']) ? $this->additional_data['themeRO'] : 'xq-light'; 
-	}
-	
-	function setROTheme($newValue) {
-		$this->additional_data['themeRO'] = ''.$newValue;
-	}
-
-	function getIncludeThreeJS() {
-		return isset($this->additional_data['includeThreeJS']) ? $this->additional_data['includeThreeJS'] : false; 
-	}
-	
-	function setIncludeThreeJS($newValue) {
-		$this->additional_data['includeThreeJS'] = (bool)$newValue;
-	}
-
-	function getIncludeD3() {
-		return isset($this->additional_data['includeD3']) ? $this->additional_data['includeD3'] : false; 
-	}
-	
-	function setIncludeD3($newValue) {
-		$this->additional_data['includeD3'] = (bool)$newValue;
-	}
-
-	function getNumberOfBlocks() {
-		if (is_array($this->additional_data['blocks'])){
-			return count($this->additional_data['blocks']);
-		} else {
-			return 3;
-		}
-	}
-
-	function clearBlocks(){
-		$this->additional_data['blocks'] = array();
-	}
-
-	function getLinesForBlock($nr) {
-		if (is_array($this->additional_data['blocks'])){
-			$res = $this->additional_data['blocks'][$nr]['lines']+0;
-			if ($res==0) $res = 15;
-			return $res;
-		} else {
-			return 15;
-		}
-	}
-
-	function setLinesForBlock($nr, $value) {
-		if (!is_array($this->additional_data['blocks'])){
-			$this->additional_data['blocks'] = array();			
-		} 	
-		$this->additional_data['blocks'][$nr]['lines'] = $value;
-	}
-
-	function getTypeForBlock($nr) {
-		if (is_array($this->additional_data['blocks'])){
-			return $this->additional_data['blocks'][$nr]['type'];
-		} else {
-			if ($nr==0) return assCodeQuestionBlockTypes::StaticCode;
-			if ($nr==1) return assCodeQuestionBlockTypes::SolutionCode;
-			if ($nr==2) return assCodeQuestionBlockTypes::StaticCode;
-
-			return assCodeQuestionBlockTypes::HiddenCode;
-		}
-	}
-
-	function setTypeForBlock($nr, $value) {
-		if (!is_array($this->additional_data['blocks'])){
-			$this->additional_data['blocks'] = array();			
-		} 	
-		$this->additional_data['blocks'][$nr]['type'] = $value;
-	}
-
-	function getContentForBlock($nr) {
-		if (is_array($this->additional_data['blocks'])){
-			return $this->fixLoadedCode($this->additional_data['blocks'][$nr]['content']);
-		} else {
-			if ($nr==0) return $this->fixLoadedCode($this->additional_data['prefixCode']);
-			if ($nr==1) return $this->fixLoadedCode($this->additional_data['bestSolution']);
-			if ($nr==2) return $this->fixLoadedCode($this->additional_data['postfixCode']);
-
-			return '';
-		}
-	}
-
-	function setContentForBlock($nr, $value) {
-		if (!is_array($this->additional_data['blocks'])){
-			$this->additional_data['blocks'] = array();			
-		} 	
-		$this->additional_data['blocks'][$nr]['content'] = $value;
-	}
-
-	function setJSONEncodedAdditionalData($data) {
-		$this->additional_data = json_decode($data, true);
-	}
-
-	function getJSONEncodedAdditionalData(){
-		return json_encode($this->additional_data);
 	}
 
 	/**
@@ -212,6 +71,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 				
 		}
 		return $this->plugin;
+	}
+
+	public function blocks(){
+		return $this->blocks;
 	}
 
 	/**
@@ -269,7 +132,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			),
 			array(
 				'question_fi' => array('integer', $ilDB->quote($this->getId(), 'integer')),
-				'data' => array('clob', $this->getJSONEncodedAdditionalData())
+				'data' => array('clob', $this->blocks->getJSONEncodedAdditionalData())
 			)
 		);
 	}
@@ -317,8 +180,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			. " WHERE d.question_fi ="
 			. $ilDB->quote($question_id, 'integer'));
 
-		$data = $ilDB->fetchAssoc($result);
-		$this->setJSONEncodedAdditionalData($data["data"]);
+		$data = $ilDB->fetchAssoc($result);		
+		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
 
 		try
 		{
@@ -442,21 +305,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		parent::syncWithOriginal();
 	}
 
-	/**
-	 * Used to generate a token for each solution. 
-	 * We will use this when talking to a solution as a salt.
-	 */
-	private function guidv4()
-	{
-		if (function_exists('com_create_guid') === true)
-			return trim(com_create_guid(), '{}');
-
-		$data = openssl_random_pseudo_bytes(16);
-		$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-		$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-	}
-
 
 	/**
 	 * Get a submitted solution array from $_POST
@@ -470,19 +318,103 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit()
-	{		
+	{				
 		$data = $_POST['block'][$this->getId()];
-		//$result = array('token'=>$this->guidv4());
+
 		$result = array();
-		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
-			if ($this->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
+		for ($i=0; $i<$this->blocks->getNumberOfBlocks(); $i++){
+			if ($this->blocks[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
 				$result[$i] = $data[$i];
 			}
 		}
 		return array(
-			'value1' => json_encode($result),
+			'value1' => $this->decodeSolution($result),
 			'value2' => ''
 		);
+	}
+
+	private function buildInitialSolution($ridIn=NULL){
+		$ct = count($this->blocks()->getRandomizerSets());
+		$rid = ($ridIn==NULL)?(($ct>0)?random_int(0, $ct-1):0):$ridIn;
+		$state = array(
+			"storageUUID" => $this->blocks()->getStorageUUID(),
+			"rid" => $rid,
+			"blocks" => $this->blocks()->getRandomBlocks($rid)
+		);
+
+		$initialSolution = array();
+		for ($i=0; $i<$this->blocks()->getNumberOfBlocks(); $i++){
+			if ($this->blocks()[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
+				$initialSolution[$i] = $state["blocks"][$i];
+			}
+		}	
+		
+		return array(
+			'value1' => $this->decodeSolution($initialSolution), 
+			'value2' => $this->decodeSolution($state)
+		);
+	}
+
+	public function getPreviewValuesOrInit($previewSession, $init_solution=false, $inPreview=false){
+		$solution = array();
+		if( is_object($previewSession)) {
+			$solution = (array) $previewSession->getParticipantsSolution();
+			if (isset($solution['value2']) && (!isset($solution['value2']->rid) || $solution['value2']->storageUUID!=$this->blocks()->getStorageUUID())){
+				$solution = array();
+			}
+		}
+
+		if ($init_solution && count($solution)==0){			
+			if( is_object($previewSession) ) {
+				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
+				$previewSession->setParticipantsSolution($res);				
+			} else {
+				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
+			}
+			return $res;
+		}
+
+		return $solution;
+	}
+
+	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false, $save=true){
+		if(is_null($pass))
+		{
+			$pass = $this->getSolutionMaxPass($active_id);
+		}
+
+		// other calls should explictly indicate whether to use the authorized or intermediate solutions			
+		$rows = $this->getSolutionValues($active_id, $pass, $authorized);
+		
+		if ($init_solution && count($rows)==0){
+			$res = $this->buildInitialSolution();
+			$value1 = $res['value1'];
+			$value2 = $res['value2'];
+			if ($save) {
+				$this->saveCurrentSolution($active_id, $pass, 'TState', json_encode($value2), true);
+			}
+			return $res;
+		} else {
+			$value1 = '';
+			$value2 = new \stdClass();;
+
+			foreach ($rows as $solution)
+			{
+				$v1 = isset($solution["value1"]) ? $solution["value1"] : '{}';
+				$v2 = isset($solution["value2"]) ? $solution["value2"] : '{}';
+				$f = strlen($v1)>0 ? $v1[0] : '';
+				if ($f!='T') { //original style
+					$value1 = $this->decodeSolution($v1);
+					$value2 = $this->decodeSolution('{}');
+				} else if ($v1=='TSolution') {
+					$value1 = $this->decodeSolution($v2);
+				} else if ($v1=='TState') {
+					$value2 = $this->decodeSolution($v2);
+				}	
+			}
+
+			return array('value1' => $value1, 'value2' => $value2);
+		}		
 	}
 
 	/**
@@ -532,7 +464,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// get the answers of the learner from the tst_solution table
 		// the data is saved by saveWorkingData() in this class
-		$solutions = $this->getSolutionValues($active_id, $pass);
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, $authorizedSolution, false);
 
 		// there may be more solutions stored due to race conditions
 		// the last saved solution record wins
@@ -571,57 +503,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
-	private function saveWorkingDataInner ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-		global $ilDB;
-		global $ilUser;
-		// save the answers of the learner to tst_solution table
-		// this data is question type specific
-		// it is used used by calculateReachedPointsForSolution() in this class
-
-		$result = $ilDB->queryF("SELECT solution_id FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-			array('integer','integer','integer'),
-			array($active_id, $this->getId(), $pass)
-		);
-
-		$row = $ilDB->fetchAssoc($result);
-		if ($row)
-		{
-			$affectedRows = $ilDB->update("tst_solutions",
-				array(
-					"active_fi"   => array("integer", $active_id),
-					"question_fi" => array("integer", $this->getId()),
-					"pass"        => array("integer", $pass),
-					"tstamp"      => array("integer", time()),
-
-					// points, value1 and value2 are multi-purpose fields
-					// store here what you want from the POST data
-					// in our example we allow to enter these values directly
-					"value1"      => array("clob", $solution["value1"]),
-					"value2"      => array("clob", $solution["value2"]),					
-				),
-				array (
-					"solution_id" => array("integer", $row['solution_id']),
-				)
-			);
-		}
-		else
-		{
-			$next_id = $ilDB->nextId('tst_solutions');
-			$affectedRows = $ilDB->insert("tst_solutions",
-				array(
-					"solution_id" => array("integer", $next_id),
-					"active_fi"   => array("integer", $active_id),
-					"question_fi" => array("integer", $this->getId()),
-					"pass"        => array("integer", $pass),
-					"tstamp"      => array("integer", time()),
-
-					// points, value1 and value2 are multi-purpose fields
-					// store here what you want from the POST data
-					// in our example we allow to enter these values directly
-					"value1"      => array("clob", $solution["value1"]),
-					"value2"      => array("clob", $solution["value2"]),
-			));
-		};
+	private function mylog($s){
+		/*$fp = fopen('/opt/iliasdata/assCodeQuestion.log', 'a');
+		fwrite($fp, $s);
+		fwrite($fp, '---');
+		fclose($fp);*/
 	}
 
 	/**
@@ -646,62 +532,161 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// get the submitted solution
 		$solution = $this->getSolutionSubmit();
 
+		//interested in randomized values, which are allways authorized
+		$initialSolution = $this->getSolutionValuesOrInit($active_id, $pass, true, true, false); 
 
-		if (method_exists($this->getProcessLocker(), 'executeUserSolutionUpdateLockOperation')){ //ilias 5.2
-			$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
-				$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
-			});
-		} else { // ilias 5.1
-			// lock to prevent race conditions
-			$this->getProcessLocker()->requestUserSolutionUpdateLock();
+		$solution['value1'] = json_encode($solution['value1']);
+		$solution['value2'] = json_encode($initialSolution['value2']);		
 
-			$this->saveWorkingDataInner($solution, $active_id, $pass, $authorized, $value1, $value2);
-
-			// unlock
-			$this->getProcessLocker()->releaseUserSolutionUpdateLock();
-		}
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+			$this->removeCurrentSolution($active_id, $pass, $authorized);
+		$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], true/*$authorized*/);
+		});
 		
-
-		// Check if the user has entered something
-		// Then set entered_values accordingly
-		if (!empty($solution["points"]))
+		// log the saving, we assume that values have been entered
+		if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 		{
-			$entered_values = TRUE;
+			$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 		}
-
-		if ($entered_values)
-		{
-			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-			}
-		}
-		else
-		{
-			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-			}
-		}
-
 		return true;
+	}
+
+	/**
+	 * Calculate the points a user has reached in a preview session
+	 * @param ilAssQuestionPreviewSession $previewSession
+	 * @return float
+	 */
+	public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession)
+	{
+        $solution = (array) $previewSession->getParticipantsSolution();
+		
+        return 0;
 	}
 
 
 	/**
-	 * Reworks the allready saved working data if neccessary
+	 * Reworks the already saved working data if neccessary
 	 *
+	 * @abstract
 	 * @access protected
 	 * @param integer $active_id
 	 * @param integer $pass
 	 * @param boolean $obligationsAnswered
+	 * * @param boolean $authorized
 	 */
 	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
-		// normally nothing needs to be reworked
+		// nothing to rework!
 	}
+
+    /**
+     * Remove the current user solution
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function removeCurrentSolution($active_id, $pass, $authorized = true)
+    {
+		global $ilDB;
+        if($this->getStep() !== NULL)
+        {
+            $query = "
+				DELETE FROM tst_solutions
+				WHERE active_fi = %s
+				AND question_fi = %s
+				AND pass = %s
+				AND step = %s
+				AND authorized = %s
+				AND value1 <> 'TState'
+			";
+            return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer', 'integer'),
+                array($active_id, $this->getId(), $pass, $this->getStep(), (int)$authorized)
+            );
+        }
+        else
+        {
+            $query = "
+				DELETE FROM tst_solutions
+				WHERE active_fi = %s
+				AND question_fi = %s
+				AND pass = %s
+				AND authorized = %s
+				AND value1 <> 'TState'
+			";
+            return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer'),
+                array($active_id, $this->getId(), $pass, (int)$authorized)
+            );
+        }
+    }
+    /**
+     * Remove authorized and intermediate solution for a user in the test pass
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function removeExistingSolutions($activeId, $pass)
+    {
+		global $ilDB;
+        $query = "
+			DELETE FROM tst_solutions
+			WHERE active_fi = %s
+			AND question_fi = %s
+			AND pass = %s
+			AND value1 <> 'TState'
+		";
+        if( $this->getStep() !== NULL )
+        {
+            $query .= " AND step = " . $ilDB->quote((int)$this->getStep(), 'integer') . " ";
+        }
+        return $ilDB->manipulateF($query, array('integer', 'integer', 'integer'),
+            array($activeId, $this->getId(), $pass)
+        );
+    }
+    /**
+     * Lookup if an authorized or intermediate solution exists
+     * Overwritten to keep the stored randomization
+     *
+     * @inheritdoc
+     */
+    public function lookupForExistingSolutions($activeId, $pass)
+    {
+		/** @var $ilDB \ilDBInterface  */
+        global $ilDB;
+        $return = array(
+            'authorized' => false,
+            'intermediate' => false
+        );
+        $query = "
+			SELECT authorized, COUNT(*) cnt
+			FROM tst_solutions
+			WHERE active_fi = %s
+			AND question_fi = %s
+			AND pass = %s
+			AND value1 <> 'TState'
+		";
+        if( $this->getStep() !== NULL )
+        {
+            $query .= " AND step = " . $ilDB->quote((int)$this->getStep(), 'integer') . " ";
+        }
+        $query .= "
+			GROUP BY authorized
+		";
+		$result = $ilDB->queryF($query, array('integer', 'integer', 'integer'), array($activeId, $this->getId(), $pass));
+		
+        while ($row = $ilDB->fetchAssoc($result))
+        {
+            if ($row['authorized']) {
+                $return['authorized'] = $row['cnt'] > 0;
+            }
+            else
+            {
+                $return['intermediate'] = $row['cnt'] > 0;
+            }
+		}
+
+        return $return;
+    }
+
 
 
 	/**
@@ -761,16 +746,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 
 		
-		$solutions = $this->getSolutionValues($active_id, $pass);
-
-		if (is_array($solutions))
-		{
-			foreach ($solutions as $solution)
-			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";				
-			}
-		}
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
 
 		if ($il52){
 			// also see parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
@@ -788,20 +764,20 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$stringEscaping = $worksheet->getStringEscaping();
 			$worksheet->setStringEscaping(false);
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, $value1);
+			$worksheet->setCell($startrow + $i, 1, $solutions['value1']);
 			$worksheet->setStringEscaping($stringEscaping);
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value1));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value1']));
 		}
 		$i++;
 
 		if ($il52){
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-			$worksheet->setCell($startrow + $i, 1, $value2);	
+			$worksheet->setCell($startrow + $i, 1, $solutions['value2']);	
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($value2));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value2']));
 		}
 		
 		if ($il52){
@@ -868,7 +844,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	/*-----------------*/
 
 	function getExportExtension() {
-		$language = $this->getLanguage();
+		$language = $this->blocks->getLanguage();
 		if ($language=='c') return 'c';
 		if ($language=='c++') return 'cpp';		
 		if ($language=='c#') return 'cs';
@@ -880,6 +856,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if ($language=='objectivec') return 'm';
 		if ($language=='perl') return 'pl';
 		if ($language=='python') return 'py';
+		if ($language=='python3') return 'py';
 		if ($language=='r') return 'r';
 		if ($language=='ruby') return 'rb';
 
@@ -889,7 +866,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	function getExportFilename() {
 		if (is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
-		} else if ($this->getLanguage()=='java' || $this->getLanguage()=='java2'){
+		} else if ($this->blocks->getLanguage()=='java' || $this->blocks->getLanguage()=='java2'){
 			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
 			$className = trim($matches[1][0]);
 			if ($className=='') $className="Unbekannt";
@@ -900,11 +877,15 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function getBestSolution(){
+		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], false);
+	
 		$res = '';
-		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
-			$t = $this->getTypeForBlock($i);
-			if ($t == assCodeQuestionBlockTypes::SolutionCode || $t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode){
-				$res .= $this->getContentForBlock($i)."\n";
+		for ($i=0; $i<count($blocks); $i++){
+			$t = $this->blocks[$i]->getType();
+			if ($t == assCodeQuestionBlockTypes::SolutionCode ) { 
+				$res .= $this->blocks[$i]->getContent()."\n";			
+			} else {
+				$res .= $blocks[$i];
 			}
 		}
 		return $res;
@@ -915,14 +896,20 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
-		$solutions = $this->getSolutionValues($active_id, $pass);
-		if (count($solutions)>0) return $solutions[count($solutions)-1];
-
-		return NULL;
+		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false, false);		
+		$rows = $this->getSolutionValues($active_id, $pass, true);
+		foreach ($rows as $solution){
+			foreach ($solution as $k=>$v){
+				if ($k=="value1" || $k=="value2") continue;
+				$solutions[$k] = $v;
+			}
+		}
+		
+		return $solutions;
 	}
 
 	public function decodeSolution($value){
-		$res = json_decode($value);
+		$res = is_string($value)?json_decode($value):$value;
 		if (is_array($res)){
 			$alt = new \stdClass();
 			foreach ($res as $i=>$val){
@@ -935,54 +922,31 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	private function createCommentedCodeLine($str){
-		$language = $this->getLanguage();
+		$language = $this->blocks->getLanguage();
 		if ($language=='python' || $language=='perl' || $language=='ruby' || $language=='r') return '# '.$str;
 		if ($language=='fortran') return 'c '.$str;				
 
 		return '// '.$str;
 	}
 
-	public function prepareSolutionData($solution){
-		//in StudOn we sometimes have solutions without any data, 
-		//create a skleton solution that contains a special type of line comment
-		if(is_null($solution)){	
-			$res = '';
-			for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
-				$t = $this->getTypeForBlock($i);
-				if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-					if ($res != '') {
-						$res .= ', ';
-					}
-					$res .= '"'.$i.'":"'.$this->createCommentedCodeLine('Student had no answer!').'"';
-				}
-			}		
-			$res = '{'.$res.'}';
-			$solution = array('value1'=>$res);
-		}
-		
-
-		$studentCode = $this->decodeSolution($solution['value1']);
-		return $studentCode;
-	}
-
 	public function getCompleteSource($solution, $withAnswerMarkers=false){	
-		$studentCode = $this->prepareSolutionData($solution);
+		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 	
 		$res = '';
-		for ($i=0; $i<$this->getNumberOfBlocks(); $i++){
-			$t = $this->getTypeForBlock($i);
+		for ($i=0; $i<count($blocks); $i++){
+			$t = $this->blocks[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				if ($withAnswerMarkers) {
 					$res .= $this->createCommentedCodeLine("---------- START: ANSWER ----------")."\n";
 				}
-				if (!empty($studentCode)){
-					$res .= $studentCode->$i."\n";
+				if (isset($blocks[$i])){
+					$res .= $blocks[$i]."\n";
 				}
 				if ($withAnswerMarkers) {
 					$res .= $this->createCommentedCodeLine("---------- END: ANSWER ----------")."\n";
 				}
 			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
-				$res .= $this->getContentForBlock($i)."\n";
+				$res .= $blocks[$i]."\n";
 			}
 		}
 		return $res;

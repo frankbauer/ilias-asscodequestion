@@ -26,7 +26,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @const	string 	URL suffix to prevent caching of css files (increase with every change)
 	 * 					Note: this does not yet work with $tpl->addJavascript()
 	 */
-	const URL_SUFFIX = "?css_version=1.5.5";
+	const URL_SUFFIX = "?css_version=1.5.6";
 
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
@@ -38,6 +38,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @var assCodeQuestion	The question object
 	 */
 	var $object = NULL;
+
+	var $lang_user = 'en';
 	
 	/**
 	* Constructor
@@ -50,16 +52,21 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		parent::__construct();
 		include_once "./Services/Component/classes/class.ilPlugin.php";
 		$this->plugin = ilPlugin::getPluginObject(IL_COMP_MODULE, "TestQuestionPool", "qst", "assCodeQuestion");
+		$this->plugin->includeClass("ui/codeBlockUI.php");
 		$this->plugin->includeClass("class.assCodeQuestion.php");
 		$this->object = new assCodeQuestion();
 		if ($id >= 0)
 		{
 			$this->object->loadFromDb($id);
 		}		
+		global $DIC;
+		
+		$this->lang_user = $this->plugin->txt('used_lang');
+		if ('-qpl_qst_codeqst_used_lang-' == $this->lang_user) $this->lang_user = 'en';		
 	}
 
 	function getLanguage() {
-		return $this->object->getLanguage();
+		return $this->object->blocks()->getLanguage();
 	}
 
 	var $didPrepare = false;
@@ -100,149 +107,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	private function prepareTemplate($force=false, $negativeQuestionID=false)
-	{		
+	{
 		$qidf = $negativeQuestionID?-1:1;
-		//if (($this->didPrepare) && !$force) return;
-		
-		
 		$lngData = $this->getLanguageData();
 		
-		if (!$this->tpl->didPrepare) {
-			$this->tpl->addCss(self::URL_PATH.'/css/custom.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/lib/codemirror.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/solarized.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-dark.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/base16-light.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/duotone-dark.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/duotone-light.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-dark.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/xq-light.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/blackboard.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/midnight.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/neo.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mbo.css'.self::URL_SUFFIX);
-			$this->tpl->addCss(self::URL_PATH.'/js/codemirror/theme/mdn-like.css'.self::URL_SUFFIX);
-
-			$tm = $this->object->getROTheme();
-			if ($tm =='default') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='base16-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='base16-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='duotone-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='duotone-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='xq-light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='xq-dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='blackborard') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='mbo') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='mdn-like') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='midnight') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='neo') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='solarized light') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='solarized dark') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-dark.css'.self::URL_SUFFIX);
-			}
-			else if ($tm =='yeti') {
-				$this->tpl->addCss(self::URL_PATH.'/js/highlight.js/styles/solarized-light.css'.self::URL_SUFFIX);
-			}
-			
-			
-			
-			
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/lib/codemirror.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/clike/clike.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/perl/perl.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/python/python.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/r/r.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/highlight.js/highlight.pack.js');
-
-			$this->tpl->addJavascript(self::URL_PATH.'/js/codemirror/mode/'.$lngData['cmLanguage'].'/'.$lngData['cmLanguage'].'.js');
-
-			$this->tpl->addJavascript(self::URL_PATH.'/js/helper.js');
-
-
-			if ($lngData['org'] == "java") {
-				if (!$this->tpl->hasJava){
-					if ($this->object->getAllowRun()){
-						$this->tpl->addJavascript(self::URL_PATH.'/js/browserfs/browserfs.min.js');
-						$this->tpl->addJavascript(self::URL_PATH.'/js/doppio/doppio.js');
-						$this->tpl->addJavascript(self::URL_PATH.'/js/JavaExec.js');
-						$this->tpl->hasJava = true;
-					}										
-				}
-			}
-			
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/javascript.js');			
-			$this->tpl->addJavascript(self::URL_PATH.'/js/python.js');						
-			$this->tpl->addJavascript(self::URL_PATH.'/js/java2.js');		
-			$this->tpl->addJavascript(self::URL_PATH.'/js/glsl.js');
-
-			$this->tpl->didPrepare = true;
-			$this->tpl->initializedSolutionBoxes = [];
-		}		
-	
-		$sBoxID = ($qidf*$this->object->getId());
-		if (!array_key_exists($sBoxID, $this->tpl->initializedSolutionBoxes)) {
-			$this->tpl->addOnLoadCode('initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$sBoxID.'");');
-			$this->tpl->initializedSolutionBoxes[$sBoxID] = true;
-		}
-
-		if (!$this->didPrepare) {			
-			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('pre[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('pre[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR: false});$('hl[class=".$lngData['hljsLanguage']."][usebr=no]').each(function(i, block) { hljs.highlightBlock(block);});");
-			$this->tpl->addOnLoadCode("hljs.configure({useBR:  true});$('hl[class=".$lngData['hljsLanguage']."][usebr=yes]').each(function(i, block) { hljs.highlightBlock(block);});");
-					
-		}
-
-		if ($this->object->getIncludeThreeJS() && !$this->tpl->didIncludeThreeJS){
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/three.min.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/OrbitControls.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/controls/TrackballControls.js');
-			$this->tpl->addJavascript(self::URL_PATH.'/js/three.js/Detector.js');			
-			$this->tpl->addOnLoadCode('initThreeJS();');
-			$this->tpl->didIncludeThreeJS = true;			
-		}
-
-		if ($this->object->getIncludeD3() && !$this->tpl->didIncludeD3){
-			$this->tpl->addJavascript(self::URL_PATH.'/js/d3/d3.v5.min.js');
-			$this->tpl->addOnLoadCode('initD3();');
-			$this->tpl->didIncludeD3 = true;			
-		}
-
-		
-		
-		$this->didPrepare = true;
+		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);			
 	}
 
 	/**
@@ -316,69 +185,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return 1;
 	}
 
-	private function printableString($value){
-		$value = str_replace("\t", "  ",$value);
-		$value = str_replace(" ", "&nbsp;",$value);
-		$value = str_replace("\n", "<br />", $value);
-
-		return $value;
-	}
-
-	private function prepareSolutionCode($value, $blockID, $toHTMLOutput=false, $forPrint=false){
-		if (empty($value)) return '';
-
-		$json = $this->object->decodeSolution($value);				
-		if (!empty($json)) $value = $json->$blockID;
-
-		$value = ilUtil::prepareFormOutput($value);
-
-		if ($toHTMLOutput){
-			$value = str_replace('[err]', '<span style="color:red">', $value);
-			$value = str_replace('[/err]', '</span>', $value);	
-		}
-
-		if ($forPrint) {
-			$value = $this->printableString($value);
-		}
-		return $value;
-	}
-	
-	/**
-	 * Show the question in Test mode
-	 * (called from ilTestOutputGUI)
-	 * 
-	 * @param string $formaction			The action link for the form
-	 * @param integer $active_id			The active user id
-	 * @param integer $pass					The test pass
-	 * @param boolean $is_postponed			Question is postponed
-	 * @param boolean $use_post_solutions	Use post solutions
-	 * @param boolean $show_feedback		Show a feedback
-	 */
-	/*public function outQuestionForTest($formaction, $active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
-	{
-		$test_output = $this->getTestOutput($active_id, $pass, $is_postponed, $use_post_solutions, $show_feedback); 
-		$this->tpl->setVariable("QUESTION_OUTPUT", $test_output);
-		$this->tpl->setVariable("FORMACTION", $formaction);
-	}*/
-
-	private function createRunHTMLCode($language, $questionID){
-		$runCode = "";
-		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
-		$runCode = $tplPrep->get();	
-
-		if ($this->object->getAllowRun()) {
-			$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-			$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-			$tpl->setVariable("QUESTION_ID", $questionID);			
-			$tpl->setVariable("LANGUAGE", $language);
-			$tpl->setVariable("DISABLED_STATE", $language=='java'?'disabled':'');
-			$runCode .= $tpl->get();			
-		}
-		return $runCode;
-	}
-
 	/**
 	 * Get the html output of the question for different usages (preview, test)
 	 *
@@ -388,96 +194,60 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
+		//print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
-		$language = $this->getLanguage();		
-
-		$runCode = $this->createRunHTMLCode($language, $this->object->getId()*$qidf);
-		//we can not run when we have multiple instances of the same question on screen
-		if ($active_id!=NULL || $print) $runCode='';
+		$language = $this->getLanguage();				
 
 		if ($template == NULL) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
 		}
 
+		$oldUUID = $this->object->blocks()->ui()->getUUID();
+		if ($negativeQuestionID) {
+			$this->object->blocks()->ui()->setUUID("0-".$oldUUID);
+		}
+		$template->setVariable("UUID", $this->object->blocks()->ui()->getUUID());
 		if ($show_question_text==true){
 			$questiontext = $this->object->getQuestion();
-			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);
-			$questiontext = str_replace('[code]', '<pre class="'.$language.'" usebr="no">', $questiontext);
-			$questiontext = str_replace('[/code]', '</pre>', $questiontext);
-			$questiontext = str_replace('[hl]', '<hl class="'.$language.'" usebr="no">', $questiontext);
-			$questiontext = str_replace('[/hl]', '</hl>', $questiontext);
+			$questiontext = $this->object->blocks()->processStringWithSet(
+				$questiontext, 
+				$this->object->blocks()->getRandomSet(($value2!=NULL && isset($value2->rid))?$value2->rid:-1)
+			);
+			$questiontext = $this->object->prepareTextareaOutput($questiontext, TRUE);			
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
-		}	
-
+		}			
 
 		$html = '';
-		$script = '';
-		//Add Code Blocks
-		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-			$questionID = $this->object->getId()*$qidf ;
-			$code = $this->object->getContentForBlock($i);
-			if ($print) $code = $this->printableString($code);
-			$id = 'block['.$questionID.']['.$i.']';
-			if ($active_id!=NULL){
-				$id .= '['.$active_id.']';
-			}
-			$type = $this->object->getTypeForBlock($i);
-
-			$tpl = $print?$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_print_code.html'):$this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');;
-			$tpl->setVariable("NAME", $id);
-			$tpl->setVariable("BLOCK_ID", $i);
-			$tpl->setVariable("BLOCK_TYPE", $type);
-			$tpl->setVariable("QUESTION_ID", $questionID);				
-			$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
-			$tpl->setVariable("THEME", $this->object->getTheme());
-			$tpl->setVariable("ROTHEME", $this->object->getROTheme());
-			if ($readOnly)
-				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", 'data-readonly=true');
-			else 
-				$tpl->setVariable("ADDITIONAL_ATTRIBUTES", '');
 
 		
-			if ((trim($code)==='' || $type==assCodeQuestionBlockTypes::Text) && $type!=assCodeQuestionBlockTypes::SolutionCode) {
-				$html .= '<span id="'.$id.'" data-question="'.$questionID.'">'.$code.'</span>';
-			} else if ($type==assCodeQuestionBlockTypes::StaticCode) {
-				$tpl->setVariable("CONTENT", $code);
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
-				$tpl->setVariable("CONTENT", $this->prepareSolutionCode($value1, $i));
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::HiddenCode) {
-				//$html .= '<span id="'.$id.'" style="display:none" data-question="'.$questionID.'" data-contains-code>'.$code.'</span>';
-				
-				$tpl->setVariable("CONTENT", $code);
-				$html .= $tpl->get();
-			} else if ($type==assCodeQuestionBlockTypes::Canvas) {
-				//$html .= '<canvas id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas hiddenBlock"></canvas>';	
-				$html .= '<playground id="'.$id.'" data-question="'.$questionID.'" data-blocknr="'.$i.'" class="assCodeQuestionCanvas"></playground>';	
-				//$script .= 'if (questionID=='.$questionID.' && blockID=='.$i.") {\n".$code."\n}";
-				$script .= "if (calls[$questionID]===undefined) calls[$questionID]=[];\n";
-				$script .= 'calls['.$questionID.']['.$i."]= ".$code."\n";
-			}
-		}
-		$template->setVariable("BLOCK_HTML", $html);		
-		$template->setVariable("CANVAS_SCRIPT", $script);	 
-		$template->setVariable("LANGUAGE", $language);
-		$template->setVariable("RUN_CODE_HTML", $runCode);
+		//get the student solution		
+		$solutions = $value1;
+		$state = $value2;					
 
+		if ($print){
+			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state);
+		} else {
+			$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
+		}
+
+		$template->setVariable("BLOCK_HTML", $html);		
+		$template->setVariable("LANGUAGE", $language);
+		
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
 		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
 
-		$template->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$template->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());
-
+		if ($negativeQuestionID) {
+			$this->object->blocks()->ui()->setUUID($oldUUID);
+		}
 		$questionoutput = $template->get();
 		return $questionoutput;
 	}
 
 	/**
-	 * Get the HTML output of the question for a test
+	 * Get the HTML output of the question for a test (The way students see the test)
 	 * (this function could be private)
 	 * 
 	 * @param integer $active_id			The active user id
@@ -489,42 +259,34 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
+		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")");  die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		if (is_NULL($pass))
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
-		$solutions = $this->object->getSolutionValues($active_id, $pass);
-
-		// there may be more tham one solution record
-		// the last saved wins
-		if (is_array($solutions))
-		{
-			foreach ($solutions as $solution)
-			{
-				$value1 = isset($solution["value1"]) ? $solution["value1"] : "";
-				$value2 = isset($solution["value2"]) ? $solution["value2"] : "";
-			}
-		}
-
-		$questionoutput = $this->getQuestionOutput($value1, $value2);		
+		$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, true);
+		$questionoutput = $this->getQuestionOutput($solutions['value1'], $solutions['value2']);
 		$pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
 		return $pageoutput;
 	}
 
 	
 	/**
-	 * Get the output for question preview
+	 * Get the output for question preview ("Preview Button")
 	 * (called from ilObjQuestionPoolGUI)
 	 * 
 	 * @param boolean	show only the question instead of embedding page (true/false)
 	 */
 	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
 	{
-		if( is_object($this->getPreviewSession()) )
-		{
-			$solution = $this->getPreviewSession()->getParticipantsSolution();
-		}
+		 	// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
+			// print_r($this->getPreviewSession()->getParticipantsSolution());
+		$solution = (array) $this->object->getPreviewValuesOrInit($this->getPreviewSession(), true, true);
+		//  print_r($this->getPreviewSession());	
+		//  print_r($solution);
+		//  echo "count:".count($solution)."\n";	
+		//  die;
 
 		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
 		if(!$show_question_only)
@@ -536,7 +298,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	/**
-	 * Get the question solution output
+	 * Get the question solution output 
+	 * 	 - (When student views the "Result" of a test run)
+	 *   - (When in manual correction mode)
+	 *   - (When best solution is requested in preview)
 	 * @param integer $active_id             The active user id
 	 * @param integer $pass                  The test pass
 	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
@@ -559,49 +324,60 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		
+		//print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); 
+
 		$print = $this->isRenderPurposePrintPdf();		
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
+		//echo "showStudentResults=".$showStudentResults."<br>";
+		
 		// get the solution template
 		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
+
+		//this is requested through ajax and added to the already loaded DOM
+		if ($show_manual_scoring){
+			// always load jQuery
+			include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
+			iljQueryUtil::initjQuery($template);
+			iljQueryUtil::initjQueryUI($template);
+
+			$this->object->blocks()->ui()->prepareTemplate($template, self::URL_PATH);
+
+			//we need this for the manual scoring view, otherwise the boxes have to get clicked
+			$template->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+
+			$template->setCurrentBlock("DEFAULT");
+			$template->fillCssFiles();
+			$template->fillInlineCss();
+			$template->fillJavaScriptFiles();
+			$template->fillOnLoadCode();
+		}
 
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
 		if ($showStudentResults)
-		{
+		{			
 			// get the answers of the user for the active pass or from the last pass if allowed
-			$solutions = $this->object->getSolutionValues($active_id, $pass);
-
-			$template->setVariable("NAME_MODIFIER", "");
+			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);			
 		}
 		else
-		{
-			$bestSolution = array();
-			for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-				if ($this->object->getTypeForBlock($i) == assCodeQuestionBlockTypes::SolutionCode){
-					$bestSolution[$i] = $this->object->getContentForBlock($i);
-				}
-			}
+		{		
+			$stored = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);
+			$rid = -1;
+			if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
+			$solutions = $this->object->blocks()->getBestRandomSolution($rid);	
+			
+			$stored['value2']->blocks = $solutions;
+
 			// show the correct solution
-			$solutions = array(array(
-				"value1" => json_encode($bestSolution),
-				"value2" => "..."
-			));
-			$template->setVariable("NAME_MODIFIER", "_SOL");			
+			$solutions = array(
+				"value1" => $solutions,
+				"value2" => $stored['value2']
+			);			
 		}
 
-		// loop through the saved values if more records exist
-		// the last record wins
-		// adapt this to your structure of answers
-		foreach ($solutions as $solution)
-		{
-			$value1 = isset($solution["value1"]) ? $solution["value1"] : "";			
-			$value2 = isset($solution["value2"]) ? $solution["value2"] : "";			
-		}		
+		$value1 = $solutions['value1'];
+		$value2 = $solutions['value2'];
 		
-		if ( $this->object->getAllowRun() ) {			
-			//$this->tpl->addOnLoadCode('runInSolution("'+$this->getLanguage()+'");');			
-		}
 			
 		if ($showStudentResults)
 		{
@@ -623,59 +399,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 
-		$solutionoutput = $solutiontemplate->get();
-
-		//include everything we need to execute python code when we just want to display a brief answer
-		if ($_GET['cmd'] == 'getAnswerDetail' ) {
-			$lngData = $this->getLanguageData();
-			if (!$this->didAddLinksToSolutions) {
-				$solutionoutput .= '
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/css/custom.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/lib/codemirror.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/solarized.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-dark.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/base16-light.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-dark.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/xq-light.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/blackboard.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/neo.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/codemirror/theme/midnight.css" media="screen" />
-				<link rel="stylesheet" type="text/css" href="'.self::URL_PATH.'/js/highlight.js/styles/solarized-light.css" media="screen" />
-				
-				
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt.min.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/skulpt/skulpt-stdlib.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/lib/codemirror.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/python/python.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/clike/clike.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/fortran/fortran.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/javascript/javascript.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/perl/perl.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/r/r.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/ruby/ruby.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/mode/glsl/glsl.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/codemirror/addon/edit/closebrackets.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/highlight.js/highlight.pack.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/helper.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/java.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/java2.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/javascript.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/python.js'.self::URL_SUFFIX.'"></script>
-				<script type="text/javascript" src="'.self::URL_PATH.'/js/glsl.js'.self::URL_SUFFIX.'"></script>';
-
-				$this->didAddLinksToSolutions = true;
-
-				$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-				$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-				$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());	
-				
-				$solutionoutput .= $tplPrep->get();
-			}
-
-			$solutionoutput .= '<script type="text/javascript">initSolutionBox("'.$lngData['cmMode'].'","'.$this->getLanguage().'","'.$this->object->getId().'");hljs.configure({useBR: false});$("pre[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});$("hl[class='.$lngData['hljsLanguage'].'][usebr=no]").each(function(i, block) { hljs.highlightBlock(block);});</script>';
-		}
-		
-		
+		$solutionoutput = $solutiontemplate->get();	
 		if(!$show_question_only)
 		{
 			// get page object output
@@ -775,45 +499,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addBackTab($ilTabs);
 	}
 
-	public function createBlockTypeOption($value, $nameRef, $currentValue=-1){
-		return '<option value="'.$value.'" '.($currentValue==$value?'selected':'').'>'.$this->plugin->txt($nameRef).'</option>';
-	}
-
-	public function createCodeBlockInput($i, $elname){
-		$type = $this->object->getTypeForBlock($i);
-		$options_html  = $this->createBlockTypeOption(assCodeQuestionBlockTypes::Text, 'plain_text', $type);
-		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::StaticCode, 'static_code', $type);
-		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::HiddenCode, 'hidden_code', $type);
-		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::SolutionCode, 'solution_code', $type);
-		$options_html .= $this->createBlockTypeOption(assCodeQuestionBlockTypes::Canvas, 'canvas', $type);			
-
-		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_block_ui.html');
-		$tpl->setVariable("BLOCK_ID", $i==-1?'[ID]':$i);
-		$tpl->setVariable("REMOVE_TXT", $this->plugin->txt('remove'));
-		$tpl->setVariable("BLOCK_TYPE_OPTIONS", $options_html);
-		$tpl->setVariable("CODE_EDITOR_ID", $elname);
-		$tpl->setVariable("BUTTON_CLASS", $i==0?"hideBlockButton":"");
-		$tpl->setVariable("CODE_EDITOR", $this->createCodeEditorInput($elname, $this->object->getContentForBlock($i), $i, $type));
-		$tpl->setVariable("SHOW_LINES_TXT", $this->plugin->txt('show_lines_label'));
-		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($i));
-		
-		return $tpl->get();		
-	}
-
-	public function createCodeEditorInput($name, $value, $blockID=-1, $blockType=1){
-		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_edit_code.html');
-		$tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($value));
-		$tpl->setVariable("NAME", $name);
-		$tpl->setVariable("BLOCK_ID", $blockID==-1?'[ID]':$blockID);
-		$tpl->setVariable("BLOCK_TYPE", $blockType);
-		$tpl->setVariable("QUESTION_ID", $this->object->getId());	
-		$tpl->setVariable("SHOW_LINES", $this->object->getLinesForBlock($blockID));
-		$tpl->setVariable("ADDITIONAL_ATTRIBUTES", ' '.($blockID==-1?'data-ignore=true':'').' ');	
-		$item = new ilCustomInputGUI('');
-		
-		return $tpl->get();		
-	}
-
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
 	{
 		global $lng;
@@ -827,141 +512,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$points->setRequired(true);
 		$points->setValue($this->object->getPoints());
 		$form->addItem($points);
-
-		// Add Source Code Type Selection
-		// first complete scripts for codemirror
-		$language = $this->getLanguage();
-		$lngData = $this->getLanguageData();
-		$select = new ilSelectInputGUI($this->plugin->txt('source_lang'), 'source_lang');
-        $select->setOptions(array(
-			'c'=>'C', 
-			'c++'=>'C++',
-			'c#' => 'C#', 
-			'fortran'=>'Fortran', 
-			'glsl'=>'GLSL', 			
-			'java2'=>'Java',
-			'javascript'=>'JavaScript',
-			'objectivec'=>'Objective-C',
-			'perl'=>'Perl',
-			'python'=>'Python',
-			'r' => 'R', 
-			'ruby'=>'Ruby',
-			'java'=>'[Java (legacy)]')
-			);
-		$select->addCustomAttribute('onchange="selectLanguage( )"');
-		$select->setValue($this->getLanguage());
-		$select->setInfo($this->plugin->txt('source_lang_info'));
-		$form->addItem($select);
-
-		$allowRun = new ilCheckboxInputGUI($this->plugin->txt('allow_run'), 'allow_run');
-		$allowRun->setInfo($this->plugin->txt('allow_run_info'));	
-		$allowRun->setChecked( $this->object->getAllowRun() );		
-		$form->addItem($allowRun);
-
-		$haved3 = new ilCheckboxInputGUI($this->plugin->txt('havedthree'), 'havedthree');
-		$haved3->setInfo($this->plugin->txt('havedthree_info'));	
-		$haved3->setChecked( $this->object->getIncludeD3() );
-		$form->addItem($haved3);
-
-		$have3js = new ilCheckboxInputGUI($this->plugin->txt('havethreejs'), 'havethreejs');
-		$have3js->setInfo($this->plugin->txt('havethreejs_info'));	
-		$have3js->setChecked( $this->object->getIncludeThreeJS() );
-		$form->addItem($have3js);
-
-		if ($this->getLanguage() == 'javascript' || $this->getLanguage() == 'python' || $this->getLanguage() == 'java' || $this->getLanguage() == 'java2' || $this->getLanguage() == 'glsl') {
-			$allowRun->setValue('true');
-			$haved3->setValue('true');
-			$have3js->setValue('true');
-		} else {
-			$allowRun->setValue('false');
-			$haved3->setValue('false');
-			$have3js->setValue('false');
-		}
-
-		$id = 'timeout_ms-question'.$this->object->getId().'value1';
-		$runtime = new ilNumberInputGUI($this->plugin->txt('timeout_ms'),$id);	
-		$runtime->setInfo($this->plugin->txt('timeout_ms_info'));
-		$runtime->setSize(5);
-		$runtime->setMinValue(500);
-		$runtime->allowDecimals(0);
-		//$runtime->setRequired(true);
-		$runtime->setValue($this->object->getTimeoutMS());
-		$form->addItem($runtime);
-
-		$id = 'max_chars-question'.$this->object->getId().'value1';
-		$maxChars = new ilNumberInputGUI($this->plugin->txt('max_chars'),$id);	
-		$maxChars->setInfo($this->plugin->txt('max_chars_info'));
-		$maxChars->setSize(5);
-		$maxChars->setMinValue(512);
-		$maxChars->allowDecimals(0);
-		//$runtime->setRequired(true);
-		$maxChars->setValue($this->object->getMaxChars());
-		$form->addItem($maxChars);
-
-		$selectTheme = new ilSelectInputGUI($this->plugin->txt('cm_theme'), 'cm_theme');
-		$selectTheme->setOptions(array(
-			'default' => 'default',
-			'base16-dark' => 'base16-dark',
-			'base16-light' => 'base16-light',
-			'duotone-dark' => 'duotone-dark',
-			'duotone-light' => 'duotone-light',
-			'xq-light' => 'xq-light',
-			'xq-dark' => 'xq-dark',
-			'blackborard' => 'blackboard',
-			'mbo' => 'mbo',
-			'mdn-like' => 'mdn-like',
-			'midnight' => 'midnight',
-			'neo' => 'neo',
-			'solarized light' => 'solarized light',
-			'solarized dark' => 'solarized dark',
-			'yeti' => 'yeti'
-		));
-		$selectTheme->addCustomAttribute('onchange="selectTheme()"');
-		$selectTheme->setValue($this->object->getTheme());
-		$selectTheme->setInfo($this->plugin->txt('cm_theme_info'));
-		$form->addItem($selectTheme);
-
-		$selectROTheme = new ilSelectInputGUI($this->plugin->txt('cm_ro_theme'), 'cm_ro_theme');
-		$selectROTheme->setOptions($selectTheme->getOptions());
-		$selectROTheme->addCustomAttribute('onchange="selectTheme()"');
-		$selectROTheme->setValue($this->object->getROTheme());
-		$selectROTheme->setInfo($this->plugin->txt('cm_ro_theme_info'));
-		$form->addItem($selectROTheme);
-
-		$item = new ilCustomInputGUI($this->plugin->txt('cq_blocks'));
-		$item->setInfo($this->plugin->txt('cq_blocks_info'));
+	
+		$item = new ilCustomInputGUI('');
+		$item->setPostVar('codeblock');	
+		$item->setHTML($this->object->blocks()->ui()->render(true));
 		$form->addItem($item);
-
-		
-		for ($i=0; $i<$this->object->getNumberOfBlocks(); $i++){
-			$elname = 'block['.$i.']';
-			$item = new ilCustomInputGUI('');		
-			$item->setHTML($this->createCodeBlockInput($i, $elname));
-			$form->addItem($item);			
-		}
-
-		//Add Button and Template UI
-		$rect = new ilCustomInputGUI('');
-		$rect->setHTML('<input type="button" class="addBlockButton" value="+" onclick="addBlock(this, \''.$lngData['cmMode'].'\', '.$this->object->getId().')"><div id="blockTemplate">'.$this->createCodeBlockInput(-1, 'block_template').'</div>');
-		$form->addItem($rect);
-
-		//$this->prepareTemplate();
-		$language = $this->getLanguage();	
-		$tplPrep = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_prep_run_code.html');
-		$tplPrep->setVariable("MAX_CHARACTERS_VAL",$this->object->getMaxChars());
-		$tplPrep->setVariable("TIMEOUT_VAL",$this->object->getTimeoutMS());		
-
-		$tpl = $this->plugin->getTemplate('tpl.il_as_qpl_codeqst_run_code.html');
-		$tpl->setVariable("RUN_LABEL", $this->plugin->txt('run_code'));
-		$tpl->setVariable("QUESTION_ID", $this->object->getId());
-		$tpl->setVariable("LANGUAGE", 'codeqst_edit_mode');
-		
-		$item = new ilCustomInputGUI(" ");
-		$item->setInfo(" ");
-		$item->setHTML($tplPrep->get() . $tpl->get());
-
-		$form->addItem($item);
-
 
 		return $form;
 	}
@@ -976,30 +531,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form)
 	{		
-		// Here you can write the question type specific values
 		$this->object->setPoints((int) $_POST["points"]);
-		$this->object->setLanguage((string) $_POST["source_lang"]);
-		$this->object->setTimeoutMS((int) $_POST["timeout_ms-question".$this->object->getId().'value1']);
-		$this->object->setMaxChars((int) $_POST["max_chars-question".$this->object->getId().'value1']);
-		$this->object->setTheme(((string) $_POST["cm_theme"]));
-		$this->object->setROTheme(((string) $_POST["cm_ro_theme"]));
-		$this->object->setAllowRun(((string) $_POST["allow_run"])=='true');
-		$this->object->setIncludeThreeJS(((string) $_POST["havethreejs"])=='true');
-		$this->object->setIncludeD3(((string) $_POST["havedthree"])=='true');
-		$this->object->clearBlocks();
-		$i = 0;
-		foreach($_POST["block"] as $k=>$c){
-			$lns = $_POST["block_lines"][$k] + 0;
-			$t = $_POST['block_type_'.$k];
-			if ($_POST["source_lang"]=='glsl' && $k==0){
-				$t = 4;
-				$this->object->setIncludeThreeJS(true);
-			}
-			$this->object->setTypeForBlock($i, $t);
-			$this->object->setLinesForBlock($i, $lns);
-			$this->object->setContentForBlock($i, $c);
-			$i = $i + 1;
-		}
+		$this->object->blocks()->setFromPOST($_POST);			
 	}
 
 	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)
@@ -1018,7 +551,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getAfterParticipationSuppressionAnswerPostVars()
 	{
-		return array();
+		return array('block', 'source_lang');
 	}
 
 	/**
@@ -1032,7 +565,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	public function getAfterParticipationSuppressionQuestionPostVars()
 	{
-		return array();
+		return getAfterParticipationSuppressionAnswerPostVars();
 	}
 
 	/**
