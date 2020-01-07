@@ -45,7 +45,7 @@ class codeBlock {
 	}
 
 	function getAlternativeContent(){
-		return isset($this->block['altContent'])?$this->block['altContent']:'';
+		return isset($this->block['altContent'])?$this->fixLoadedCode($this->block['altContent']):'';
 	}
 
 	function getAlternativeContentForSet($set){

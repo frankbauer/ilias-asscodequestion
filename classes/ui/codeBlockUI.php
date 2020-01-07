@@ -9,7 +9,7 @@ class codeBlockUI {
         $this->model = $model;        
     }
 
-    private function saveParamString($str){
+    private function saveParamString($str){        
         $str = str_replace("\"", "&quot;",$str);
         return $str;
     }
