@@ -1,93 +1,35 @@
-.remBlockButton, .addBlockButton {    
-    border-radius: 3px;
-    font-weight: bold;
-    text-align:center;
-    font-size:120%;
-    padding:4px;
-    width:100%;
+div.codeblocks {
+    max-width: 1920px;
+}
+
+div#mainspacekeeper > div.row {
     display:block;
+    flex-wrap: nowrap;
 }
 
-.remBlockButton {
-    margin-top:2px!important;
-    border:1px dashed rgb(128, 48, 48);
-    color:rgb(128, 48, 48);
-    background-color:rgb(240, 220, 220);  
+div.playground table td.block, div.ilc_question_Standard table td.block{
+    display:table-cell !important;
 }
 
-.remBlockButton:hover {
-    background-color:rgb(241, 48, 48);
-    color:white;
+div.playground table td.fixed, div.ilc_question_Standard table td.fixed{
+    display:table-cell !important;
+    position:relative;
 }
 
-.addBlockButton {
-    border:1px dashed gray;
-    color:black;
-    background-color:rgb(235, 235, 235);    
+div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
+    width:100%
 }
 
-.addBlockButton:hover{
-    background-color:rgb(245, 245, 245);
+.cm-s-solarized div.CodeMirror-gutter.CodeMirror-linenumbers{
+    width:29px !important;
+    border-right: 1px solid #d8d2c0
+}
+div.codeblocks.editmode{
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
 }
 
-.hideBlockButton{
-    display:none!important;
-}
-
-.hiddenBlock{
-    display:none!important;
-}
-
-.hideBlockButton, .hiddenBlock{    
-    opacity:0;
-    visibility: hidden;
-}
-
-.BlockContainer{
-    margin-bottom:20px;
-}
-
-#blockTemplate{
-    display:none;
-}
-
-playground{
-    display:block;
-}
-
-.assCodeQuestionCanvas{
-    width:100%;
-    height:200px;
-    border:1px dashed rgb(128, 48, 48, 0.66);
-    border-radius: 3px;
-    background-color:rgba(255, 255, 255, 0.63766);
-    margin-top:4px;
-    margin-bottom:4px;
-
-    transition: opacity 600ms, visibility 600ms;
-}
-
-hl {
-    display:inline!important;
-    padding-top:0px!important;
-    padding-bottom:0px!important;
-    padding-left:4px!important;
-    padding-right:4px!important;
-}
-
-.red-wave {
-    background: url("red-wave.png") repeat-x;
-    background-position-y: bottom;
-}
-
-.yellow-wave {
-    background: url("yellow-wave.png") repeat-x;
-    background-position-y: bottom;
-}
-
-.gutter-error {
-    color: red;
-}
-.gutter-warning {
-    color: #b8a600;
+div.editModeBlockContainer{
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1)
 }

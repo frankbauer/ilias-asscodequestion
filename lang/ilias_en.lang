@@ -1,5 +1,6 @@
 // English Language File for assCodeQuestion Plugin
 <!-- language file start -->
+used_lang#:#en
 assCodeQuestion#:#Sourcecode Question
 label_value1#:#Your Solution:
 any_text#:##This could be your answer :)

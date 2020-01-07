@@ -1,15 +1,11 @@
-<p>{QUESTIONTEXT}</p>
-<p>
-    <textarea style="display:none" id="question{QUESTION_ID}result1" name="question{QUESTION_ID}result1" />{RESULT1}</textarea>
-    <br>
-    <label for="question{QUESTION_ID}value1">
-        <b>{LABEL_VALUE1}</b>
-    </label>
-    {BLOCK_HTML}
-    <br> {RUN_CODE_HTML}
-</p>
-<script type="text/javascript">
-    var calls = {}
- 
-    {CANVAS_SCRIPT}  
-</script>
+<div id="{UUID}" class="blockParent">
+    <div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
+    <div>
+        <textarea style="display:none" id="question{QUESTION_ID}result1" name="question{QUESTION_ID}result1">{RESULT1}</textarea>
+        <br>
+        <label for="question{QUESTION_ID}value1">
+            <b>{LABEL_VALUE1}</b>
+        </label>
+        {BLOCK_HTML}
+    </div>
+</div>

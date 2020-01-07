@@ -1,0 +1,4 @@
+[submodule "__dev/codeblocks.js"]
+	path = __dev/codeblocks.js
+	url = git@github.com:frankbauer/codeblocks-js.git
+	branch = develop
