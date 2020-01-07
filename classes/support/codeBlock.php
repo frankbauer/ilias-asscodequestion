@@ -215,9 +215,9 @@ class codeBlock {
 
         if ($withSolution) {            
             if (is_object($solutions)){                
-                return $solutions->$nr;
+                return $this->fixLoadedCode($solutions->$nr);
             } else if (is_array($solutions)){
-                return $solutions[$nr];
+                return $this->fixLoadedCode($solutions[$nr]);
             }
 
             if ($altContent != NULL) {
