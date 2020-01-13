@@ -44,6 +44,9 @@ class codeBlockUI {
         if ($type==assCodeQuestionBlockTypes::Text) 
             return $this->renderText($state);
 
+        if ($type==assCodeQuestionBlockTypes::Blockly) 
+            return $this->renderBlockly($state);
+
         return '';
     }
 
@@ -93,6 +96,10 @@ class codeBlockUI {
 
     private function renderText($state=NULL){
         return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
+    }
+
+    private function renderBlockly($state=NULL){
+        return "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '')."><code>".$this->getContent($state)."</code><toolbox>".$this->model->getToolboxString()."</toolbox></blockly>";
     }
 }
 

@@ -11,6 +11,7 @@ abstract class assCodeQuestionBlockTypes
 	const SolutionCode = 2;
 	const HiddenCode = 3;
 	const Canvas = 4;
+	const Blockly = 5;
 }
 
 /**

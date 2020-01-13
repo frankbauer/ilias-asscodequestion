@@ -91,6 +91,8 @@ class codeBlock {
 			$t = assCodeQuestionBlockTypes::Canvas;
 		} else if ($options->type == 'TEXT'){
 			$t = assCodeQuestionBlockTypes::Text;
+		} else if ($options->type == 'BLOCKLY'){
+			$t = assCodeQuestionBlockTypes::Blockly;
 		}
 		
 		
@@ -106,7 +108,8 @@ class codeBlock {
 			'version' => $options->version,
 			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
-			'altContent' => $altContent
+			'altContent' => $altContent,
+			'toolbox' => $options->toolbox
 		);				
 		
 		$o = new codeBlock($nr, $data, $object);
@@ -168,6 +171,13 @@ class codeBlock {
 
 	function setLines($value) {
 		$this->block['lines'] = $value;
+	}
+
+
+
+	function getToolboxString(){
+		if (!isset($this->block['toolbox'])) return '';
+		return $this->block['toolbox'];
 	}
 
 	function getExpanded() {

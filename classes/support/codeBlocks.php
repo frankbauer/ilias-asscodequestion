@@ -175,6 +175,7 @@ class codeBlocks implements ArrayAccess {
 
 
 	public function setFromPOST($P){
+		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		
@@ -188,6 +189,7 @@ class codeBlocks implements ArrayAccess {
 		$this->additional_data = array();
 		
 		$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
+		$this->additional_data['vcodeblocks'] = CODEBLOCKS_VERSION;
 		$this->additional_data['language'] = $settings->language;
 		
 		if (isset($settings->compiler)){
@@ -221,8 +223,18 @@ class codeBlocks implements ArrayAccess {
 			if (isset($P['alt_block']) 
 				&& isset($P['alt_block'][$this->getID()]) 
 				&& isset($P['alt_block'][$this->getID()][$i])
-			) 
+			) {
 				$abl = $P['alt_block'][$this->getID()][$i];
+			}
+
+			if (isset($P['toolbox_block']) 
+				&& isset($P['toolbox_block'][$this->getID()]) 
+				&& isset($P['toolbox_block'][$this->getID()][$i])
+			) {				
+				$blockOptions[$i]->toolbox = $P['toolbox_block'][$this->getID()][$i];				
+			}
+
+			
 			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
 		}	
 	}
