@@ -131,6 +131,10 @@ class codeBlock {
 		return $value;
 	}
 
+	static public function fixExportedCode($str){
+		return str_replace('&lt;', '<', $str);
+	}
+
     function fixLoadedCode($str){
 		return str_replace('<', '&lt;', $str);
 		//return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
@@ -207,7 +211,7 @@ class codeBlock {
 		$altContent = NULL;
 		if ($state!=NULL ){
 			if ($state->blocks!=NULL) {
-				$altContent = $state->blocks[$nr];
+				$altContent = $this->fixLoadedCode($state->blocks[$nr]);
 			} else if ($withSolution && !$this->getHasAlternativeContent()){
 				$altContent = $this->getContent();
 			}
