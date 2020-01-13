@@ -17,11 +17,12 @@ class codeBlocks implements ArrayAccess {
 		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
 		$this->getPlugin()->includeClass("./support/codeBlock.php");
-		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.1.1.php");
+		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.0.php");		
 
 		if ($json_data == null){
 			$this->additional_data = array();
 			$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
+			$this->additional_data['vcodeblocks'] = CODEBLOCKS_VERSION;
 			$this->additional_data['blocks'] = array();
 			$this->additional_data['domlibs'] = array();
 			$this->additional_data['workerlibs'] = array();
@@ -76,6 +77,10 @@ class codeBlocks implements ArrayAccess {
 		if (!isset($this->additional_data['version'])){
 			$this->additional_data['version'] = 100;
 		}
+
+		if (!isset($this->additional_data['vcodeblocks'])){
+			$this->additional_data['vcodeblocks'] = "0.1.1";
+		}		
         // initialize new block structure for
         // old version with fixed code blocks
         if (!is_array($this->additional_data['blocks'])){
