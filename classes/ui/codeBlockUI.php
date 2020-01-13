@@ -99,7 +99,7 @@ class codeBlockUI {
     }
 
     private function renderBlockly($state=NULL){
-        return "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '')."><code>".$this->getContent($state)."</code><toolbox>".$this->model->getToolboxString()."</toolbox></blockly>";
+        return "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '')."><code>".CodeBlock::fixExportedCode($this->getContent($state))."</code><toolbox>".$this->model->getToolboxString()."</toolbox></blockly>";
     }
 }
 
