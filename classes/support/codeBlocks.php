@@ -17,7 +17,7 @@ class codeBlocks implements ArrayAccess {
 		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
 		$this->getPlugin()->includeClass("./support/codeBlock.php");
-		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.1.2.php");
+		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.1.3.php");
 
 		if ($json_data == null){
 			$this->additional_data = array();
