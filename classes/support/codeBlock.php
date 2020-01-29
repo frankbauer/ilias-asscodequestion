@@ -213,7 +213,23 @@ class codeBlock {
 			if ($state->blocks!=NULL) {
 				$altContent = $this->fixLoadedCode($state->blocks[$nr]);
 			} else if ($withSolution && !$this->getHasAlternativeContent()){
-				$altContent = $this->getContent();
+				// Hm, where was this important. This will print the best Solution in the 
+				// Solution view if the student did not answer the question.
+				// Replaced with an empty string to prevent that!!!
+				//$altContent = $this->getContent(); 
+				$altContent = '';
+			} else if ( $state->blocks==NULL 						
+						&& $this->object->getRandomizerActive()
+					){
+				//this case makes sure, that we never display 
+				//placeholders in student solutions, even if the question was 
+				//never opened and thus we did not generate a random set.
+				$set = $this->object->getRandomSet(-1);
+
+				if ($this->getHasAlternativeContent())
+					$altContent = $this->getAlternativeContentForSet($set);
+				else 
+					$altContent = $this->getContentForSet($set);
 			}
 		}
 
