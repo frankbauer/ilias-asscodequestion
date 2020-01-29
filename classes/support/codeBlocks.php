@@ -367,7 +367,7 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	function getTimeoutMS() {
-		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 500; 
+		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 5000; 
 	}
 
 	function setTimeoutMS($newValue) {
