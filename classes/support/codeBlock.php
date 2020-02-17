@@ -132,7 +132,7 @@ class codeBlock {
 	}
 
 	static public function fixExportedCode($str){
-		return str_replace('&lt;', '<', $str);
+		return str_replace('&gt;', '>', str_replace('&lt;', '<', $str));
 	}
 
     function fixLoadedCode($str){
