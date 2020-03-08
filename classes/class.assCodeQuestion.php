@@ -864,11 +864,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return 'txt';
 	}
 
-	function getExportFilename() {
+	function getExportFilename($solution=NULL) {
 		if (is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
 		} else if ($this->blocks->getLanguage()=='java' || $this->blocks->getLanguage()=='java2'){
-			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution(), $matches, PREG_OFFSET_CAPTURE);				
+			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution($solution), $matches, PREG_OFFSET_CAPTURE);				
 			$className = trim($matches[1][0]);
 			if ($className=='') $className="Unbekannt";
 			return $className.'.java';
@@ -877,7 +877,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 	}
 
-	public function getBestSolution(){
+	public function getBestSolution($solution){
 		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], false);
 	
 		$res = '';

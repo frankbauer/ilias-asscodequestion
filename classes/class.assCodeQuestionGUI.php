@@ -140,12 +140,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$form->setId("codeqst");
 		$form->setDescription($this->plugin->txt('question_edit_info'));
 		$this->addBasicQuestionFormProperties( $form );
-		$this->populateQuestionSpecificFormPart( $form );
-		$this->populateAnswerSpecificFormPart( $form );
-
-		// Here you can add question type specific form properties
-		$this->populateTaxonomyFormSection($form);
-		$this->addQuestionFormCommandButtons($form);
 
 		$errors = false;
 
@@ -154,8 +148,20 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$form->setValuesByPost();
 			$errors = !$form->checkInput();
 			$form->setValuesByPost(); // again, because checkInput now performs the whole stripSlashes handling and we need this if we don't want to have duplication of backslashes
+			
+			//this reloads the posted data into the object
+			global $_POST;
+			$this->object->blocks()->setFromPOST($_POST);
+			
 			if ($errors) $checkonly = false;
 		}
+
+		$this->populateQuestionSpecificFormPart( $form );
+		$this->populateAnswerSpecificFormPart( $form );
+
+		// Here you can add question type specific form properties
+		$this->populateTaxonomyFormSection($form);
+		$this->addQuestionFormCommandButtons($form);
 
 		if (!$checkonly)
 		{
