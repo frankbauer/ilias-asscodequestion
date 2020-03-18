@@ -764,20 +764,20 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$stringEscaping = $worksheet->getStringEscaping();
 			$worksheet->setStringEscaping(false);
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, $solutions['value1']);
+			$worksheet->setCell($startrow + $i, 1, (print_r($solutions['value1'], true)));
 			$worksheet->setStringEscaping($stringEscaping);
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value1']));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value1'], true)));
 		}
 		$i++;
 
 		if ($il52){
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-			$worksheet->setCell($startrow + $i, 1, $solutions['value2']);	
+			$worksheet->setCell($startrow + $i, 1, print_r($solutions['value2'], true));
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value2']));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value2'], true)));
 		}
 		
 		if ($il52){
