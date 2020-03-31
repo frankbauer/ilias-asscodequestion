@@ -19,6 +19,8 @@ class codeBlockUI {
             return '<pre>' . $this->model->printableString($this->getContent($state)) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
             return $this->renderBlock($withSolution, $solutions, $state, true);
+        }else if ($type==assCodeQuestionBlockTypes::Blockly) {
+            return $this->renderBlockly($withSolution, $solutions, $state, true);
         }
     }
 
@@ -45,7 +47,7 @@ class codeBlockUI {
             return $this->renderText($state);
 
         if ($type==assCodeQuestionBlockTypes::Blockly) 
-            return $this->renderBlockly($state);
+            return $this->renderBlockly($withSolution, $solutions, $state, false);
 
         return '';
     }
@@ -98,20 +100,17 @@ class codeBlockUI {
         return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
     }
 
-    private function renderBlockly($state=NULL){
+    private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
         
         $bl = $this->model->getBlockly();
-        // $tb = 'nix';
-        // echo "<br>\nBlock:";
-        // print_r($bl);
-        // echo "<br>\nToolbox:";
-        // print_r($bl['toolbox']);
-        // if ($bl['toolbox']) $tb = json_encode($bl['toolbox']);
-
-        // echo "<br>\nJSON:";
-        // print_r($tb);die;
-        $str = "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">";
-        $str .= "<Code>".CodeBlock::fixExportedCode($this->getContent($state))."</Code>";
+        $str = "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '').' '.
+                ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
+                 'width="'.$this->model->getWidth().'" '.
+                 'height="'.$this->model->getHeight().'" '.
+                 'align="'.$this->model->getAlign().'">';
+        $str .= "<Code>".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Code>";
+        
+        
         $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";
         $str .= "<CustomBlocks>".json_encode($this->model->getCustomBlocks())."</CustomBlocks>";
         $str .= "<ToolboxOverride" . ($bl['useOverride']?' use':'').">".$this->model->getToolboxOverride()."</ToolboxOverride>";
