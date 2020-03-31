@@ -170,12 +170,7 @@ class codeBlocks implements ArrayAccess {
 		return $v;
 	}
 
-
-
-
-
-	public function setFromPOST($P){
-		
+	public function setFromPOST($P){		
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		

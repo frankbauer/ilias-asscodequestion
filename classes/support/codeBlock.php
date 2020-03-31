@@ -69,11 +69,13 @@ class codeBlock {
 			unset($this->block['altContent']);
 			unset($this->block['hasAltContent']);
 		}
-		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas && $this->getType()!=assCodeQuestionBlockTypes::Blockly){
 			unset($this->block['width']);
 			unset($this->block['height']);
+			unset($this->block['align']);			
 			unset($this->block['version']);
-			unset($this->block['align']);
+		}
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
 			unset($this->block['codeExpanded']);
 		}
 	}
@@ -93,6 +95,14 @@ class codeBlock {
 			$t = assCodeQuestionBlockTypes::Text;
 		} else if ($options->type == 'BLOCKLY'){
 			$t = assCodeQuestionBlockTypes::Blockly;
+			if (is_object($options->blockly)) {
+				//convert from std class (object) to array				
+				$ar = [];
+				foreach ($options->blockly as $i=>$val){
+					$ar[$i] = $val;					
+				}
+				$options->blockly = $ar;
+			}
 		}
 		
 		
@@ -109,7 +119,7 @@ class codeBlock {
 			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
 			'altContent' => $altContent,
-			'toolbox' => $options->toolbox
+			'blockly' => $options->blockly
 		);				
 		
 		$o = new codeBlock($nr, $data, $object);
@@ -173,11 +183,26 @@ class codeBlock {
 		$this->block['lines'] = $value;
 	}
 
+	function getBlockly(){
+		if (!isset($this->block['blockly'])) {
+			return ["toolbox" => [], "categories" => [], "blocks" => []];
+		}
+		return $this->block['blockly'];
+	}
 
+	function getToolbox(){
+		$bl = $this->getBlockly();
+		return $bl['toolbox'];
+	}
 
-	function getToolboxString(){
-		if (!isset($this->block['toolbox'])) return '';
-		return $this->block['toolbox'];
+	function getToolboxOverride(){
+		$bl = $this->getBlockly();
+		return $bl['toolboxOverride'];		
+	}
+
+	function getCustomBlocks(){
+		$bl = $this->getBlockly();
+		return $bl['blocks'];		
 	}
 
 	function getExpanded() {

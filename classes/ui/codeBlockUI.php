@@ -99,7 +99,25 @@ class codeBlockUI {
     }
 
     private function renderBlockly($state=NULL){
-        return "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '')."><code>".CodeBlock::fixExportedCode($this->getContent($state))."</code><toolbox>".$this->model->getToolboxString()."</toolbox></blockly>";
+        
+        $bl = $this->model->getBlockly();
+        // $tb = 'nix';
+        // echo "<br>\nBlock:";
+        // print_r($bl);
+        // echo "<br>\nToolbox:";
+        // print_r($bl['toolbox']);
+        // if ($bl['toolbox']) $tb = json_encode($bl['toolbox']);
+
+        // echo "<br>\nJSON:";
+        // print_r($tb);die;
+        $str = "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">";
+        $str .= "<Code>".CodeBlock::fixExportedCode($this->getContent($state))."</Code>";
+        $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";
+        $str .= "<CustomBlocks>".json_encode($this->model->getCustomBlocks())."</CustomBlocks>";
+        $str .= "<ToolboxOverride" . ($bl['useOverride']?' use':'').">".$this->model->getToolboxOverride()."</ToolboxOverride>";
+        $str .= "</blockly>";
+
+        return $str;
     }
 }
 
