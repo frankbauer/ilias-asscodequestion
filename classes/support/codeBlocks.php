@@ -138,7 +138,7 @@ class codeBlocks implements ArrayAccess {
 		return $this->blocks;
 	}
 
-	function getJSONEncodedAdditionalData(){
+	function tidyAdditionalData(){
 		$this->additional_data['storageUUID'] = $this->guidv4();
 		$bls = array();
 		foreach($this->blocks as $cbl){
@@ -146,7 +146,11 @@ class codeBlocks implements ArrayAccess {
 			$bls[] = $cbl->getRawData();
 		}
 		$this->additional_data['blocks'] = $bls;
-		return json_encode($this->additional_data);
+		return $this->additional_data;
+	}
+
+	function getJSONEncodedAdditionalData(){
+		return json_encode($this->tidyAdditionalData());
 	}
 
 	public function getDataVersion(){		

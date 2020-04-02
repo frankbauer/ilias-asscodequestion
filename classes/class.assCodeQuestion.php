@@ -181,9 +181,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			. " WHERE d.question_fi ="
 			. $ilDB->quote($question_id, 'integer'));
 
-		$data = $ilDB->fetchAssoc($result);		
-		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
-
+		$data = $ilDB->fetchAssoc($result);	
+		$this->loadDataToBlocks($data, $question_id);
+		
 		try
 		{
 			$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
@@ -194,6 +194,19 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// loads additional stuff like suggested solutions
 		parent::loadFromDb($question_id);
+	}
+
+	function loadDataToBlocks($data, $question_id){
+		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
+	}
+
+	function createBlocksFromPost($P, $question_id){
+		
+		$this->blocks = new codeBlocks($this->getPlugin(), null, $question_id);
+		// echo $question_id." ".$this->blocks->getID()."<br><br>";
+		// print_r($P);
+		// die;
+		$this->blocks->setFromPOST($P);
 	}
 	
 
