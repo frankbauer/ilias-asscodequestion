@@ -174,7 +174,11 @@ class codeBlock {
 
 		$res = $this->block['lines'];
 		if ($res == 'auto') return 'auto';
+		try{
 		$res += 0;
+		} catch(Error $e){
+			$res = 0;
+		}
 		if ($res==0) $res = 10;
 		return $res;		
 	}
