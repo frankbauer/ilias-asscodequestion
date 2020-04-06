@@ -252,10 +252,20 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 2.0.1
+* Continous Compilation for some langauges (Javascript, Python)
+* Added brain.js. dom-side (all languages) and worker-side (JavaScript)
+* Pass Runtime Arguments from Canvas Object to worker-code (JavaScript)
+* Cancel-Button for Run-Actions. (allows users to terminate the code compilation/execution)
+* Initial Support for Blockly 
+* Migrated CodeBlocks.js to TypeScript
+* API Extensions for pcCodeQuestion (https://github.com/frankbauer/ilias-pccodequestion)
+
 ### Version 2.0.0
 * Release Version
 * Support for Template answer
 * Support for randomized Values
+
 ### Version 1.2.0
 * Move most of the CodeBlocks editor/Display logic to client side javascript App (https://github.com/frankbauer/codeblocks-js/). Should make adaption to learning-modules easier.
 * Refactor Code Structure to a MVC-like style
@@ -267,15 +277,6 @@ Alternativley you may use the built-in setup function to prepare a default Three
 * Add UI to define random values
 * Add support to replace random tags
 
-### Version 2.0.1
-* Continous Compilation for some langauges (Javascript, Python)
-* Added brain.js. dom-side (all languages) and worker-side (JavaScript)
-* Pass Runtime Arguments from Canvas Object to worker-code (JavaScript)
-* Cancel-Button for Run-Actions. (allows users to terminate the code compilation/execution)
-
-### Version 2.0.0
-* Initial Support for Blockly 
-* API Extensions for pcCodeQuestion (https://github.com/frankbauer/ilias-pccodequestion)
   
 ### Version 1.1.10
 * Support for Ilias 5.4
