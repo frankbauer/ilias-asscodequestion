@@ -17,7 +17,7 @@ class codeBlocks implements ArrayAccess {
 		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
 		$this->getPlugin()->includeClass("./support/codeBlock.php");
-		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.0.php");		
+		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.1.php");		
 
 		if ($json_data == null){
 			$this->additional_data = array();
@@ -121,7 +121,11 @@ class codeBlocks implements ArrayAccess {
 		}
 
 		//force reload of blocks data structure
-        $this->loadBlocks(true);
+		$this->loadBlocks(true);
+		
+		// print_r($this->additional_data);
+		// print_r($data);
+		// die;
     }
     
     /**
@@ -174,7 +178,7 @@ class codeBlocks implements ArrayAccess {
 		return $v;
 	}
 
-	public function setFromPOST($P){		
+	public function setFromPOST($P){	
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		
@@ -209,6 +213,7 @@ class codeBlocks implements ArrayAccess {
 		$this->setTheme( $settings->solutionTheme );
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
+		$this->setContinousCompilation( $settings->continousCompilation);
 
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
@@ -324,6 +329,13 @@ class codeBlocks implements ArrayAccess {
 
 	function setRandomizerSets($newValue){
 		$this->additional_data['rndSets'] = $newValue;
+	}
+
+	function getContinousCompilation(){
+		return isset($this->additional_data['continousCompilation']) ? $this->additional_data['continousCompilation'] :false; 
+	}
+	function setContinousCompilation($newValue){
+		return $this->additional_data['continousCompilation'] = $newValue; 
 	}
 
 

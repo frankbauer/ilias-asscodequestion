@@ -1,4 +1,13 @@
-const __whitelist = new Set(['close', 'postMessage', 'console', 'performance', 'setTimeout'])
+const __whitelist = new Set([
+    'args',
+    'close',
+    'postMessage',
+    'console',
+    'performance',
+    'setTimeout'
+])
+var window = {}
+var args = {}
 
 onmessage = function(input) {
     switch (input.data[0]) {
@@ -9,7 +18,27 @@ onmessage = function(input) {
             __whitelist.add('d3')
             __whitelist.add('document')
             break
+        case 'importBrain':
+            console.log('[Importing Brain.JS]')
+            importScripts('../../brain.js/2.0.0-alpha/brain-browser.min.js')
+
+            var brain = window.brain
+            this.brain = window.brain
+            __whitelist.add('brain')
+            __whitelist.add('window')
+            break
         case 'start':
+            const o =
+                input && input.data && input.data.length > 0
+                    ? input.data[1]
+                    : { code: '', args: {} }
+
+            const script = o.code
+            args = o.args
+            window.args = args
+            this.args = args
+
+            console.error(args)
             //erase all worker functionality from the global scope (except whitelist)
             for (let t in this) {
                 if (!__whitelist.has(t)) {
@@ -33,9 +62,8 @@ onmessage = function(input) {
             }
             console.warn = console.log
 
-            let script = input.data[1]
-            let func = new Function('"use strict"; ' + script)
-            postMessage(['finished', func()])
+            let func = new Function('args', '"use strict";' + script)
+            postMessage(['finished', func(args)])
             close()
             break
     }
