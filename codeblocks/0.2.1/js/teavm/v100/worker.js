@@ -1,2 +1,2 @@
-self.importScripts("worker/classes.js");
-main();
+self.importScripts('worker/classes.js')
+main()

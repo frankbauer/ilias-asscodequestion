@@ -1,49 +1,53 @@
-self.importScripts("worker/runtime.js");
+self.importScripts('worker/runtime.js')
 
-function listener(event) {    
-    let request = event.data;
+function listener(event) {
+    let request = event.data
     //console.log(request);
-    if (request.command == 'run') {                    
-        var $stderrBuffer = "";
-        var $stdoutBuffer = "";
-        
-        $rt_putStdoutCustom = function(ch) {        
-            if (ch === 0xA) {
-                self.postMessage({ command: "stdout", line: $stdoutBuffer, id:request.id });
-                $stdoutBuffer = "";
+    if (request.command == 'run') {
+        var $stderrBuffer = ''
+        var $stdoutBuffer = ''
+
+        $rt_putStdoutCustom = function(ch) {
+            if (ch === 0xa) {
+                self.postMessage({ command: 'stdout', line: $stdoutBuffer, id: request.id })
+                $stdoutBuffer = ''
             } else {
-                $stdoutBuffer += String.fromCharCode(ch);
+                $stdoutBuffer += String.fromCharCode(ch)
             }
         }
-        
+
         $rt_putStderrCustom = function(ch) {
-            if (ch === 0xA) {
-                self.postMessage({ command: "stderr", line: $stderrBuffer, id:request.id});
-                $stderrBuffer = "";
+            if (ch === 0xa) {
+                self.postMessage({ command: 'stderr', line: $stderrBuffer, id: request.id })
+                $stderrBuffer = ''
             } else {
-                $stderrBuffer += String.fromCharCode(ch);
+                $stderrBuffer += String.fromCharCode(ch)
             }
         }
 
-        let blob = new Blob([request.code], {type: 'application/javascript'});       let URLObject =  URL.createObjectURL(blob);    
-        self.importScripts(URLObject);
-        self.postMessage({ command: "run-finished-setup", id:request.id });  
-        
-        main();
-        
-        if ($stderrBuffer != '') self.postMessage({ command: "stderr", line: $stderrBuffer, id:request.id });
-        if ($stdoutBuffer != '') self.postMessage({ command: "stdout", line: $stdoutBuffer, id:request.id }); 
-        
-        self.postMessage({ command: "run-completed", id:request.id }); 
+        let blob = new Blob([request.code], { type: 'application/javascript' })
+        let URLObject = URL.createObjectURL(blob)
+        self.importScripts(URLObject)
+        self.postMessage({ command: 'run-finished-setup', id: request.id })
 
-        URLObject = undefined;
-        blob = undefined;
-        $stderrBuffer = undefined;
-        $stdoutBuffer = undefined;
-        self.removeEventListener("message", listener);     
+        main(request.args)
+
+        if ($stderrBuffer != '') {
+            self.postMessage({ command: 'stderr', line: $stderrBuffer, id: request.id })
+        }
+        if ($stdoutBuffer != '') {
+            self.postMessage({ command: 'stdout', line: $stdoutBuffer, id: request.id })
+        }
+
+        self.postMessage({ command: 'run-completed', id: request.id })
+
+        URLObject = undefined
+        blob = undefined
+        $stderrBuffer = undefined
+        $stdoutBuffer = undefined
+        self.removeEventListener('message', listener)
     }
-    request = undefined;
+    request = undefined
 }
 
-self.addEventListener("message", listener);
-
+self.addEventListener('message', listener)
