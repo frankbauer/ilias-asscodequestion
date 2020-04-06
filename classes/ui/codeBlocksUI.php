@@ -48,7 +48,7 @@ class codeBlocksUI {
                  "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
                  ($readOnly?'data-readonly ':'').
                  'data-output-parser="'.$this->model->getOutputParser().'" '.
-                 ($editMode?'data-randomizer-active="'.$this->model->getRandomizerActive().'" ':'').
+                 ($editMode?'data-randomizer-active="'.($this->model->getRandomizerActive()?'true':'false').'" ':'').
                  ($editMode?'data-randomizer-preview-index="'.$this->model->getRandomizerPreviewIndex().'" ':'').
                  ($editMode?"data-randomizer-known-tags='".json_encode($this->model->getRandomizerTags())."' ":'').
                  ($editMode?"data-randomizer-sets='".json_encode($this->model->getRandomizerSets())."' ":'').
