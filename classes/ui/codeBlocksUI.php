@@ -69,18 +69,36 @@ class codeBlocksUI {
     public function prepareTemplate($tpl, $basePath){
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
-			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
-			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
-			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
-			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
-			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
-            $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
-            $tpl->addCss($basePath.'/css/custom.css');
+			// $tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
+			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
+			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
+			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
+			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
+            // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
+            // $tpl->addCss($basePath.'/css/custom.css');
 
-            $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
+            // $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
 
-			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
-			$tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
+			// $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
+            // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
+            
+            $loader = 'if (window.mountCodeBlocks) {' . "\n";
+            $loader .= '    mountCodeBlocks()' . "\n";
+            $loader .= '} else {' . "\n";
+            $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
+            $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/loader.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/roboto.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css\">')\n";            
+
+            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";
+            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')\n";
+            $loader .= '}' . "\n";
+
+            $tpl->addOnLoadCode($loader);
         }	
         
         if (!$tpl->hasLegacyHelpers) {

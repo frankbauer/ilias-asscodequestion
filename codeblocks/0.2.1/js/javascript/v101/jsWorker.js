@@ -38,7 +38,6 @@ onmessage = function(input) {
             window.args = args
             this.args = args
 
-            console.error(args)
             //erase all worker functionality from the global scope (except whitelist)
             for (let t in this) {
                 if (!__whitelist.has(t)) {
