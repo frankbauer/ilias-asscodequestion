@@ -266,7 +266,16 @@ Alternativley you may use the built-in setup function to prepare a default Three
 * Add Support for Prefabs
 * Add UI to define random values
 * Add support to replace random tags
-  
+
+### Version 2.0.1
+* Continous Compilation for some langauges (Javascript, Python)
+* Added brain.js. dom-side (all languages) and worker-side (JavaScript)
+* Pass Runtime Arguments from Canvas Object to worker-code (JavaScript)
+* Cancel-Button for Run-Actions. (allows users to terminate the code compilation/execution)
+
+### Version 2.0.0
+* Initial Support for Blockly 
+* API Extensions for pcCodeQuestion (https://github.com/frankbauer/ilias-pccodequestion)
   
 ### Version 1.1.10
 * Support for Ilias 5.4
