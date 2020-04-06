@@ -213,7 +213,7 @@ class codeBlocks implements ArrayAccess {
 		$this->setTheme( $settings->solutionTheme );
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
-		$this->setContinousCompilation( $settings->continousCompilation);
+		$this->setContinuousCompilation( $settings->continuousCompilation);
 
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
@@ -331,11 +331,11 @@ class codeBlocks implements ArrayAccess {
 		$this->additional_data['rndSets'] = $newValue;
 	}
 
-	function getContinousCompilation(){
-		return isset($this->additional_data['continousCompilation']) ? $this->additional_data['continousCompilation'] :false; 
+	function getContinuousCompilation(){
+		return isset($this->additional_data['continuousCompilation']) ? $this->additional_data['continuousCompilation'] :false; 
 	}
-	function setContinousCompilation($newValue){
-		return $this->additional_data['continousCompilation'] = $newValue; 
+	function setContinuousCompilation($newValue){
+		return $this->additional_data['continuousCompilation'] = $newValue; 
 	}
 
 
