@@ -108,7 +108,7 @@ class codeBlockUI {
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'">';
-        $str .= "<Code>".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Code>";
+        $str .= "<Script>".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Script>";
         
         
         $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";

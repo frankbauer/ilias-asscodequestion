@@ -66,13 +66,46 @@ class codeBlocksUI {
         return $html;
     }
 
+    public function mountyJSCode($basePath, $mountOnly=false){
+        $loader = 'if (window.mountCodeBlocks) {' . "\n";
+        //$loader .= '    console.log("MOUNTING")' . "\n";
+        $loader .= '    mountCodeBlocks()' . "\n";
+        if ($mountOnly){
+            $loader .= '}'."\n";
+        } else {
+            $loader .= '} else if (!window.codeBlocksJS) {' . "\n";
+            //$loader .= '    console.log("IMPORTING")' . "\n";
+            $loader .= "    window.codeBlocksJS = true\n";
+            $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
+            $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/loader.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/roboto.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css\">')\n";                   
+
+            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";
+            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')\n";
+            $loader .= '}' . "\n";
+
+            if ($this->model->getMinCanvasVersion()<=100){
+                $loader = 'if (window.processMixedOutput === undefined) {' . "\n";
+                $loader .= "    import('" . $basePath . "/js/legacyHelper.js')\n";
+                $loader .= '}' . "\n";
+            }
+        }
+
+        return $loader;
+    }
+
     public function prepareTemplate($tpl, $basePath){
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
-			// $tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
+			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
 			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
 			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
-			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
+			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
 			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
             // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
             // $tpl->addCss($basePath.'/css/custom.css');
@@ -82,31 +115,15 @@ class codeBlocksUI {
 			// $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
             // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
             
-            $loader = 'if (window.mountCodeBlocks) {' . "\n";
-            $loader .= '    mountCodeBlocks()' . "\n";
-            $loader .= '} else {' . "\n";
-            $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
-            $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/loader.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/roboto.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css\">')\n";            
-
-            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";
-            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')\n";
-            $loader .= '}' . "\n";
-
-            $tpl->addOnLoadCode($loader);
+            $tpl->addOnLoadCode($this->mountyJSCode($basePath));
         }	
         
-        if (!$tpl->hasLegacyHelpers) {
-            if ($this->model->getMinCanvasVersion()<=100) {
-                $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
-                $tpl->hasLegacyHelpers = true;
-            }
-        }
+        // if (!$tpl->hasLegacyHelpers) {
+        //     if ($this->model->getMinCanvasVersion()<=100) {
+        //         $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
+        //         $tpl->hasLegacyHelpers = true;
+        //     }
+        // }
     }
 }
 
