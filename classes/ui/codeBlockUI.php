@@ -108,12 +108,12 @@ class codeBlockUI {
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'">';
-        $str .= "<Script id=\"content\">".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Script>";
+        $str .= "<Script id=\"content\" type=\"text/xmldata\">".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Script>";
         
         
-        $str .= "<Script id=\"toolbox\">".json_encode($this->model->getToolbox())."</Script>";
+        $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";
         $str .= "<Script id=\"customblocks\">".json_encode($this->model->getCustomBlocks())."</Script>";
-        $str .= "<Script id=\"toolboxoverride\"" . ($bl['useOverride']?' use':'').">".$this->model->getToolboxOverride()."</Script>";
+        $str .= "<Script id=\"toolboxoverride\"" . ($bl['useOverride']?' use':'')." type=\"text/xmldata\">".$this->model->getToolboxOverride()."</Script>";
         $str .= "</blockly>";
 
         return $str;
