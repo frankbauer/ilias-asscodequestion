@@ -103,8 +103,9 @@ class codeBlockUI {
     private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
         
         $bl = $this->model->getBlockly();
-        $str = "<blockly".(!$this->model->getExpanded() ? ' data-expanded=0' : '').' '.
+        $str = "<blockly ".
                 ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
+                (($this->model->getBlocklyShowControls()) ? 'data-show-controls=1 ' : '').
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'">';

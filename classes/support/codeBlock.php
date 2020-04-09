@@ -209,6 +209,12 @@ class codeBlock {
 		return $bl['blocks'];		
 	}
 
+	function getBlocklyShowControls() {
+		$bl = $this->getBlockly();
+		if (!isset($bl['showControls'])) return false;
+		return $bl['showControls'];		
+	}
+
 	function getExpanded() {
 		if (!isset($this->block['expanded'])) return true;
 		return $this->block['expanded'];		
