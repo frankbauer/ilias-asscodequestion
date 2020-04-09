@@ -111,9 +111,9 @@ class codeBlockUI {
         $str .= "<Script id=\"content\">".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Script>";
         
         
-        $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";
+        $str .= "<Script id=\"toolbox\">".json_encode($this->model->getToolbox())."</Script>";
         $str .= "<Script id=\"customblocks\">".json_encode($this->model->getCustomBlocks())."</Script>";
-        $str .= "<ToolboxOverride" . ($bl['useOverride']?' use':'').">".$this->model->getToolboxOverride()."</ToolboxOverride>";
+        $str .= "<Script id=\"toolboxoverride\"" . ($bl['useOverride']?' use':'').">".$this->model->getToolboxOverride()."</Script>";
         $str .= "</blockly>";
 
         return $str;
