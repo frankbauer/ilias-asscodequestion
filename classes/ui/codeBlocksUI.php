@@ -91,7 +91,7 @@ class codeBlocksUI {
 
             if ($this->model->getMinCanvasVersion()<=100){
                 $loader .= 'if (window.processMixedOutput === undefined) {' . "\n";
-                $loader .= "    import('" . $basePath . "/js/legacyHelper.js')\n";
+                $loader .= "    import('" . $basePath . "/js/legacyHelper.js#20200409')\n";
                 $loader .= '}' . "\n";
             }
         }

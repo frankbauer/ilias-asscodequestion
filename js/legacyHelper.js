@@ -31,5 +31,5 @@ if (window.processMixedOutput===undefined){
         };
     }
 
-    //window.processMixedOutput = processMixedOutput
+    window.processMixedOutput = processMixedOutput
 }
