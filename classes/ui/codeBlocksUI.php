@@ -115,7 +115,7 @@ class codeBlocksUI {
 			// $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
             // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
             
-            $tpl->addOnLoadCode($this->mountyJSCode($basePath));
+            $tpl->addOnLoadCode($this->mountyJSCode($basePath, false));
         }	
         
         // if (!$tpl->hasLegacyHelpers) {
