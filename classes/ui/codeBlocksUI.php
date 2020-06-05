@@ -45,6 +45,7 @@ class codeBlocksUI {
                  'data-solution-theme="'.$this->model->getTheme().'" '.
                  'data-code-theme="'.$this->model->getROTheme().'" '.
                  'data-continuous-compilation="'.($this->model->getContinuousCompilation()?'true':'false').'" '.
+                 'data-persistent-arguments="'.($this->model->getPersistentArguments()?'true':'false').'" '.
                  "data-dom-libs='".json_encode($this->model->getDomLibs())."' ".
                  "data-worker-libs='".json_encode($this->model->getWorkerLibs())."' ".
                  ($readOnly?'data-readonly ':'').

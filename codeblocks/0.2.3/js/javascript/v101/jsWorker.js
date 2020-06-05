@@ -62,7 +62,7 @@ onmessage = function(input) {
             console.warn = console.log
 
             let func = new Function('args', '"use strict";' + script)
-            postMessage(['finished', func(args)])
+            postMessage(['finished', func(args), args])
             close()
             break
     }

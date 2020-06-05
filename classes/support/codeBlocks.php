@@ -214,6 +214,7 @@ class codeBlocks implements ArrayAccess {
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
 		$this->setContinuousCompilation( $settings->continuousCompilation);
+		$this->setPersistentArguments( $settings->persistentArguments);
 
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
@@ -336,6 +337,13 @@ class codeBlocks implements ArrayAccess {
 	}
 	function setContinuousCompilation($newValue){
 		return $this->additional_data['continuousCompilation'] = $newValue; 
+	}
+
+	function getPersistentArguments(){
+		return isset($this->additional_data['persistentArguments']) ? $this->additional_data['persistentArguments'] :false; 
+	}
+	function setPersistentArguments($newValue){
+		return $this->additional_data['persistentArguments'] = $newValue; 
 	}
 
 
