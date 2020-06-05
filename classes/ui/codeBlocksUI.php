@@ -33,6 +33,7 @@ class codeBlocksUI {
     
     public function render($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL, $state=NULL){
         $html  = '';
+        $html  = '<noscript><div class="ilc_Paragraph ilc_text_block_Attention">You need to enable JavaScript in your Browser to see and use this content!</div></noscript>';
         $html .= '<div '.($editMode?'codeblockseditor ':'codeblocks ');
         $html .= 'data-question="'.$this->model->getId().'" '.
                  'data-compiler="'.$this->model->getCompilerLanguage().'" '.
@@ -115,6 +116,8 @@ class codeBlocksUI {
 			// $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
             // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
             
+            //
+            //$tpl->setVariable("MOUNTY", $this->mountyJSCode($basePath, false));
             $tpl->addOnLoadCode($this->mountyJSCode($basePath, false));
         }	
         
