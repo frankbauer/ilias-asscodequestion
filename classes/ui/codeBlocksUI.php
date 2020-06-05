@@ -86,8 +86,15 @@ class codeBlocksUI {
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css\">')\n";                   
 
-            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";
-            $loader .= "    import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')\n";
+            $loader .= "    try {\n";
+            $loader .= "        import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";
+            $loader .= "        import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')\n";
+            $loader .= "    } catch (error) {\n";
+            $loader .= "        console.error(error)\n";
+            $loader .= "        const s = document.createElement('STYLE');\n";
+            $loader .= "        s.innerHTML = 'codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {content:\"\"}'\n"; 
+            $loader .= "        Array.prototype.forEach.call(document.getElementsByTagName('loading'),e => {const p = e.parentElement; p.appendChild(s); const c=document.createElement('DIV'); c.className='ilc_Paragraph ilc_text_block_Attention'; c.innerHTML='<b>An Error Occured while loading the Page</b><p>Your Browser does not support this Element. If possible update your browser (the latest Versions of FireFox, Edge, Safari or Chrome should work fine).</p>'; c.style='display:block;height:100%;margin:0'; p.replaceChild(c, e)});\n";           
+            $loader .= "    } \n";
             $loader .= '}' . "\n";
 
             if ($this->model->getMinCanvasVersion()<=100){
