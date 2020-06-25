@@ -200,7 +200,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
 	{		
-		//print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] "); 
+		//$dddddd = print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] ", true); 
 		$qidf = $negativeQuestionID?-1:1;
 		$this->prepareTemplate(false, $negativeQuestionID);
 		$language = $this->getLanguage();				
@@ -233,13 +233,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutions = $value1;
 		$state = $value2;					
 
-		if ($print){
-			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state);
+		if ($print){			
+			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state);			
 		} else {
 			$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
 		}
 
-		$template->setVariable("BLOCK_HTML", $html);		
+		$template->setVariable("BLOCK_HTML", $html);			
 		$template->setVariable("LANGUAGE", $language);
 		
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
@@ -310,7 +310,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *   - (When best solution is requested in preview)
 	 * @param integer $active_id             The active user id
 	 * @param integer $pass                  The test pass
-	 * @param boolean $graphicalOutput       Show visual feedback for right/wrong answers
+	 * @param boolean $show_solutions        Show visual feedback for right/wrong answers (checkmarks in multiple choice for example)
 	 * @param boolean $result_output         Show the reached points for parts of the question
 	 * @param boolean $show_question_only    Show the question without the ILIAS content around
 	 * @param boolean $show_feedback         Show the question feedback
@@ -321,7 +321,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	function getSolutionOutput(
 		$active_id,
 		$pass = NULL,
-		$graphicalOutput = FALSE,
+		$show_solutions = FALSE,
 		$result_output = FALSE,
 		$show_question_only = TRUE,
 		$show_feedback = FALSE,
@@ -330,10 +330,13 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		//print_r("getSolutionOutput active_id=$active_id pass=$pass graphicalOutput=$graphicalOutput result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text"); 
+		print_r("getSolutionOutput active_id=$active_id pass=$pass show_solutions=$show_solutions result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text", false); 
 
-		$print = $this->isRenderPurposePrintPdf();		
+		$print = $this->isRenderPurposePrintPdf();			
+		//($active_id > 0) will default back to the best solution if no answer is present, this might cause problems when priting the solutions...
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
+		//$showStudentResults = (!$show_correct_solution);
+		
 		//echo "showStudentResults=".$showStudentResults."<br>";
 		
 		// get the solution template
@@ -363,22 +366,29 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		if ($showStudentResults)
 		{			
 			// get the answers of the user for the active pass or from the last pass if allowed
-			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);			
+			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);	
+			
+			echo " STUDENT<br>\n";
 		}
 		else
-		{		
+		{	
+			//build best solution, but start with the student results	
 			$stored = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);
+			
+			//generate the best solution for the picked random id
 			$rid = -1;
 			if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
 			$solutions = $this->object->blocks()->getBestRandomSolution($rid);	
-			
+									
+			//override the loaded best solution (with placeholders) with the one that fits the rid
 			$stored['value2']->blocks = $solutions;
 
-			// show the correct solution
+			// show the best solution
 			$solutions = array(
 				"value1" => $solutions,
 				"value2" => $stored['value2']
-			);			
+			);		
+			echo " SOLUTION<br>\n";	
 		}
 
 		$value1 = $solutions['value1'];
@@ -387,7 +397,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			
 		if ($showStudentResults)
 		{
-			if ($graphicalOutput)
+			if ($show_solutions)
 			{
 				// copied from assNumericGUI, yet not really understood
 				if($this->object->getStep() === NULL) 
