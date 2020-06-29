@@ -137,9 +137,9 @@ class codeBlock {
 	}
 	
 	public function printableString($value){
-		$value = str_replace("\t", "  ",$value);
-		$value = str_replace(" ", "&nbsp;",$value);
-		$value = str_replace("\n", "<br />", $value);
+		// $value = str_replace("\t", "  ",$value);
+		// $value = str_replace(" ", "&nbsp;",$value);
+		// $value = str_replace("\n", "<br />", $value);
 
 		return $value;
 	}
