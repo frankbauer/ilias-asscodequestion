@@ -330,12 +330,14 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_question_text = TRUE
 	)
 	{
-		print_r("getSolutionOutput active_id=$active_id pass=$pass show_solutions=$show_solutions result_output=$result_output show_question_only=$show_question_only show_feedback=$show_feedback show_correct_solution=$show_correct_solution show_manual_scoring=$show_manual_scoring show_question_text=$show_question_text", false); 
+		
 
 		$print = $this->isRenderPurposePrintPdf();			
 		//($active_id > 0) will default back to the best solution if no answer is present, this might cause problems when priting the solutions...
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);
+
+		return print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults</pre>", true); 
 		
 		//echo "showStudentResults=".$showStudentResults."<br>";
 		
