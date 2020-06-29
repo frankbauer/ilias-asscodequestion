@@ -337,7 +337,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);
 
-		return print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults</pre>", true); 
+		$debugInfo = print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults</pre>", true); 
 		
 		//echo "showStudentResults=".$showStudentResults."<br>";
 		
@@ -370,7 +370,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			// get the answers of the user for the active pass or from the last pass if allowed
 			$solutions = $this->object->getSolutionValuesOrInit($active_id, $pass, true, false);	
 			
-			echo " STUDENT<br>\n";
+			$debugInfo .= "<pre>STUDENT</pre>";	
 		}
 		else
 		{	
@@ -390,7 +390,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				"value1" => $solutions,
 				"value2" => $stored['value2']
 			);		
-			echo " SOLUTION<br>\n";	
+			$debugInfo .= "<pre>SOLUTION</pre>";	
 		}
 
 		$value1 = $solutions['value1'];
@@ -424,6 +424,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
 		
+		return $debugInfo . '<hr>' . $solutionoutput;
 		return $solutionoutput;
 	}
 
