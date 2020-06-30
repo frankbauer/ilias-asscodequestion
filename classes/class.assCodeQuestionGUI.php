@@ -198,7 +198,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false)
+	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false, $student_solution=true)
 	{		
 		//$dddddd = print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] ", true); 
 		$qidf = $negativeQuestionID?-1:1;
@@ -243,7 +243,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$template->setVariable("LANGUAGE", $language);
 		
 		$template->setVariable("QUESTION_ID", $this->object->getId()*$qidf);
-		$template->setVariable("LABEL_VALUE1", $this->plugin->txt('label_value1'));
+		$template->setVariable("LABEL_VALUE1", $this->plugin->txt($student_solution?'label_value1':'label_value_best'));
 
 		if ($negativeQuestionID) {
 			$this->object->blocks()->ui()->setUUID($oldUUID);
@@ -337,7 +337,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);
 
-		// $debugInfo = print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults\n print=$print</pre>", true); 
+		//$debugInfo = print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults\n print=$print</pre>", true); 
 		
 		//echo "showStudentResults=".$showStudentResults."<br>";
 		
@@ -409,7 +409,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :NULL, $print);
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :NULL, $print, $showStudentResults);
 		
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
