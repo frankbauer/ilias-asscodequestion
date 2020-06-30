@@ -18,7 +18,7 @@ class codeBlockUI {
         $type = $this->model->getType();
 
         if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
-            return '<pre style="border-style:dashed">'. $this->model->printableString($this->getContent($state)) . '</pre>';
+            return '<pre class="static">'. $this->model->printableString($this->getContent($state)) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
             return $this->renderBlock($withSolution, $solutions, $state, true);
         }else if ($type==assCodeQuestionBlockTypes::Blockly) {
@@ -72,7 +72,7 @@ class codeBlockUI {
     private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
         $html  = '<';
         if ($print){
-            $html .= 'pre style="border-width:3px">';
+            $html .= 'pre class="solution">';
             $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions));
             $html .= '</pre>';            
         } else {

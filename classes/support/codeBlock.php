@@ -140,6 +140,9 @@ class codeBlock {
 		// $value = str_replace("\t", "  ",$value);
 		// $value = str_replace(" ", "&nbsp;",$value);
 		// $value = str_replace("\n", "<br />", $value);
+		$value = str_replace("\r", "", $value);
+		$value = str_replace("\n", "↵\n", $value);
+		$value = str_replace("\t", "↦\t", $value);
 
 		return $value;
 	}

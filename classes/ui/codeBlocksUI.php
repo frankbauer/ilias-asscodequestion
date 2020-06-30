@@ -22,7 +22,7 @@ class codeBlocksUI {
     }
 
     public function print($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL, $state=NULL){
-        $html  = '<div>';
+        $html  = '<div printblocks>';
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
             $html .= $this->model[$i]->ui()->print($withSolution, $solutions, $state);
         }
@@ -85,7 +85,7 @@ class codeBlocksUI {
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\">')\n";
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\">')\n";
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css\">')\n";                   
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css?&v=2\">')\n";                   
 
             $loader .= "    try {\n";
             $loader .= "        import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";

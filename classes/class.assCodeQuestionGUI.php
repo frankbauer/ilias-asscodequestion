@@ -23,12 +23,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	const URL_PATH = "./Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion";
 
 	/**
-	 * @const	string 	URL suffix to prevent caching of css files (increase with every change)
-	 * 					Note: this does not yet work with $tpl->addJavascript()
-	 */
-	const URL_SUFFIX = "?css_version=1.5.6";
-
-	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
 	var $plugin = NULL;
@@ -332,7 +326,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		
 
-		$print = $this->isRenderPurposePrintPdf();			
+		$print = true || $this->isRenderPurposePrintPdf();			
 		//($active_id > 0) will default back to the best solution if no answer is present, this might cause problems when priting the solutions...
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);
