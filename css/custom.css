@@ -3,33 +3,53 @@ div.codeblocks {
 }
 
 div#mainspacekeeper > div.row {
-    display:block;
+    display: block;
     flex-wrap: nowrap;
 }
 
-div.playground table td.block, div.ilc_question_Standard table td.block{
-    display:table-cell !important;
+div.playground table td.block,
+div.ilc_question_Standard table td.block {
+    display: table-cell !important;
 }
 
-div.playground table td.fixed, div.ilc_question_Standard table td.fixed{
-    display:table-cell !important;
-    position:relative;
+div.playground table td.fixed,
+div.ilc_question_Standard table td.fixed {
+    display: table-cell !important;
+    position: relative;
 }
 
 div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
-    width:100%
+    width: 100%;
 }
 
-.cm-s-solarized div.CodeMirror-gutter.CodeMirror-linenumbers{
-    width:29px !important;
-    border-right: 1px solid #d8d2c0
+.cm-s-solarized div.CodeMirror-gutter.CodeMirror-linenumbers {
+    width: 29px !important;
+    border-right: 1px solid #d8d2c0;
 }
-div.codeblocks.editmode{
+div.codeblocks.editmode {
     background-color: transparent;
     background-image: none;
     box-shadow: none;
 }
 
-div.editModeBlockContainer{
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.1)
+div.editModeBlockContainer {
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+div[printblocks] pre {
+    tab-size: 3;
+    line-break: after-white-space;
+    font-size: 90%;
+}
+
+div[printblocks] pre.solution {
+    color: rgb(22, 74, 189);
+    border-width: 3px;
+    border-color: rgb(22, 74, 189);
+    background-color: white;
+}
+
+div[printblocks] pre.static {
+    color: #383838;
+    border-style: dashed;
 }

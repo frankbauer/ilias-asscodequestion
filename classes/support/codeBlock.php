@@ -69,11 +69,13 @@ class codeBlock {
 			unset($this->block['altContent']);
 			unset($this->block['hasAltContent']);
 		}
-		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas && $this->getType()!=assCodeQuestionBlockTypes::Blockly){
 			unset($this->block['width']);
 			unset($this->block['height']);
+			unset($this->block['align']);			
 			unset($this->block['version']);
-			unset($this->block['align']);
+		}
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
 			unset($this->block['codeExpanded']);
 		}
 	}
@@ -91,6 +93,16 @@ class codeBlock {
 			$t = assCodeQuestionBlockTypes::Canvas;
 		} else if ($options->type == 'TEXT'){
 			$t = assCodeQuestionBlockTypes::Text;
+		} else if ($options->type == 'BLOCKLY'){
+			$t = assCodeQuestionBlockTypes::Blockly;
+			if (is_object($options->blockly)) {
+				//convert from std class (object) to array				
+				$ar = [];
+				foreach ($options->blockly as $i=>$val){
+					$ar[$i] = $val;					
+				}
+				$options->blockly = $ar;
+			}
 		}
 		
 		
@@ -106,7 +118,8 @@ class codeBlock {
 			'version' => $options->version,
 			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
-			'altContent' => $altContent
+			'altContent' => $altContent,
+			'blockly' => $options->blockly
 		);				
 		
 		$o = new codeBlock($nr, $data, $object);
@@ -124,9 +137,12 @@ class codeBlock {
 	}
 	
 	public function printableString($value){
-		$value = str_replace("\t", "  ",$value);
-		$value = str_replace(" ", "&nbsp;",$value);
-		$value = str_replace("\n", "<br />", $value);
+		// $value = str_replace("\t", "  ",$value);
+		// $value = str_replace(" ", "&nbsp;",$value);
+		// $value = str_replace("\n", "<br />", $value);
+		$value = str_replace("\r", "", $value);
+		$value = str_replace("\n", "↵\n", $value);
+		$value = str_replace("\t", "↦\t", $value);
 
 		return $value;
 	}
@@ -161,13 +177,45 @@ class codeBlock {
 
 		$res = $this->block['lines'];
 		if ($res == 'auto') return 'auto';
+		try{
 		$res += 0;
+		} catch(Error $e){
+			$res = 0;
+		}
 		if ($res==0) $res = 10;
 		return $res;		
 	}
 
 	function setLines($value) {
 		$this->block['lines'] = $value;
+	}
+
+	function getBlockly(){
+		if (!isset($this->block['blockly'])) {
+			return ["toolbox" => [], "categories" => [], "blocks" => []];
+		}
+		return $this->block['blockly'];
+	}
+
+	function getToolbox(){
+		$bl = $this->getBlockly();
+		return $bl['toolbox'];
+	}
+
+	function getToolboxOverride(){
+		$bl = $this->getBlockly();
+		return $bl['toolboxOverride'];		
+	}
+
+	function getCustomBlocks(){
+		$bl = $this->getBlockly();
+		return $bl['blocks'];		
+	}
+
+	function getBlocklyShowControls() {
+		$bl = $this->getBlockly();
+		if (!isset($bl['showControls'])) return false;
+		return $bl['showControls'];		
 	}
 
 	function getExpanded() {

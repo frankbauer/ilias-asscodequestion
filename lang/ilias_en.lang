@@ -3,6 +3,7 @@
 used_lang#:#en
 assCodeQuestion#:#Sourcecode Question
 label_value1#:#Your Solution:
+label_value_best#:#Best Solution:
 any_text#:##This could be your answer :)
 source_lang#:#Source Language
 code_prefix#:#Leading Sourcecode

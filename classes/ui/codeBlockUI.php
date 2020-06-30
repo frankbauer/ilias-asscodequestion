@@ -15,11 +15,17 @@ class codeBlockUI {
     }
 
     public function print($withSolution=false, $solutions=NULL, $state=NULL){
+        $type = $this->model->getType();
+
         if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
-            return '<pre>' . $this->model->printableString($this->getContent($state)) . '</pre>';
+            return '<pre class="static">'. $this->model->printableString($this->getContent($state)) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
             return $this->renderBlock($withSolution, $solutions, $state, true);
+        }else if ($type==assCodeQuestionBlockTypes::Blockly) {
+            return $this->renderBlockly($withSolution, $solutions, $state, true);
         }
+
+        return '';
     }
 
     public function getContent($state=NULL, $withSolution=false, $solutions=NULL){
@@ -44,6 +50,9 @@ class codeBlockUI {
         if ($type==assCodeQuestionBlockTypes::Text) 
             return $this->renderText($state);
 
+        if ($type==assCodeQuestionBlockTypes::Blockly) 
+            return $this->renderBlockly($withSolution, $solutions, $state, false);
+
         return '';
     }
 
@@ -62,7 +71,11 @@ class codeBlockUI {
 
     private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
         $html  = '<';
-        if (!$print){
+        if ($print){
+            $html .= 'pre class="solution">';
+            $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions));
+            $html .= '</pre>';            
+        } else {
             $html .= 'block ';
             $html .= 'data-visible-lines="'.$this->model->getLines().'" '; 
             if (!$this->model->getExpanded()) $html .= 'data-expanded=0 ';
@@ -72,10 +85,6 @@ class codeBlockUI {
             $html .= '>';
             $html .= $this->getContent($state, $withSolution, $solutions);                    
             $html .= '</block>';
-        } else {
-            $html .= 'pre>';
-            $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions));
-            $html .= '</pre>';
         }
 
         
@@ -93,6 +102,29 @@ class codeBlockUI {
 
     private function renderText($state=NULL){
         return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
+    }
+
+    private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
+        
+        $bl = $this->model->getBlockly();        
+        $str = "<blockly ".
+                ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
+                (($this->model->getBlocklyShowControls()) ? 'data-show-controls=1 ' : '').
+                 'width="'.$this->model->getWidth().'" '.
+                 'height="'.$this->model->getHeight().'" '.
+                 'align="'.$this->model->getAlign().'">';
+        $str .= "<Script id=\"content\" type=\"text/xmldata\">".CodeBlock::fixExportedCode($this->getContent($state, $withSolution, $solutions))."</Script>";
+        
+        
+        $str .= "<Toolbox>".json_encode($this->model->getToolbox())."</Toolbox>";
+        $str .= "<Script id=\"customblocks\">".json_encode($this->model->getCustomBlocks())."</Script>";
+        $str .= "<Script id=\"toolboxoverride\"" . ($bl['useOverride']?' use':'')." type=\"text/xmldata\">".$this->model->getToolboxOverride()."</Script>";
+        $str .= "</blockly>";
+
+        if ($print){
+            $str = '<div codeblocks data-readonly=1>'.$str.'</div>';
+        }
+        return $str;
     }
 }
 

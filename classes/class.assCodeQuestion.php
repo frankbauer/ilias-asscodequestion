@@ -11,6 +11,7 @@ abstract class assCodeQuestionBlockTypes
 	const SolutionCode = 2;
 	const HiddenCode = 3;
 	const Canvas = 4;
+	const Blockly = 5;
 }
 
 /**
@@ -180,9 +181,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			. " WHERE d.question_fi ="
 			. $ilDB->quote($question_id, 'integer'));
 
-		$data = $ilDB->fetchAssoc($result);		
-		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
-
+		$data = $ilDB->fetchAssoc($result);	
+		$this->loadDataToBlocks($data, $question_id);
+		
 		try
 		{
 			$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
@@ -193,6 +194,19 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// loads additional stuff like suggested solutions
 		parent::loadFromDb($question_id);
+	}
+
+	function loadDataToBlocks($data, $question_id){
+		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
+	}
+
+	function createBlocksFromPost($P, $question_id){
+		
+		$this->blocks = new codeBlocks($this->getPlugin(), null, $question_id);
+		// echo $question_id." ".$this->blocks->getID()."<br><br>";
+		// print_r($P);
+		// die;
+		$this->blocks->setFromPOST($P);
 	}
 	
 
@@ -764,20 +778,20 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$stringEscaping = $worksheet->getStringEscaping();
 			$worksheet->setStringEscaping(false);
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, $solutions['value1']);
+			$worksheet->setCell($startrow + $i, 1, (print_r($solutions['value1'], true)));
 			$worksheet->setStringEscaping($stringEscaping);
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value1']));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value1'], true)));
 		}
 		$i++;
 
 		if ($il52){
 			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-			$worksheet->setCell($startrow + $i, 1, $solutions['value2']);	
+			$worksheet->setCell($startrow + $i, 1, print_r($solutions['value2'], true));
 		} else {
 			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($solutions['value2']));
+			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value2'], true)));
 		}
 		
 		if ($il52){

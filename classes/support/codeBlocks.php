@@ -17,11 +17,12 @@ class codeBlocks implements ArrayAccess {
 		$this->id = $id;
 		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
 		$this->getPlugin()->includeClass("./support/codeBlock.php");
-		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.1.3.php");
+		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.3.php");		
 
 		if ($json_data == null){
 			$this->additional_data = array();
 			$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
+			$this->additional_data['vcodeblocks'] = CODEBLOCKS_VERSION;
 			$this->additional_data['blocks'] = array();
 			$this->additional_data['domlibs'] = array();
 			$this->additional_data['workerlibs'] = array();
@@ -76,6 +77,10 @@ class codeBlocks implements ArrayAccess {
 		if (!isset($this->additional_data['version'])){
 			$this->additional_data['version'] = 100;
 		}
+
+		if (!isset($this->additional_data['vcodeblocks'])){
+			$this->additional_data['vcodeblocks'] = "0.1.1";
+		}		
         // initialize new block structure for
         // old version with fixed code blocks
         if (!is_array($this->additional_data['blocks'])){
@@ -116,7 +121,11 @@ class codeBlocks implements ArrayAccess {
 		}
 
 		//force reload of blocks data structure
-        $this->loadBlocks(true);
+		$this->loadBlocks(true);
+		
+		// print_r($this->additional_data);
+		// print_r($data);
+		// die;
     }
     
     /**
@@ -133,7 +142,7 @@ class codeBlocks implements ArrayAccess {
 		return $this->blocks;
 	}
 
-	function getJSONEncodedAdditionalData(){
+	function tidyAdditionalData(){
 		$this->additional_data['storageUUID'] = $this->guidv4();
 		$bls = array();
 		foreach($this->blocks as $cbl){
@@ -141,7 +150,11 @@ class codeBlocks implements ArrayAccess {
 			$bls[] = $cbl->getRawData();
 		}
 		$this->additional_data['blocks'] = $bls;
-		return json_encode($this->additional_data);
+		return $this->additional_data;
+	}
+
+	function getJSONEncodedAdditionalData(){
+		return json_encode($this->tidyAdditionalData());
 	}
 
 	public function getDataVersion(){		
@@ -165,11 +178,7 @@ class codeBlocks implements ArrayAccess {
 		return $v;
 	}
 
-
-
-
-
-	public function setFromPOST($P){
+	public function setFromPOST($P){	
 		$settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		
@@ -183,6 +192,7 @@ class codeBlocks implements ArrayAccess {
 		$this->additional_data = array();
 		
 		$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
+		$this->additional_data['vcodeblocks'] = CODEBLOCKS_VERSION;
 		$this->additional_data['language'] = $settings->language;
 		
 		if (isset($settings->compiler)){
@@ -203,6 +213,8 @@ class codeBlocks implements ArrayAccess {
 		$this->setTheme( $settings->solutionTheme );
 		$this->setROTheme( $settings->codeTheme );
 		$this->setOutputParser( $settings->outputParser );
+		$this->setContinuousCompilation( $settings->continuousCompilation);
+		$this->setPersistentArguments( $settings->persistentArguments);
 
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
@@ -216,8 +228,18 @@ class codeBlocks implements ArrayAccess {
 			if (isset($P['alt_block']) 
 				&& isset($P['alt_block'][$this->getID()]) 
 				&& isset($P['alt_block'][$this->getID()][$i])
-			) 
+			) {
 				$abl = $P['alt_block'][$this->getID()][$i];
+			}
+
+			if (isset($P['toolbox_block']) 
+				&& isset($P['toolbox_block'][$this->getID()]) 
+				&& isset($P['toolbox_block'][$this->getID()][$i])
+			) {				
+				$blockOptions[$i]->toolbox = $P['toolbox_block'][$this->getID()][$i];				
+			}
+
+			
 			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
 		}	
 	}
@@ -308,6 +330,20 @@ class codeBlocks implements ArrayAccess {
 
 	function setRandomizerSets($newValue){
 		$this->additional_data['rndSets'] = $newValue;
+	}
+
+	function getContinuousCompilation(){
+		return isset($this->additional_data['continuousCompilation']) ? $this->additional_data['continuousCompilation'] :false; 
+	}
+	function setContinuousCompilation($newValue){
+		return $this->additional_data['continuousCompilation'] = $newValue; 
+	}
+
+	function getPersistentArguments(){
+		return isset($this->additional_data['persistentArguments']) ? $this->additional_data['persistentArguments'] :false; 
+	}
+	function setPersistentArguments($newValue){
+		return $this->additional_data['persistentArguments'] = $newValue; 
 	}
 
 

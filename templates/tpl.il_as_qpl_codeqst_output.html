@@ -1,3 +1,17 @@
+<script>
+    if (/Edge/i.test(navigator.userAgent)){
+        console.log("FOUND LEGACY EDGE")
+        //edge produces a syntax error we need to process
+        window.onerror = function (e) {
+            if (/Syntax/i.test(e)){
+                console.log('Error: ', e);
+                const s = document.createElement('STYLE');
+                s.innerHTML = 'codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {content:""}'
+                Array.prototype.forEach.call(document.getElementsByTagName('loading'),e => {const p = e.parentElement; p.appendChild(s); const c=document.createElement('DIV'); c.className='ilc_Paragraph ilc_text_block_Attention'; c.innerHTML='<b>An Error Occured while loading the Page</b><p>Your Browser does not support this Element. If possible update your browser. The latest Versions of <a href="https://www.mozilla.org/de/firefox/new">FireFox</a>, <a href="https://www.microsoft.com/de-de/edge">Edge</a>, <a href="https://support.apple.com/downloads/safari">Safari</a> or Chrome should work fine.</p>'; c.style='display:block;height:100%;margin:0'; p.replaceChild(c, e)});
+            }
+        };
+    }
+</script>
 <div id="{UUID}" class="blockParent">
     <div highlight="{LANGUAGE}">{QUESTIONTEXT}</div>
     <div>
@@ -9,3 +23,7 @@
         {BLOCK_HTML}
     </div>
 </div>
+
+<script type="text/javascript">
+    if (window.mountInElement) { mountInElement(document.getElementById('{UUID}')); }
+</script>
