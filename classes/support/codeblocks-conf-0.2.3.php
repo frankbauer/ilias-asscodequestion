@@ -2,5 +2,5 @@
 define("CODEBLOCKS_VERSION",     "0.2.3");
 define("CODEBLOCKS_BASE_URI",     ".//Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion/codeblocks/0.2.3/");
 define("CODEBLOCKS_REL_PATH",     "codeblocks/0.2.3/");
-define("CODEBLOCKS_TAG_REGEX",     "/{:([\w]+)}/");
+define("CODEBLOCKS_TAG_REGEX",    "/({|&#123;):(?<name>[\w]+)}/");
 ?>

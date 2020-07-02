@@ -53,7 +53,7 @@ class codeBlock {
 		return preg_replace_callback(
 			CODEBLOCKS_TAG_REGEX,
 			function ($treffer)  use ($set) {
-				return $set[$treffer[1]];
+				return $set[$treffer['name']];
 			},
 			$this->getAlternativeContent()
 		);
@@ -110,7 +110,7 @@ class codeBlock {
 			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
 			'codeExpanded' => $options->codeExpanded == 1 || $options->codeExpanded == 'true',
 			'type' => $t,
-			'content' => $content,
+			'content' => codeBlock::fixSentCode($content),
 			'lines' => $options->visibleLines,
 			'width' => $options->width,
 			'height' => $options->height,
@@ -148,16 +148,18 @@ class codeBlock {
 	}
 
 	static public function fixExportedCode($str){
-		return str_replace('&gt;', '>', str_replace('&lt;', '<', $str));
+		return str_replace('&gt;', '>', str_replace('&lt;', '<', str_replace('&#123;', '{', $str)));
 	}
 
-    function fixLoadedCode($str){
-		return str_replace('<', '&lt;', $str);
+    function fixLoadedCode($str){		
+		//return str_replace('<', '&lt;',$str);
+		return str_replace('<', '&lt;', str_replace('{', '&#123;', $str));
 		//return str_replace('<br />', '', str_replace('&lt;', '<', is_string($str) ? $str : ''));
 	}
 
-	function fixSentCode($str){
-		return str_replace('<', '&lt;', $str);
+	static function fixSentCode($str){
+		//return str_replace('<', '&lt;', $str);
+		return str_replace('&#123;', '{', $str);
 	}
 
 	public function __get($property) {
@@ -258,7 +260,7 @@ class codeBlock {
 		$nr = $this->getNr();
 		$altContent = NULL;
 		if ($state!=NULL ){
-			if ($state->blocks!=NULL) {
+			if ($state->blocks!=NULL) {				
 				$altContent = $this->fixLoadedCode($state->blocks[$nr]);
 			} else if ($withSolution && !$this->getHasAlternativeContent()){
 				// Hm, where was this important. This will print the best Solution in the 
@@ -281,7 +283,7 @@ class codeBlock {
 			}
 		}
 
-        if ($withSolution) {            
+        if ($withSolution) {     			       			
             if (is_object($solutions)){                
                 return $this->fixLoadedCode($solutions->$nr);
             } else if (is_array($solutions)){
@@ -307,12 +309,12 @@ class codeBlock {
 		return $this->fixLoadedCode($this->block['content']);
 	}
 
-	function getContentForSet($set){
+	function getContentForSet($set){	
 		if ($set==NULL) return $this->getContent();
 		return preg_replace_callback(
 			CODEBLOCKS_TAG_REGEX,
-			function ($treffer)  use ($set) {
-				return $set[$treffer[1]];
+			function ($treffer)  use ($set) {				
+				return $set[$treffer['name']];
 			},
 			$this->getContent()
 		);

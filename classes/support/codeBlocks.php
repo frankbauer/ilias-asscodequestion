@@ -244,12 +244,12 @@ class codeBlocks implements ArrayAccess {
 		}	
 	}
 
-	function processStringWithSet($str, $set){		
+	function processStringWithSet($str, $set){				
 		if ($set==NULL) return $str;
 		return preg_replace_callback(
 			CODEBLOCKS_TAG_REGEX,
 			function ($treffer)  use ($set) {
-				return $set[$treffer[1]];
+				return $set[$treffer['name']];
 			},
 			$str
 		);		
@@ -283,7 +283,7 @@ class codeBlocks implements ArrayAccess {
 		for ($i=0; $i<count($this->blocks); $i++){
 			if ($this[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode){
 				$res[$i] = $this[$i]->getAlternativeContentForSet($set);
-			} else {
+			} else {				
 				$res[$i] = $this[$i]->getContentForSet($set);
 			}
 		}
