@@ -40,3 +40,8 @@ havethreejs_info#:#Three.JS (https://threejs.org) is a WebGL-SceneGraph for Canv
 havedthree#:#Include D3
 havedthree_info#:#D3 (https://d3js.org) is a library for visualizing data using web standards.
 show_lines_label#:#Visible Lines
+config_title#:#Code Question Configuration
+config_print_control_chars#:#Display Control-Characters when printing
+config_save#:#Save
+config_saved#:#Configuration was saved succesfully.
+config_save_failed#:#Unable to store Configuration.

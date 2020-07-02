@@ -46,3 +46,31 @@ if ($res->numRows() == 0)
 
     }
 ?>
+<#3>
+<?php
+	/*
+	 * Add table for additional settings
+	 *
+	 */
+    if(!$ilDB->tableExists('il_qpl_qst_codeqst_cfg'))
+    {
+		$fields = array(
+			'config_fi' => array(
+				'type' => 'integer',
+				'length' => 1
+			),
+
+			'data' => array(
+				'type' => 'clob'
+			)
+		);
+
+		$ilDB->createTable("il_qpl_qst_codeqst_cfg", $fields);
+		$ilDB->addPrimaryKey("il_qpl_qst_codeqst_cfg", array("config_fi"));
+
+		$ilDB->insert("il_qpl_qst_codeqst_cfg", array(
+			"config_fi" =>        array("integer", 0),
+			"data" =>        array("clob", '{}')
+		));		
+    }
+?>

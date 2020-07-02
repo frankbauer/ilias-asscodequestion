@@ -40,3 +40,8 @@ havethreejs_info#:#Three.JS (https://threejs.org) ist ein WebGL Szenengraph der 
 havedthree#:#D3 einbetten
 havedthree_info#:#D3 (https://d3js.org) ist eine Webkonforme Visualisierungsbibliothek
 show_lines_label#:#Sichtbare Zeilen
+config_title#:#Konfiguration der Quelltext Frage
+config_print_control_chars#:#Steuerzeichen in Druckansicht einblenden
+config_save#:#Speichern
+config_saved#:#Konfiguration erfolgreich gespeichert.
+config_save_failed#:#Konfiguration konnte nicht gespeichert werden.
