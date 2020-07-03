@@ -74,6 +74,19 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return $this->plugin;
 	}
 
+	/**
+	 * Load plugin settings and return.
+	 * The method will cache the results, so changes to the DB after the first get are not reflected!
+	 */
+	var $_settings = NULL;
+	public function getSettings(){
+		if ($this->_settings == NULL){
+			$this->plugin->includeClass("class.ilassCodeQuestionConfigGUI.php");	
+			$this->_settings = ilassCodeQuestionConfigGUI::loadSettings();
+		}
+		return $this->_settings;
+	}
+
 	public function blocks(){
 		return $this->blocks;
 	}

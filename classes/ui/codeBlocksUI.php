@@ -21,10 +21,10 @@ class codeBlocksUI {
         $this->uuid = $newUUID;
     }
 
-    public function print($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL, $state=NULL){
+    public function print($editMode=false, $readOnly=false, $withSolution=false, $solutions=NULL, $state=NULL, $withCtrlChars=true){
         $html  = '<div printblocks>';
         for ($i=0; $i<$this->model->getNumberOfBlocks(); $i++){
-            $html .= $this->model[$i]->ui()->print($withSolution, $solutions, $state);
+            $html .= $this->model[$i]->ui()->print($withSolution, $solutions, $state, $withCtrlChars);
         }
         $html .= '</div>';
         return $html;

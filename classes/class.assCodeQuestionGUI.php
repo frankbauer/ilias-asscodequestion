@@ -227,8 +227,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutions = $value1;
 		$state = $value2;					
 
-		if ($print){			
-			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state);			
+		if ($print){	
+			$withCtrlChars = $this->object->getSettings()->printctrlchars;
+			$html = $this->object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state, $withCtrlChars);			
 		} else {
 			$html = $this->object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
 		}
@@ -326,7 +327,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		
 
-		$print = true || $this->isRenderPurposePrintPdf();			
+		$print = $this->isRenderPurposePrintPdf();			
 		//($active_id > 0) will default back to the best solution if no answer is present, this might cause problems when priting the solutions...
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);

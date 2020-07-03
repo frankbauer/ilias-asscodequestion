@@ -14,15 +14,15 @@ class codeBlockUI {
         return $str;
     }
 
-    public function print($withSolution=false, $solutions=NULL, $state=NULL){
+    public function print($withSolution=false, $solutions=NULL, $state=NULL, $withCtrlChars=true){
         $type = $this->model->getType();
 
         if ($type==assCodeQuestionBlockTypes::StaticCode || $type==assCodeQuestionBlockTypes::Text) {
-            return '<pre class="static">'. $this->model->printableString($this->getContent($state)) . '</pre>';
+            return '<pre class="static">'. $this->model->printableString($this->getContent($state), $withCtrlChars) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
-            return $this->renderBlock($withSolution, $solutions, $state, true);
+            return $this->renderBlock($withSolution, $solutions, $state, true, $withCtrlChars);
         }else if ($type==assCodeQuestionBlockTypes::Blockly) {
-            return $this->renderBlockly($withSolution, $solutions, $state, true);
+            return $this->renderBlockly($withSolution, $solutions, $state, true, $withCtrlChars);
         }
 
         return '';
@@ -69,11 +69,11 @@ class codeBlockUI {
         return $html;
     }
 
-    private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
+    private function renderBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){
         $html  = '<';
         if ($print){
             $html .= 'pre class="solution">';
-            $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions));
+            $html .= $this->model->printableString($this->getContent($state, $withSolution, $solutions), $withCtrlChars);
             $html .= '</pre>';            
         } else {
             $html .= 'block ';
@@ -104,7 +104,7 @@ class codeBlockUI {
         return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
     }
 
-    private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false){
+    private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){
         
         $bl = $this->model->getBlockly();        
         $str = "<blockly ".
