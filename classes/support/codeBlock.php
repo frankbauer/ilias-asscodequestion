@@ -150,7 +150,7 @@ class codeBlock {
 	}
 
 	static public function fixExportedCode($str){
-		return str_replace('&gt;', '>', str_replace('&lt;', '<', str_replace('&#123;', '{', $str)));
+		return str_replace('&gt;', '>', str_replace('&lt;', '<', str_replace('&#123;', '{', str_replace('&amp;', '&', $str))));
 	}
 
     function fixLoadedCode($str){		
@@ -161,7 +161,7 @@ class codeBlock {
 
 	static function fixSentCode($str){
 		//return str_replace('<', '&lt;', $str);
-		return str_replace('&#123;', '{', $str);
+		return str_replace('&#123;', '{', str_replace('&', '&amp;', $str));
 	}
 
 	public function __get($property) {
