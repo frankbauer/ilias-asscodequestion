@@ -53,3 +53,7 @@ div[printblocks] pre.static {
     color: #383838;
     border-style: dashed;
 }
+
+table.fullwidth {
+    table-layout: fixed;
+}
