@@ -21,10 +21,11 @@ div.ilc_question_Standard table td.fixed {
 div#il_prop_cont_codeblock.form-group > div.col-sm-9 {
     width: 100%;
 }
-
-.cm-s-solarized div.CodeMirror-gutter.CodeMirror-linenumbers {
-    width: 29px !important;
+.cm-s-solarized div.CodeMirror-gutters {
     border-right: 1px solid #d8d2c0;
+}
+div.CodeMirror-gutter.CodeMirror-linenumbers {
+    width: 31px !important;
 }
 div.codeblocks.editmode {
     background-color: transparent;
@@ -56,4 +57,9 @@ div[printblocks] pre.static {
 
 table.fullwidth {
     table-layout: fixed;
+}
+
+div.codeblock.block-block-static,
+div.codeblock.block-block {
+    box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.05);
 }
