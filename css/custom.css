@@ -58,8 +58,3 @@ div[printblocks] pre.static {
 table.fullwidth {
     table-layout: fixed;
 }
-
-div.codeblock.block-block-static,
-div.codeblock.block-block {
-    box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.05);
-}
