@@ -2,7 +2,7 @@ self.importScripts('worker/runtime.js')
 
 function listener(event) {
     let request = event.data
-    //console.log(request);
+    //console.log('JAVA-WORKE-RUN-MSG', request)
     if (request.command == 'run') {
         var $stderrBuffer = ''
         var $stdoutBuffer = ''
@@ -30,7 +30,18 @@ function listener(event) {
         self.importScripts(URLObject)
         self.postMessage({ command: 'run-finished-setup', id: request.id })
 
-        main(request.args)
+        try {
+            console.log('Starting')
+            main(request.args)
+        } catch (EE) {
+            if (EE instanceof Error){
+                console.log('APPLICATION ERROR', EE)
+                $stderrBuffer += 'Application Terminated (' + EE.name + '): ' + EE.message
+            } else {
+                console.log('APPLICATION ERROR', EE)
+                $stderrBuffer += 'Application Terminated due to an internal Error.'
+            }
+        }
 
         if ($stderrBuffer != '') {
             self.postMessage({ command: 'stderr', line: $stderrBuffer, id: request.id })
