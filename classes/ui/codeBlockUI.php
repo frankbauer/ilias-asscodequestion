@@ -61,7 +61,7 @@ class codeBlockUI {
         $html .= 'data-version="'.$this->model->getVersion().'" '.
                  (($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : '').
                  ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
-                 ((!$this->model->getCodeExpanded()) ? 'data-code-expanded=0 ' : '').
+                 ('data-code-expanded='. ($this->model->getCodeExpanded()+0) . ' ').
                  'width="'.$this->model->getWidth().'" '.
                  'height="'.$this->model->getHeight().'" '.
                  'align="'.$this->model->getAlign().'" ';

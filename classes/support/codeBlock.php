@@ -108,7 +108,7 @@ class codeBlock {
 		
 		$data = array(
 			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
-			'codeExpanded' => $options->codeExpanded == 1 || $options->codeExpanded == 'true',
+			'codeExpanded' => $options->codeExpanded + 0,
 			'type' => $t,
 			'content' => codeBlock::fixSentCode($content),
 			'lines' => $options->visibleLines,
@@ -232,7 +232,7 @@ class codeBlock {
 	}
 
 	function getCodeExpanded() {
-		if (!isset($this->block['codeExpanded'])) return true;
+		if (!isset($this->block['codeExpanded'])) return 1;
 		return $this->block['codeExpanded'];		
 	}
 
