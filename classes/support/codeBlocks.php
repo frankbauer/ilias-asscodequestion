@@ -326,7 +326,7 @@ class codeBlocks implements ArrayAccess {
 
 	function getRandomizerSets(){
 		return isset($this->additional_data['rndSets']) ? $this->additional_data['rndSets'] : array();
-	}
+	}    
 
 	function setRandomizerSets($newValue){
 		$this->additional_data['rndSets'] = $newValue;
@@ -444,7 +444,7 @@ class codeBlocks implements ArrayAccess {
 
 	public function __get($property) {
 		return $this->additional_data[$porperty];
-	  }
+	}
 	
 	public function __set($property, $value) {
 		if (property_exists($this, $property)) {

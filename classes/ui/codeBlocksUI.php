@@ -53,7 +53,7 @@ class codeBlocksUI {
                  ($editMode?'data-randomizer-active="'.($this->model->getRandomizerActive()?'true':'false').'" ':'').
                  ($editMode?'data-randomizer-preview-index="'.$this->model->getRandomizerPreviewIndex().'" ':'').
                  ($editMode?"data-randomizer-known-tags='".json_encode($this->model->getRandomizerTags())."' ":'').
-                 ($editMode?"data-randomizer-sets='".json_encode($this->model->getRandomizerSets())."' ":'').
+                 ($editMode?"data-randomizer-sets='".str_replace("'", "&#39;", json_encode($this->model->getRandomizerSets()))."' ":'').
                  'data-scope-selector="[id=\''.$this->getUUID().'\']" '.
                  '>';
 
