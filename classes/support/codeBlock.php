@@ -149,6 +149,10 @@ class codeBlock {
 		return $value;
 	}
 
+    static public function fixCodeForExport($str){
+		return str_replace('>', '&gt;', str_replace('<', '&lt;', str_replace('{', '&#123;', str_replace('&', '&amp;', $str))));
+	}
+
 	static public function fixExportedCode($str){
 		return str_replace('&gt;', '>', str_replace('&lt;', '<', str_replace('&#123;', '{', str_replace('&amp;', '&', $str))));
 	}
