@@ -221,6 +221,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		// die;
 		$this->blocks->setFromPOST($P);
 	}
+
+
+
+    public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = ""){
+        return $this->duplicate(false, $targetQuestionTitle, "", "", $targetParentId);
+    }
 	
 
 	/**
