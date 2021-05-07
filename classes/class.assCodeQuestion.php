@@ -366,9 +366,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		);
 	}
 
-	private function buildInitialSolution($ridIn=NULL){
+	private function buildInitialSolution($ridIn=-1){
 		$ct = count($this->blocks()->getRandomizerSets());
-		$rid = ($ridIn==NULL)?(($ct>0)?random_int(0, $ct-1):0):$ridIn;
+        $rid = ($ridIn<0)?(($ct>0)?random_int(0, $ct-1):0):$ridIn;
 		$state = array(
 			"storageUUID" => $this->blocks()->getStorageUUID(),
 			"rid" => $rid,
@@ -391,18 +391,18 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	public function getPreviewValuesOrInit($previewSession, $init_solution=false, $inPreview=false){
 		$solution = array();
 		if( is_object($previewSession)) {
-			$solution = (array) $previewSession->getParticipantsSolution();
+            $solution = (array) $previewSession->getParticipantsSolution();
 			if (isset($solution['value2']) && (!isset($solution['value2']->rid) || $solution['value2']->storageUUID!=$this->blocks()->getStorageUUID())){
-				$solution = array();
+                $solution = array();
 			}
 		}
 
-		if ($init_solution && count($solution)==0){			
-			if( is_object($previewSession) ) {
-				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
+		if ($init_solution && count($solution)==0){	
+            if( is_object($previewSession) ) {
+                $res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():-1);
 				$previewSession->setParticipantsSolution($res);				
 			} else {
-				$res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():NULL);
+                $res = $this->buildInitialSolution($inPreview?$this->blocks->getRandomizerPreviewIndex():-1);
 			}
 			return $res;
 		}
