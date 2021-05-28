@@ -80,12 +80,12 @@ class codeBlocksUI {
             $loader .= "    window.codeBlocksJS = true\n";
             $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
             $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/loader.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/roboto.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css?&v=2\">')\n";                   
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/loader.css\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/roboto.css\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/main.css\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/app.css\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/".CODEBLOCKS_REL_PATH."css/chunk-vendors.css\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"".$basePath."/css/custom.css?&v=2\" shadow>')\n";                   
 
             $loader .= "    try {\n";
             $loader .= "        import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')\n";

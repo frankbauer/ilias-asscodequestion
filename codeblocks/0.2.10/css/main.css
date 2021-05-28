@@ -1,17 +1,20 @@
-#codeblocks {display:none}
-
-codeblocks>playground{
-    display:none;
-}
-codeblocks>block[data-hidden]{
-    display:none;
+#codeblocks {
+    display: none;
 }
 
-codeblocks>block, codeblocks>text{
+codeblocks > playground {
+    display: none;
+}
+codeblocks > block[data-hidden] {
+    display: none;
+}
+
+codeblocks > block,
+codeblocks > text {
     unicode-bidi: embed;
     font-family: monospace;
     white-space: pre;
-    color:silver;
+    color: silver;
 }
 
 .red-wave {
@@ -24,24 +27,25 @@ codeblocks>block, codeblocks>text{
     background-position-y: bottom;
 }
 
-.gutter-warning, .gutter-error {
-    font-size:16px!important;
-    padding-top:0px!important;
-    margin-top:-3px!important;
-    padding-left:1px!important;
+.gutter-warning,
+.gutter-error {
+    font-size: 16px !important;
+    padding-top: 0px !important;
+    margin-top: -3px !important;
+    padding-left: 1px !important;
 }
 
 .gutter-error {
-    color: #B71C1C !important;
+    color: #b71c1c !important;
 }
 .gutter-warning {
-    color: #F9A825 !important;
+    color: #f9a825 !important;
 }
 
-div.CodeMirror.cm-s-solarized{
-    box-shadow:none
+div.CodeMirror.cm-s-solarized {
+    box-shadow: none;
 }
 
-pre div#id{
-    margin:0px;
+pre div#id {
+    margin: 0px;
 }
