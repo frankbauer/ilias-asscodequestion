@@ -138,7 +138,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$errors = false;
 
 		if ($save)
-		{
+		{            
 			$form->setValuesByPost();
 			$errors = !$form->checkInput();
 			$form->setValuesByPost(); // again, because checkInput now performs the whole stripSlashes handling and we need this if we don't want to have duplication of backslashes
@@ -258,11 +258,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @param boolean $show_feedback		Show a feedback
 	 * @return string
 	 */
-	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
+	public function getTestOutput($active_id, $pass = -1, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
 	{
 		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")");  die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if (is_NULL($pass))
+		if ($pass<0)
 		{
 			$pass = ilObjTest::_getPass($active_id);
 		}
@@ -315,7 +315,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 */
 	function getSolutionOutput(
 		$active_id,
-		$pass = NULL,
+		$pass = -1,
 		$show_solutions = FALSE,
 		$result_output = FALSE,
 		$show_question_only = TRUE,

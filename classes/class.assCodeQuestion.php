@@ -411,7 +411,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function getSolutionValuesOrInit($active_id, $pass, $authorized, $init_solution=false, $save=true){
-		if(is_null($pass))
+		if($pass<0)
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
@@ -483,14 +483,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see  assQuestion::calculateReachedPoints()
 	 */
-	function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
+	function calculateReachedPoints($active_id, $pass = -1, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
 			throw new ilTestException('return details not implemented for '.__METHOD__);
 		}
 
-		if(is_null($pass))
+		if($pass<0)
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
@@ -513,13 +513,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	* @return boolean true on success, otherwise false
 	* @access public
 	*/
-	function setReachedPoints($active_id, $points, $pass = NULL)
+	function setReachedPoints($active_id, $points, $pass = -1)
 	{
 		global $ilDB;
 		
 		if (($points > 0) && ($points <= $this->getPoints()))
 		{
-			if (is_null($pass))
+			if ($pass<0)
 			{
 				$pass = $this->getSolutionMaxPass($active_id);
 			}
@@ -551,12 +551,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access 	public
 	 * @see 	assQuestion::saveWorkingData()
 	 */
-	function saveWorkingData($active_id, $pass = NULL, $authorized = true)
+	function saveWorkingData($active_id, $pass = -1, $authorized = true)
 	{
 		global $ilDB;
 		global $ilUser;
 
-		if (is_null($pass))
+		if ($pass<0)
 		{
 			include_once "./Modules/Test/classes/class.ilObjTest.php";
 			$pass = ilObjTest::_getPass($active_id);
@@ -900,7 +900,9 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if (is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
 		} else if ($this->blocks->getLanguage()=='java' || $this->blocks->getLanguage()=='java2'){
-			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $this->getBestSolution($solution), $matches, PREG_OFFSET_CAPTURE);				
+            $code = $this->getBestSolution($solution);
+            $code = str_replace("&#123;", "{", $code);
+			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $code, $matches, PREG_OFFSET_CAPTURE);				
 			$className = trim($matches[1][0]);
 			if ($className=='') $className="Unbekannt";
 			return $className.'.java';
@@ -924,8 +926,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return $res;
 	}
 
-	public function getExportSolution($active_id=NULL, $pass=NULL){
-		if(is_null($pass)){
+	public function getExportSolution($active_id=NULL, $pass=-1){
+		if($pass<0){
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
@@ -961,6 +963,21 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		return '// '.$str;
 	}
+
+    function getJustAnswers($solution){
+        $blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
+	
+		$res = '';
+		for ($i=0; $i<count($blocks); $i++){
+			$t = $this->blocks[$i]->getType();
+			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+				if (isset($blocks[$i])){
+					$res .= $blocks[$i]."\n";
+				}				
+			} 
+		}
+		return $res;
+    }
 
 	public function getCompleteSource($solution, $withAnswerMarkers=false){	
 		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
