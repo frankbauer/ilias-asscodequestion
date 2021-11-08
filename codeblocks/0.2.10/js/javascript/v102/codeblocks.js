@@ -1,5 +1,13 @@
 const CodeBlocks = {
     worker: undefined,
+    postResult: function (obj) {
+        const msg = {
+            value: obj,
+            command: `f-FINAL`,
+            id: -1,
+        }
+        this.worker.postMessage(msg)
+    },
     postMessage: function (cmd, id, data) {
         const msg = {
             ...data,

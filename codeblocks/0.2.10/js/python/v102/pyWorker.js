@@ -24,7 +24,8 @@ function parseError(err) {
     let msg = ''
     if (err.message) {
         if (err.message.indexOf('Traceback') >= 0) {
-            const ep = /File\s*"(\S*?)",\s*line\s*(\d*),\s*in\s*(\S.*)|File\s*"(\S*?)",\s*line\s*(\d*)/gm
+            const ep =
+                /File\s*"(\S*?)",\s*line\s*(\d*),\s*in\s*(\S.*)|File\s*"(\S*?)",\s*line\s*(\d*)/gm
             let m
 
             while ((m = ep.exec(err.message)) !== null) {
@@ -75,28 +76,6 @@ async function listener(input) {
     if (typeof self.__pyodideLoading === 'undefined') {
         await loadPyodide({ indexURL: './pyodide-0.17.0/' })
         dict = pyodide.globals.get('dict')
-
-        // custom logging
-        this.console = {
-            log(...s) {
-                clog(...s)
-                if (Array.isArray(s)) {
-                    s = s.join(', ')
-                }
-                //postMessage(['log', '' + s])
-                self.postMessage({ command: 'log', s: '' + s })
-            },
-            error(...s) {
-                cerr(...s)
-                if (Array.isArray(s)) {
-                    s = s.join(', ')
-                }
-                //postMessage(['err', '' + s])
-                self.postMessage({ command: 'err', s: '' + s })
-            },
-        }
-        this.console.warn = this.console.log
-        self.console = console
     }
 
     switch (input.data.command) {
@@ -136,10 +115,37 @@ async function listener(input) {
                 pyodide.runPython(
                     `import sys
 import io
+sys.setrecursionlimit(200)
 sys.stdout = io.StringIO()`,
                     globals
                 )
                 await pyodide.loadPackagesFromImports(script)
+
+                if (this.console.redirected === undefined) {
+                    // custom logging
+                    this.console = {
+                        log(...s) {
+                            clog(...s)
+                            if (Array.isArray(s)) {
+                                s = s.join(', ')
+                            }
+                            //postMessage(['log', '' + s])
+                            self.postMessage({ command: 'log', s: '' + s })
+                        },
+                        error(...s) {
+                            cerr(...s)
+                            if (Array.isArray(s)) {
+                                s = s.join(', ')
+                            }
+                            //postMessage(['err', '' + s])
+                            self.postMessage({ command: 'err', s: '' + s })
+                        },
+                    }
+                    this.console.warn = this.console.log
+                    self.console = console
+                    this.console.redirected = true
+                }
+
                 let coroutine = pyodide.pyodide_py.eval_code_async(script, globals)
                 try {
                     const output = await coroutine
