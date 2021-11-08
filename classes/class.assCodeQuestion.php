@@ -964,7 +964,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return '// '.$str;
 	}
 
-    function getJustAnswers($solution){
+    function getJustAnswers($solution, $trimall=false){
         $blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 	
 		$res = '';
@@ -972,7 +972,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$t = $this->blocks[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				if (isset($blocks[$i])){
-					$res .= $blocks[$i]."\n";
+                    if ($trimall){
+                        $res .= trim($blocks[$i])."\n"; 
+                    } else {
+                        $res .= $blocks[$i]."\n";
+                    }
 				}				
 			} 
 		}
