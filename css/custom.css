@@ -1,5 +1,6 @@
 div.codeblocks {
-    max-width: 1920px;
+    padding: 0px;
+    margin: 0px !important;
 }
 
 div#mainspacekeeper > div.row {
@@ -57,4 +58,16 @@ div[printblocks] pre.static {
 
 table.fullwidth {
     table-layout: fixed;
+}
+
+div.ilc_question_Standard {
+    background-image: none;
+    padding-top: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+}
+
+div#il_center_col {
+    width: 100% !important;
 }
