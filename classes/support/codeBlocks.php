@@ -215,6 +215,8 @@ class codeBlocks implements ArrayAccess {
 		$this->setOutputParser( $settings->outputParser );
 		$this->setContinuousCompilation( $settings->continuousCompilation);
 		$this->setPersistentArguments( $settings->persistentArguments);
+        $this->setMessagePassing( $settings->messagePassing);
+        $this->setKeepAlive( $settings->keepAlive);
 
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
@@ -344,6 +346,18 @@ class codeBlocks implements ArrayAccess {
 	}
 	function setPersistentArguments($newValue){
 		return $this->additional_data['persistentArguments'] = $newValue; 
+	}
+    function getMessagePassing(){
+		return isset($this->additional_data['messagePassing']) ? $this->additional_data['messagePassing'] :false; 
+	}
+	function setMessagePassing($newValue){
+		return $this->additional_data['messagePassing'] = $newValue; 
+	}
+    function getKeepAlive(){
+		return isset($this->additional_data['keepAlive']) ? $this->additional_data['keepAlive'] :false; 
+	}
+	function setKeepAlive($newValue){
+		return $this->additional_data['keepAlive'] = $newValue; 
 	}
 
 
