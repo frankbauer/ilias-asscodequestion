@@ -60,6 +60,7 @@ class codeBlockUI {
         $html  = '<playground ';
         $html .= 'data-version="'.$this->model->getVersion().'" '.
                  (($this->model->getShouldAutoReset()) ? 'data-should-autoreset ' : '').
+                 (($this->model->getGenerateTemplate()) ? '' : 'data-generate-template=0 ').
                  ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
                  ('data-code-expanded='. ($this->model->getCodeExpanded()+0) . ' ').
                  'width="'.$this->model->getWidth().'" '.

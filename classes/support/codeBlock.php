@@ -105,7 +105,6 @@ class codeBlock {
 			}
 		}
 		
-		
 		$data = array(
 			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
 			'codeExpanded' => $options->codeExpanded + 0,
@@ -117,6 +116,7 @@ class codeBlock {
 			'align' => $options->align,
 			'version' => $options->version,
 			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
+            'generateTemplate' => $options->generateTemplate == 1 || $options->generateTemplate == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
 			'altContent' => $altContent,
 			'blockly' => $options->blockly
@@ -251,6 +251,15 @@ class codeBlock {
 
 	function setShouldAutoReset($value) {
 		$this->block['autoreset'] = $value;
+	}
+
+	function getGenerateTemplate() {
+		if (!isset($this->block['generateTemplate'])) return true;
+		return $this->block['generateTemplate'];		
+	}
+
+	function setGenerateTemplate($value) {
+		$this->block['generateTemplate'] = $value;
 	}
 
     function getType() {
