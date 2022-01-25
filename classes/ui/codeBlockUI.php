@@ -21,8 +21,10 @@ class codeBlockUI {
             return '<pre class="static">'. $this->model->printableString($this->getContent($state), $withCtrlChars) . '</pre>';
         } else if ($type==assCodeQuestionBlockTypes::SolutionCode) {
             return $this->renderBlock($withSolution, $solutions, $state, true, $withCtrlChars);
-        }else if ($type==assCodeQuestionBlockTypes::Blockly) {
+        } else if ($type==assCodeQuestionBlockTypes::Blockly) {
             return $this->renderBlockly($withSolution, $solutions, $state, true, $withCtrlChars);
+        } else if ($type==assCodeQuestionBlockTypes::REPL) {
+            return $this->renderREPL($withSolution, $solutions, $state, true, $withCtrlChars);
         }
 
         return '';
@@ -52,6 +54,9 @@ class codeBlockUI {
 
         if ($type==assCodeQuestionBlockTypes::Blockly) 
             return $this->renderBlockly($withSolution, $solutions, $state, false);
+
+        if ($type==assCodeQuestionBlockTypes::REPL) 
+            return $this->renderREPL($withSolution, $solutions, $state, false);
 
         return '';
     }
@@ -103,6 +108,13 @@ class codeBlockUI {
 
     private function renderText($state=NULL){
         return "<text".(!$this->model->getExpanded() ? ' data-expanded=0' : '').">".$this->getContent($state)."</text>";
+    }
+
+    private function renderREPL($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){
+        if ($print){
+            return "<div>REPL not available in print mode</div>";
+        }
+       return "<repl></repl>";
     }
 
     private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){

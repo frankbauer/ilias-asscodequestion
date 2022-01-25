@@ -133,6 +133,7 @@ class codeBlocks implements ArrayAccess {
      */
 	private function loadBlocks($forecReload=false){
         $ct = count($this->additional_data['blocks']);
+        
 		if ($forecReload || $this->blocks == null /*|| $ct!=count($this->blocks)*/){
 			$this->blocks = array();
 			for ($i=0; $i<$ct; $i++){
@@ -179,7 +180,7 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	public function setFromPOST($P){	
-		$settings = json_decode($P['block_settings'][$this->getID()]);
+        $settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		
 		$blocks = $P['block'][$this->getID()];
@@ -221,11 +222,11 @@ class codeBlocks implements ArrayAccess {
 		$this->setRandomizerActive( $randomizer->active );
 		$this->setRandomizerPreviewIndex( $randomizer->previewIndex );
 		$this->setRandomizerTags( $randomizer->knownTags );
-		$this->setRandomizerSets( $randomizer->sets );
-
+		$this->setRandomizerSets( $randomizer->sets );        
+        
 		//handle blocks
 		$this->clearBlocks();
-		for ($i=0;$i<count($blocks); $i++){
+		for ($i=0;$i<count($blockOptions); $i++){
 			$abl = '';
 			if (isset($P['alt_block']) 
 				&& isset($P['alt_block'][$this->getID()]) 

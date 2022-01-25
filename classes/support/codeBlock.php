@@ -21,7 +21,7 @@ class codeBlock {
 			);
 		} else {
 			$this->block = $block;        
-		}
+		}                
 	}
 
 	public function getDataVersion(){
@@ -80,8 +80,8 @@ class codeBlock {
 		}
 	}
 
-	public static function createFromPreparedPOST($nr, $options, $content, $altContent, $object){		
-		$t = assCodeQuestionBlockTypes::StaticCode;
+	public static function createFromPreparedPOST($nr, $options, $content, $altContent, $object){	
+        $t = assCodeQuestionBlockTypes::StaticCode;
 		if ($options->type == 'BLOCK'){
 			if ($options->static==1 || $options->static=='true') 
 				$t = assCodeQuestionBlockTypes::StaticCode;
@@ -103,7 +103,9 @@ class codeBlock {
 				}
 				$options->blockly = $ar;
 			}
-		}
+		} else if ($options->type == 'REPL'){
+			$t = assCodeQuestionBlockTypes::REPL;
+		} 
 		
 		$data = array(
 			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
