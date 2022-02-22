@@ -341,21 +341,21 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		//this is requested through ajax and added to the already loaded DOM
 		if ($show_manual_scoring){
-			// always load jQuery
+            // always load jQuery
 			include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
-			iljQueryUtil::initjQuery($template);
-			iljQueryUtil::initjQueryUI($template);
+			iljQueryUtil::initjQuery($this->tpl);
+			iljQueryUtil::initjQueryUI($this->tpl);
 
-			$this->object->blocks()->ui()->prepareTemplate($template, self::URL_PATH);
+			$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);
 
 			//we need this for the manual scoring view, otherwise the boxes have to get clicked
-			$template->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+			$this->tpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
 
 			$template->setCurrentBlock("DEFAULT");
-			$template->fillCssFiles();
-			$template->fillInlineCss();
-			$template->fillJavaScriptFiles();
-			$template->fillOnLoadCode();
+			//$this->tpl->fillCssFiles();
+			//$this->tpl->fillInlineCss();
+			//$this->tpl->fillJavaScriptFiles();
+			//$this->tpl->fillOnLoadCode();
 		}
 
 		// get the solution of the user for the active pass or from the last pass if allowed
