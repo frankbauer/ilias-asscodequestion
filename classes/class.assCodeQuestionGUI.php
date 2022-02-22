@@ -105,7 +105,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$qidf = $negativeQuestionID?-1:1;
 		$lngData = $this->getLanguageData();
 		
-		$this->object->blocks()->ui()->prepareTemplate($activeGlobalTpl, self::URL_PATH);			
+		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);			
 	}
 
 	/**
@@ -159,7 +159,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		if (!$checkonly)
 		{
-			$activeGlobalTpl->setVariable("QUESTION_DATA", $form->getHTML());
+			$this->tpl->setVariable("QUESTION_DATA", $form->getHTML());
 		}
 		return $errors;
 	}
@@ -341,9 +341,8 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         //this is requested through ajax and added to the already loaded DOM
 		if ($show_manual_scoring){
             $activeGlobalTpl = null;
-            $global = false;
-            if ($show_question_only==false){                
-                $activeGlobalTpl = new ilGlobalTemplate($this->plugin->getDirectory() . "/templates/" . "tpl.il_as_qpl_codeqst_output_solution.html", true, true);                
+            $global = true;
+            if ($show_question_only==false || $this->tpl==null){                                               
                 $global = false;
                 $activeGlobalTpl = $template;
             } else {
@@ -354,23 +353,17 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			    include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
 			    iljQueryUtil::initjQuery($activeGlobalTpl);
 			    iljQueryUtil::initjQueryUI($activeGlobalTpl);
-            }                
-            
+            }                  
 
 			$this->object->blocks()->ui()->prepareTemplate($activeGlobalTpl, self::URL_PATH);
 
             if ($global){
 			    //we need this for the manual scoring view, otherwise the boxes have to get clicked
 			    $activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+                $activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 1000)");
             }
 
-			$template->setCurrentBlock("DEFAULT");
-            if ($doFill){
-			    //$activeGlobalTpl->fillCssFiles();
-			    //$activeGlobalTpl->fillInlineCss();
-			    //$activeGlobalTpl->fillJavaScriptFiles();
-			    //$activeGlobalTpl->fillOnLoadCode();
-            }
+			$template->setCurrentBlock("DEFAULT");            
 		}
 
 		// get the solution of the user for the active pass or from the last pass if allowed
