@@ -105,7 +105,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$qidf = $negativeQuestionID?-1:1;
 		$lngData = $this->getLanguageData();
 		
-		$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);			
+		$this->object->blocks()->ui()->prepareTemplate($activeGlobalTpl, self::URL_PATH);			
 	}
 
 	/**
@@ -159,7 +159,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		if (!$checkonly)
 		{
-			$this->tpl->setVariable("QUESTION_DATA", $form->getHTML());
+			$activeGlobalTpl->setVariable("QUESTION_DATA", $form->getHTML());
 		}
 		return $errors;
 	}
@@ -337,25 +337,40 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		//echo "showStudentResults=".$showStudentResults."<br>";
 		
 		// get the solution template
-		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	
-
-		//this is requested through ajax and added to the already loaded DOM
+		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	        
+        //this is requested through ajax and added to the already loaded DOM
 		if ($show_manual_scoring){
-            // always load jQuery
-			include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
-			iljQueryUtil::initjQuery($this->tpl);
-			iljQueryUtil::initjQueryUI($this->tpl);
+            $activeGlobalTpl = null;
+            $global = false;
+            if ($show_question_only==false){                
+                $activeGlobalTpl = new ilGlobalTemplate($this->plugin->getDirectory() . "/templates/" . "tpl.il_as_qpl_codeqst_output_solution.html", true, true);                
+                $global = false;
+                $activeGlobalTpl = $template;
+            } else {
+                $global = true;
+                $activeGlobalTpl = $this->tpl;                                
 
-			$this->object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);
+                // always load jQuery
+			    include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
+			    iljQueryUtil::initjQuery($activeGlobalTpl);
+			    iljQueryUtil::initjQueryUI($activeGlobalTpl);
+            }                
+            
 
-			//we need this for the manual scoring view, otherwise the boxes have to get clicked
-			$this->tpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+			$this->object->blocks()->ui()->prepareTemplate($activeGlobalTpl, self::URL_PATH);
+
+            if ($global){
+			    //we need this for the manual scoring view, otherwise the boxes have to get clicked
+			    $activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+            }
 
 			$template->setCurrentBlock("DEFAULT");
-			//$this->tpl->fillCssFiles();
-			//$this->tpl->fillInlineCss();
-			//$this->tpl->fillJavaScriptFiles();
-			//$this->tpl->fillOnLoadCode();
+            if ($doFill){
+			    //$activeGlobalTpl->fillCssFiles();
+			    //$activeGlobalTpl->fillInlineCss();
+			    //$activeGlobalTpl->fillJavaScriptFiles();
+			    //$activeGlobalTpl->fillOnLoadCode();
+            }
 		}
 
 		// get the solution of the user for the active pass or from the last pass if allowed

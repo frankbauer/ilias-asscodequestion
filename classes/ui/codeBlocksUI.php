@@ -4,6 +4,7 @@ class codeBlocksUI {
     //a codeBlock instance
     var $model = null;
     var $uuid = null;
+    var $PREPARED_TEMPLATES = [];
 
     public function __construct($model)
 	{
@@ -110,25 +111,56 @@ class codeBlocksUI {
         return $loader;
     }
 
+    
     public function prepareTemplate($tpl, $basePath){
+        if ($tpl==null) {
+            return;
+        } 
+        
         if (!$tpl->didPrepareBlocks) {
             $tpl->didPrepareBlocks = true;
-			$tpl->addInlineCss("codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}");
-			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
-			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
-			$tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css');
-			// $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
-            // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
-            // $tpl->addCss($basePath.'/css/custom.css');
 
-            // $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
+            $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
+            $css_file = $basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css';                
+            $on_load_code = $this->mountyJSCode($basePath, false);
 
-			// $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
-            // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
-            
-            //
-            //$tpl->setVariable("MOUNTY", $this->mountyJSCode($basePath, false));
-            $tpl->addOnLoadCode($this->mountyJSCode($basePath, false));
+            if ($tpl instanceof ilGlobalTemplateInterface) {
+                $tpl->addInlineCss($inline_css);
+                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
+                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
+                $tpl->addCss($css_file);
+                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
+                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
+                // $tpl->addCss($basePath.'/css/custom.css');
+
+                // $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
+
+                // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
+                // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
+                
+                //
+                //$tpl->setVariable("MOUNTY", $this->mountyJSCode($basePath, false));
+                $tpl->addOnLoadCode($on_load_code);
+            } else {
+                // set onLoadCode
+                $tpl->setCurrentBlock("on_load_code");                
+                $tpl->setCurrentBlock("on_load_code_inner");
+                $tpl->setVariable("OLCODE", $on_load_code);
+                $tpl->parseCurrentBlock();                
+                $tpl->setCurrentBlock("on_load_code");
+                $tpl->parseCurrentBlock();
+
+                // inline css
+                $tpl->setCurrentBlock("css_inline");
+                $tpl->setVariable("CSS_INLINE", $inline_css);
+                $tpl->parseCurrentBlock();                
+
+                // css files                                
+                $tpl->setCurrentBlock("css_file");
+                $tpl->setVariable("CSS_FILE", $css_file);
+                $tpl->setVariable("CSS_MEDIA", "screen");
+                $tpl->parseCurrentBlock();                
+            }
         }	
         
         // if (!$tpl->hasLegacyHelpers) {
