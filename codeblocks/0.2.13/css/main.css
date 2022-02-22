@@ -49,3 +49,7 @@ div.CodeMirror.cm-s-solarized {
 pre div#id {
     margin: 0px;
 }
+
+.modal-dialog {
+    width: 840px !important;
+}

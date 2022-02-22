@@ -252,6 +252,11 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 2.0.3
+* Support for ILILAS 7
+* Fixed issue with css body pollution
+### Version 2.0.2
+* Added Python REPL
 ### Version 2.0.1
 * Continous Compilation for some langauges (Javascript, Python)
 * Added brain.js. dom-side (all languages) and worker-side (JavaScript)
