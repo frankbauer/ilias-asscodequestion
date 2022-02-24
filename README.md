@@ -2,11 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  2.0.0
+**Version**:  2.0.3
 
-**Company**:  Visual Computing Erlangen (FAU)
+**Company**:  Friedrich-Alexander-Universität, Visual Computing
 
-**Supports**: ILIAS 5.4 - 5.4
+**Supports**: ILIAS 7
 
 ## Installation
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
