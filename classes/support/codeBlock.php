@@ -75,7 +75,7 @@ class codeBlock {
 			unset($this->block['align']);			
 			unset($this->block['version']);
 		}
-		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas && $this->getType()!=assCodeQuestionBlockTypes::Data){
 			unset($this->block['codeExpanded']);
 		}
 	}
