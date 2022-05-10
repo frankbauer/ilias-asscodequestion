@@ -68,6 +68,22 @@ div.ilc_question_Standard {
     padding-bottom: 8px;
 }
 
-div#il_center_col {
+div#il_center_cols {
     width: 100% !important;
+}
+
+#il_prop_cont_codeblock {
+    max-width: 100vw;
+}
+
+main.il-layout-page-content {
+    grid-template-columns: 100%;
+}
+
+main.il-layout-page-content > div {
+    grid-template-columns: 100%;
+}
+
+#mainspacekeeper {
+    width: 100%;
 }

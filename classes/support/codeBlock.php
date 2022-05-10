@@ -75,7 +75,7 @@ class codeBlock {
 			unset($this->block['align']);			
 			unset($this->block['version']);
 		}
-		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas){
+		if ($this->getType()!=assCodeQuestionBlockTypes::Canvas && $this->getType()!=assCodeQuestionBlockTypes::Data){
 			unset($this->block['codeExpanded']);
 		}
 	}
@@ -105,8 +105,10 @@ class codeBlock {
 			}
 		} else if ($options->type == 'REPL'){
 			$t = assCodeQuestionBlockTypes::REPL;
+		} else if ($options->type == 'DATA'){
+			$t = assCodeQuestionBlockTypes::Data;
 		} 
-		
+        
 		$data = array(
 			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
 			'codeExpanded' => $options->codeExpanded + 0,
@@ -115,6 +117,7 @@ class codeBlock {
 			'lines' => $options->visibleLines,
 			'width' => $options->width,
 			'height' => $options->height,
+            'name' => $options->name,
 			'align' => $options->align,
 			'version' => $options->version,
 			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
@@ -181,6 +184,14 @@ class codeBlock {
 
 		return $this;
 	}
+
+    function getName(){
+       return $this->block['name'];
+    }
+
+    function setName($value){
+        $this->block['name'] = $value;
+    }
 
     function getLines() {
 		if (!isset($this->block['lines'])) return 'auto';

@@ -25,6 +25,8 @@ class codeBlockUI {
             return $this->renderBlockly($withSolution, $solutions, $state, true, $withCtrlChars);
         } else if ($type==assCodeQuestionBlockTypes::REPL) {
             return $this->renderREPL($withSolution, $solutions, $state, true, $withCtrlChars);
+        }else if ($type==assCodeQuestionBlockTypes::Data) {
+            return $this->renderDataBlock($withSolution, $solutions, $state, true, $withCtrlChars);
         }
 
         return '';
@@ -57,6 +59,9 @@ class codeBlockUI {
 
         if ($type==assCodeQuestionBlockTypes::REPL) 
             return $this->renderREPL($withSolution, $solutions, $state, false);
+
+        if ($type==assCodeQuestionBlockTypes::Data) 
+            return $this->renderDataBlock($withSolution, $solutions, $state, false);
 
         return '';
     }
@@ -114,7 +119,18 @@ class codeBlockUI {
         if ($print){
             return "<div>REPL not available in print mode</div>";
         }
-       return "<repl></repl>";
+        return "<repl".(!$this->model->getExpanded() ? ' data-expanded=0' : '')."></repl>";
+    }
+
+    private function renderDataBlock($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){
+        if ($print){
+            return "<div>DataBlock not available in print mode</div>";
+        }
+        return '<data '.
+        'data-name="'.$this->model->getName().'" '.
+        ((!$this->model->getExpanded()) ? 'data-expanded=0 ' : '').
+        ('data-code-expanded='. ($this->model->getCodeExpanded()+0) . ' ').
+        '>'.$this->getContent($state)."</data>";
     }
 
     private function renderBlockly($withSolution=false, $solutions=NULL, $state=NULL, $print=false, $withCtrlChars=true){
