@@ -835,11 +835,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see assQuestion::fromXML()
 	 */
-	function fromXML(&$item, &$questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping)
-	{
+	public function fromXML(&$item, &$questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping, array $solutionhints = []): void	{
 		$this->getPlugin()->includeClass("import/qti12/class.assCodeQuestionImport.php");
 		$import = new assCodeQuestionImport($this);
-		$import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
+		$import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping, $solutionhints);
 	}
 
 	/**

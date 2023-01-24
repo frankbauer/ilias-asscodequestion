@@ -252,6 +252,10 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 2.0.5
+* No longer Blocked Fix by jcop on behalf of SURLABS, SL.
+* Support for ILIAS 7.13+ (fromXML Block commit)
+* Fixed blocking issue with Get Preview Tabs
 ### Version 2.0.3
 * Support for ILILAS 7
 * Fixed issue with css body pollution

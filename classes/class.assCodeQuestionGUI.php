@@ -482,7 +482,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			}
 	
 			// edit page
-			$this->addTab_QuestionPreview($ilTabs);
+			$ilTabs->addTarget("preview", $this->ctrl->getLinkTargetByClass("ilAssQuestionPreviewGUI", "show"), array("preview"), "ilAssQuestionPageGUI", "", "");
 		}
 
 		$force_active = false;
