@@ -2,11 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  2.0.3
+**Version**:  2.0.5
 
 **Company**:  Friedrich-Alexander-Universität, Visual Computing
 
-**Supports**: ILIAS 7
+**Supports**: ILIAS 7.13+
 
 ## Installation
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
@@ -252,6 +252,10 @@ Alternativley you may use the built-in setup function to prepare a default Three
 
 
 ## Version History
+### Version 2.0.5
+* Fix by jcopado on behalf of SURLABS.
+* Support for ILIAS 7.13+ (fromXML Block commit)
+* Fixed blocking issue with Get Preview Tabs
 ### Version 2.0.3
 * Support for ILILAS 7
 * Fixed issue with css body pollution
