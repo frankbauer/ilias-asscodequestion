@@ -2,18 +2,19 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  2.0.0
+**Version**:  2.0.5
 
 **Company**:  Visual Computing Erlangen (FAU)
 
-**Supports**: ILIAS 5.4 - 5.4
+**Supports**: ILIAS 9
 
 ## Installation
 1. Copy the `assCodeQuestion` directory to your ILIAS installation at the following path 
 (create subdirectories, if neccessary):
 `Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion`
 2. When in production you should remove or exclude the `__dev/`-Folder. You will not need to pull the submodules from `__dev/`! 
-3. Go to Administration > Plugins
+3. Ypu need to update the classmap after installing any Plugin. In the folder of your ILIAS installation, call `composer install --no-dev` to  regenerate the class map and build the static artifacts map. 
+3. Go to Administration > Plugins. If you do not see the plugin, your static artifact map needs to be rebuilt. You can rebuild those by calling `php setup/cli.php build-artifacts` in the folder of your ILIAS installation.
 4. Choose **Update** for the `assCodeQuestion` plugin
 5. Choose **Activate** for the `assCodeQuestion` plugin
 6. Choose **Refresh** for the `assCodeQuestion` plugin languages
