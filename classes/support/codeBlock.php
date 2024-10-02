@@ -11,7 +11,7 @@ class codeBlock {
 	 */
     public function __construct($nr, $block, $object)
 	{
-        $object->getPlugin()->includeClass("./ui/codeBlockUI.php");
+        //$object->getPlugin()->includeClass("./ui/codeBlockUI.php");
 		$this->object = $object;
 		$this->nr = $nr;
 		if ($block==null){
@@ -287,7 +287,7 @@ class codeBlock {
     public function getCombinedContent($state=NULL, $withSolution=false, $solutions=NULL){
 		$nr = $this->getNr();
 		$altContent = NULL;
-		if ($state!=NULL ){
+		if ($state!=NULL && isset($state->blocks)){
 			if ($state->blocks!=NULL) {				
 				$altContent = $this->fixLoadedCode($state->blocks[$nr]);
 			} else if ($withSolution && !$this->getHasAlternativeContent()){

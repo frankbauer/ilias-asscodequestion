@@ -110,15 +110,13 @@ class codeBlocksUI {
 
         return $loader;
     }
-
-    
     public function prepareTemplate($tpl, $basePath){
         if ($tpl==null) {
             return;
         } 
-        
-        if (!$tpl->didPrepareBlocks) {
-            $tpl->didPrepareBlocks = true;
+       
+        if (!in_array($tpl, $this->PREPARED_TEMPLATES)){
+            $this->PREPARED_TEMPLATES[] = $tpl;                        
 
             $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
             $css_file = $basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css';                
@@ -126,20 +124,7 @@ class codeBlocksUI {
 
             if ($tpl instanceof ilGlobalTemplateInterface) {
                 $tpl->addInlineCss($inline_css);
-                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/loader.css');
-                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/roboto.css');
                 $tpl->addCss($css_file);
-                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/app.css');
-                // $tpl->addCss($basePath.'/'.CODEBLOCKS_REL_PATH.'css/chunk-vendors.css');
-                // $tpl->addCss($basePath.'/css/custom.css');
-
-                // $tpl->addOnLoadCode("$('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/'.CODEBLOCKS_REL_PATH."\">');");
-
-                // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/chunk-vendors.js')");
-                // $tpl->addOnLoadCode("import('" . $basePath . '/'.CODEBLOCKS_REL_PATH."js/app.js')");
-                
-                //
-                //$tpl->setVariable("MOUNTY", $this->mountyJSCode($basePath, false));
                 $tpl->addOnLoadCode($on_load_code);
             } else {
                 // set onLoadCode
@@ -161,14 +146,7 @@ class codeBlocksUI {
                 $tpl->setVariable("CSS_MEDIA", "screen");
                 $tpl->parseCurrentBlock();                
             }
-        }	
-        
-        // if (!$tpl->hasLegacyHelpers) {
-        //     if ($this->model->getMinCanvasVersion()<=100) {
-        //         $tpl->addJavaScript($basePath.'/js/legacyHelper.js');
-        //         $tpl->hasLegacyHelpers = true;
-        //     }
-        // }
+        }	            
     }
 }
 

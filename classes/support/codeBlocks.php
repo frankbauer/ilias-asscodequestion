@@ -1,4 +1,5 @@
 <?php 
+require_once 'codeblocks-conf-0.2.14.php';
 
 class codeBlocks implements ArrayAccess {
 	const DEFAULT_DATA_VERSION = '101';
@@ -15,9 +16,9 @@ class codeBlocks implements ArrayAccess {
     public function __construct($plugin, $json_data, $id) {
 		$this->plugin = $plugin;
 		$this->id = $id;
-		$this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
-		$this->getPlugin()->includeClass("./support/codeBlock.php");
-		$this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.14.php");		
+		// $this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
+		// $this->getPlugin()->includeClass("./support/codeBlock.php");
+		// $this->getPlugin()->includeClass("./support/codeblocks-conf-0.2.14.php");		
 
 		if ($json_data == null){
 			$this->additional_data = array();
@@ -163,6 +164,10 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	public function getStorageUUID(){
+		if (!isset($this->additional_data['storageUUID'])){
+			return NULL;
+		}
+
 		return $this->additional_data['storageUUID'];
 	}
 

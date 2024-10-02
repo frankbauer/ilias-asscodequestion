@@ -24,7 +24,7 @@ class assCodeQuestionImport extends assQuestionImport
 	 * @param array $import_mapping An array containing references to included ILIAS objects
 	 * @access public
 	 */
-	function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping)
+	function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
 	{
 		global $ilUser, $ilLog;
 
@@ -101,7 +101,8 @@ class assCodeQuestionImport extends assQuestionImport
 		$this->object->setOwner($ilUser->getId());
 		$this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
 		$this->object->setObjId($questionpool_id);
-		$this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
+		//TODO: Find how this is done in ilias 9
+		//$this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
 		$this->object->setPoints($item->getMetadataEntry("POINTS"));
 		$this->object->blocks()->updateWithJSONEncodedAdditionalData($item->getMetadataEntry("ADDITIONAL_DATA"));
 		// additional content editing mode information

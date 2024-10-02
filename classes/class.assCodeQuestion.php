@@ -3,6 +3,7 @@ require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
+require_once 'support/assCodeQuestion.helper.php';
 
 abstract class assCodeQuestionBlockTypes
 {
@@ -55,7 +56,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	{		
 		// needed for excel export
 		$this->getPlugin()->loadLanguageModule();
-		$this->getPlugin()->includeClass("./support/codeBlocks.php");
+		//$this->getPlugin()->includeClass("./support/codeBlocks.php");
 
 		$this->blocks = new codeBlocks($this->getPlugin(), null, $question);
 		parent::__construct($title, $comment, $author, $owner, $question);
@@ -70,7 +71,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if ($this->plugin == null)
 		{
 			include_once "./Services/Component/classes/class.ilPlugin.php";
-			$this->plugin = ilPlugin::getPluginObject(IL_COMP_MODULE, "TestQuestionPool", "qst", "assCodeQuestion");
+			$this->plugin = initPluginObject("assCodeQuestion");
 				
 		}
 		return $this->plugin;
@@ -81,13 +82,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * The method will cache the results, so changes to the DB after the first get are not reflected!
 	 */
 	var $_settings = NULL;
-	public function getSettings(){
+	/*public function getSettings(){
 		if ($this->_settings == NULL){
 			$this->plugin->includeClass("class.ilassCodeQuestionConfigGUI.php");	
 			$this->_settings = ilassCodeQuestionConfigGUI::loadSettings();
 		}
 		return $this->_settings;
-	}
+	}*/
 
 	public function blocks(){
 		return $this->blocks;
@@ -98,7 +99,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @return boolean True, if the question is complete for use, otherwise false
 	 */
-	public function isComplete()
+	public function isComplete(): bool
 	{
 		// Please add here your own check for question completeness
 		// The parent function will always return false
@@ -119,7 +120,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access 	public
 	 * @see assQuestion::saveToDb()
 	 */
-	function saveToDb($original_id = "")
+	function saveToDb(string $original_id = ""):void
 	{
 		global $ilDB;
 
@@ -167,7 +168,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @param integer $question_id A unique key which defines the question in the database
 	 * @see assQuestion::loadFromDb()
 	 */
-	public function loadFromDb($question_id)
+	public function loadFromDb(int $question_id): void
 	{
 		global $ilDB;
                 
@@ -179,7 +180,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->setId($question_id);
 		$this->setTitle($data["title"]);
 		$this->setComment($data["description"]);
-		$this->setSuggestedSolution($data["solution_hint"]);
+		//TODO: Find how this is done in ilias 9
+		//$this->setSuggestedSolution($data["solution_hint"]);
 		$this->setOriginalId($data["original_id"]);
 		$this->setObjId($data["obj_fi"]);
 		$this->setAuthor($data["author"]);
@@ -188,7 +190,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		include_once("./Services/RTE/classes/class.ilRTE.php");
 		$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"], 1));
-		$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
+		//TODO: Find how this is done in ilias 9
+		//$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 
 		// now you can load additional data
 		$result = $ilDB->query(
@@ -201,7 +204,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		
 		try
 		{
-			$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
+			if (isset($data['add_cont_edit_mode']))
+				$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
 		}
 		catch(ilTestQuestionPoolException $e)
 		{
@@ -237,12 +241,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @access public
 	 */
-	function duplicate($for_test = true, $title = "", $author = "", $owner = "", $testObjId = null)
+	function duplicate(bool $for_test = true, string $title = '', string $author = '', int $owner = -1, $testObjId = null): int
 	{
 		if ($this->getId() <= 0)
 		{
 			// The question has not been saved. It cannot be duplicated
-			return;
+			return -1;
 		}
 
 		// make a real clone to keep the object unchanged
@@ -335,7 +339,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * 
 	 * @access public
 	 */
-	function syncWithOriginal()
+	function syncWithOriginal():void
 	{
 		parent::syncWithOriginal();
 	}
@@ -485,7 +489,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see  assQuestion::calculateReachedPoints()
 	 */
-	function calculateReachedPoints($active_id, $pass = -1, $authorizedSolution = true, $returndetails = FALSE)
+	function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): array|float
 	{
 		if( $returndetails )
 		{
@@ -553,7 +557,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access 	public
 	 * @see 	assQuestion::saveWorkingData()
 	 */
-	function saveWorkingData($active_id, $pass = -1, $authorized = true)
+	function saveWorkingData(int $active_id, int $pass = -1, bool $authorized = true): bool
 	{
 		global $ilDB;
 		global $ilUser;
@@ -620,7 +624,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      *
      * @inheritdoc
      */
-    public function removeCurrentSolution($active_id, $pass, $authorized = true)
+    public function removeCurrentSolution(int $active_id, int $pass, bool $authorized = true): int
     {
 		global $ilDB;
         if($this->getStep() !== NULL)
@@ -659,7 +663,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      *
      * @inheritdoc
      */
-    public function removeExistingSolutions($activeId, $pass)
+    public function removeExistingSolutions(int $activeId, int $pass): int
     {
 		global $ilDB;
         $query = "
@@ -683,7 +687,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
      *
      * @inheritdoc
      */
-    public function lookupForExistingSolutions($activeId, $pass)
+    public function lookupForExistingSolutions(int $activeId, int $pass): array
     {
 		/** @var $ilDB \ilDBInterface  */
         global $ilDB;
@@ -729,7 +733,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @return string The question type of the question
 	 */
-	public function getQuestionType()
+	public function getQuestionType():string
 	{
 		return "assCodeQuestion";
 	}
@@ -752,7 +756,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * Collects all text in the question which could contain media objects
 	 * which were created with the Rich Text Editor
 	 */
-	function getRTETextWithMediaObjects()
+	function getRTETextWithMediaObjects(): string
 	{
 		$text = parent::getRTETextWithMediaObjects();
 
@@ -835,7 +839,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see assQuestion::fromXML()
 	 */
-	function fromXML(&$item, &$questionpool_id, &$tst_id, &$tst_object, &$question_counter, &$import_mapping)
+	function fromXML($item, int $questionpool_id, ?int $tst_id, &$tst_object, int &$question_counter, array $import_mapping, array &$solutionhints = []): array
 	{
 		$this->getPlugin()->includeClass("import/qti12/class.assCodeQuestionImport.php");
 		$import = new assCodeQuestionImport($this);
@@ -851,7 +855,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see assQuestion::toXML()
 	 */
-	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false)
+	function toXML(bool $a_include_header = true, bool $a_include_binary = true, bool $a_shuffle = false, bool $test_output = false, bool $force_image_references = false): string
 	{
 		$this->getPlugin()->includeClass("export/qti12/class.assCodeQuestionExport.php");
 		$export = new assCodeQuestionExport($this);
@@ -868,7 +872,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @param integer $questionId
 	 * @return boolean $obligationPossible
 	 */
-	public static function isObligationPossible($questionId)
+	public static function isObligationPossible(int $questionId): bool
 	{
 		return true;
 	}
@@ -1006,6 +1010,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 		}
 		return $res;
+	}
+
+	public function getAnswerTableName():string{
+		return "il_qpl_qst_codeqst_dat";
 	}
 }
 
