@@ -116,11 +116,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	/**
 	 * Saves a question object to a database
 	 * 
-	 * @param	string		original id
+	 * @param	int		original id
 	 * @access 	public
 	 * @see assQuestion::saveToDb()
 	 */
-	function saveToDb(string $original_id = ""):void
+	function saveToDb(int $original_id = -1):void
 	{
 		global $ilDB;
 
@@ -275,11 +275,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		
 		if ($for_test)
 		{
-			$clone->saveToDb($original_id, false);
+			$clone->saveToDb($original_id);
 		}
 		else
 		{
-			$clone->saveToDb('', false);
+			$clone->saveToDb();
 		}		
 
 		// copy question page content
@@ -320,7 +320,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		}
 				
 		// save the clone data
-		$clone->saveToDb('', false);
+		$clone->saveToDb();
 
 		// copy question page content
 		$clone->copyPageOfQuestion($original_id);
