@@ -185,6 +185,9 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	public function setFromPOST($P){	
+		if (!isset($P['block_settings']) || !isset($P['block_settings'][$this->getID()])){
+			return;
+		}
         $settings = json_decode($P['block_settings'][$this->getID()]);
 		$randomizer = $settings->randomizer;
 		
@@ -378,8 +381,9 @@ class codeBlocks implements ArrayAccess {
 	function getCompilerLanguage() {
 		//old style
 		if (
-			$this->getDataVersion()=='100' 
-			||
+			$this->getDataVersion()=='100'  ||
+			!isset($this->additional_data['compiler']) ||
+			!isset($this->additional_data['compiler']['language']) ||
 			!is_string($this->additional_data['compiler']['language'])
 		) {
 			return $this->getLanguage();
@@ -397,11 +401,16 @@ class codeBlocks implements ArrayAccess {
 			return '100';
 		}
 		
-		return is_string($this->additional_data['compiler']['version']) ? $this->additional_data['compiler']['version'] : 'default';
+		return isset($this->additional_data['compiler']) && 
+			   isset($this->additional_data['compiler']['version']) && 
+				is_string($this->additional_data['compiler']['version']) 
+				
+				? $this->additional_data['compiler']['version'] 
+				: 'default';
 	}
 
 	private function _getLanguage() {
-		return is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
+		return isset($this->additional_data['language']) && is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
 	}
     
     function getLanguage() {

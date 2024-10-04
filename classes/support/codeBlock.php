@@ -95,7 +95,7 @@ class codeBlock {
 			$t = assCodeQuestionBlockTypes::Text;
 		} else if ($options->type == 'BLOCKLY'){
 			$t = assCodeQuestionBlockTypes::Blockly;
-			if (is_object($options->blockly)) {
+			if (isset($options->blockly) && is_object($options->blockly)) {
 				//convert from std class (object) to array				
 				$ar = [];
 				foreach ($options->blockly as $i=>$val){
@@ -124,7 +124,7 @@ class codeBlock {
             'generateTemplate' => $options->generateTemplate == 1 || $options->generateTemplate == 'true',
 			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
 			'altContent' => $altContent,
-			'blockly' => $options->blockly
+			'blockly' => isset($options->blockly) ? $options->blockly : NULL,
 		);				
 		
 		$o = new codeBlock($nr, $data, $object);

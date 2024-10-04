@@ -71,9 +71,8 @@ class codeBlocksUI {
         return $html;
     }
 
-    public function mountyJSCode($basePath, $mountOnly=false){
-        $loader = "try {\n";
-        $loader .= "    import('" . iljQueryUtil::getLocaljQueryPath() . "').then(()=> {\n";        
+    public function mountyJSCode($basePath, $mountOnly=false):string{
+        $loader = "if (typeof $ !== 'undefined') {\n";
         $loader .= 'if (window.mountCodeBlocks) {' . "\n";
         //$loader .= '    console.log("MOUNTING")' . "\n";
         $loader .= '    mountCodeBlocks()' . "\n";
@@ -107,12 +106,8 @@ class codeBlocksUI {
                 $loader .= 'if (window.processMixedOutput === undefined) {' . "\n";
                 $loader .= "    import('" . $basePath . "/js/legacyHelper.js#20200409')\n";
                 $loader .= '}' . "\n";
-            }
-
-            $loader .= "    })\n";
-            $loader .= "} catch (error) {\n";
-            $loader .= "    console.error(error)\n";
-            $loader .= "} \n";
+            }   
+            $loader .= '}' . "\n";         
         }
 
         return $loader;
