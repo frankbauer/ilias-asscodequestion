@@ -72,7 +72,9 @@ class codeBlocksUI {
     }
 
     public function mountyJSCode($basePath, $mountOnly=false){
-        $loader = 'if (window.mountCodeBlocks) {' . "\n";
+        $loader = "try {\n";
+        $loader .= "    import('" . iljQueryUtil::getLocaljQueryPath() . "').then(()=> {\n";        
+        $loader .= 'if (window.mountCodeBlocks) {' . "\n";
         //$loader .= '    console.log("MOUNTING")' . "\n";
         $loader .= '    mountCodeBlocks()' . "\n";
         if ($mountOnly){
@@ -106,6 +108,11 @@ class codeBlocksUI {
                 $loader .= "    import('" . $basePath . "/js/legacyHelper.js#20200409')\n";
                 $loader .= '}' . "\n";
             }
+
+            $loader .= "    })\n";
+            $loader .= "} catch (error) {\n";
+            $loader .= "    console.error(error)\n";
+            $loader .= "} \n";
         }
 
         return $loader;
@@ -121,6 +128,8 @@ class codeBlocksUI {
             $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
             $css_file = $basePath.'/'.CODEBLOCKS_REL_PATH.'css/main.css';                
             $on_load_code = $this->mountyJSCode($basePath, false);
+
+            iljQueryUtil::initjQuery($tpl);
 
             if ($tpl instanceof ilGlobalTemplateInterface) {
                 $tpl->addInlineCss($inline_css);
