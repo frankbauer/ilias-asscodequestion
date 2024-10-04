@@ -13,11 +13,11 @@
 (create subdirectories, if neccessary):
 `Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion`
 2. When in production you should remove or exclude the `__dev/`-Folder. You will not need to pull the submodules from `__dev/`! 
-3. Ypu need to update the classmap after installing any Plugin. In the folder of your ILIAS installation, call `composer install --no-dev` to  regenerate the class map and build the static artifacts map. 
-3. Go to Administration > Plugins. If you do not see the plugin, your static artifact map needs to be rebuilt. You can rebuild those by calling `php setup/cli.php build-artifacts` in the folder of your ILIAS installation.
-4. Choose **Update** for the `assCodeQuestion` plugin
-5. Choose **Activate** for the `assCodeQuestion` plugin
-6. Choose **Refresh** for the `assCodeQuestion` plugin languages
+3. You need to update the classmap after installing any Plugin. In the folder of your ILIAS installation, call `composer install --no-dev` to  regenerate the class map and build the static artifacts map. 
+4. Go to Administration > Plugins. If you do not see the plugin, your static artifact map needs to be rebuilt. You can rebuild those by calling `php setup/cli.php build-artifacts` in the folder of your ILIAS installation.
+5. Choose **Update** for the `assCodeQuestion` plugin
+6. Choose **Activate** for the `assCodeQuestion` plugin
+7. Choose **Refresh** for the `assCodeQuestion` plugin languages
 
 There is nothing to configure for this plugin.
 

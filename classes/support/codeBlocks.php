@@ -479,38 +479,38 @@ class codeBlocks implements ArrayAccess {
 
 
 
-	public function offsetSet($offset, $value) {
+	public function offsetSet($offset, $value):void {
         //we do not support the change of an offset
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset):bool {
         return isset($this->blocks[$offset]);
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset):void {
         unset($this->blocks[$offset]);
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         return isset($this->blocks[$offset]) ? $this->blocks[$offset] : null;
 	}
 	
-	function getNumberOfBlocks() {
+	function getNumberOfBlocks():int {
 		return count($this->blocks);		
 	}
 
-	function getBlock($idx){
+	function getBlock($idx):mixed{
 		return $this->blocks[idx];
 	}
 
-	function clearBlocks(){
+	function clearBlocks():void{
 		$this->additional_data['blocks'] = array();
 		$this->blocks = array();
 	}
 
 
 
-	function getCompleteCombinedCode($state=NULL, $withSolution=false, $solutions=NULL){
+	function getCompleteCombinedCode($state=NULL, $withSolution=false, $solutions=NULL):void{
 		$blocks = $this->getCombinedBlocks($state, $withSolution, $solutions);
 	}
 }

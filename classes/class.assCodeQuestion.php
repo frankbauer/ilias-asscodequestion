@@ -903,14 +903,17 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function getExportFilename($solution=NULL) {
-		if (is_string($this->additional_data['export_filename'])) {
+		if (isset($this->additional_data['export_filename']) && is_string($this->additional_data['export_filename'])) {
 			return $this->additional_data['export_filename'];
 		} else if ($this->blocks->getLanguage()=='java' || $this->blocks->getLanguage()=='java2'){
             $code = $this->getBestSolution($solution);
             $code = str_replace("&#123;", "{", $code);
-			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $code, $matches, PREG_OFFSET_CAPTURE);				
-			$className = trim($matches[1][0]);
-			if ($className=='') $className="Unbekannt";
+			preg_match("/public[ \n]*class[ \n]*([a-zA-Z_$0-9]*)[ \n]*(\{|implements|extends)/", $code, $matches, PREG_OFFSET_CAPTURE);
+			$className = '';
+			if (count($matches)>1){				
+			    $className = trim($matches[1][0]);			    
+			}
+			if ($className == '') $className = 'Unbekannt';
 			return $className.'.java';
 		} else {
 			return sprintf('Question_%09d.%s', $this->getId(), $this->getExportExtension());
@@ -918,6 +921,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function getBestSolution($solution){
+		if ($solution==NULL || !isset($solution['value2'])) return '';
+
 		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], false);
 	
 		$res = '';
@@ -1014,6 +1019,18 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 	public function getAnswerTableName():string{
 		return "il_qpl_qst_codeqst_dat";
+	}
+
+	public function getTitle():string{
+		return $this->title;
+	}
+
+	public function getComment():string{
+		return $this->comment;
+	}
+
+	public function getQuestion():string{
+		return $this->question;
 	}
 }
 
