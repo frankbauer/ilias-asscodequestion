@@ -3,31 +3,31 @@
 include_once "./Modules/TestQuestionPool/classes/export/qti12/class.assQuestionExport.php";
 
 /**
-* Example question export
-*
-* @author	Frank Bauer <frank.bauer@fau.de>
-* @version	$Id:  $
-* @ingroup ModulesTestQuestionPool
-*/
+ * Example question export
+ *
+ * @author	Frank Bauer <frank.bauer@fau.de>
+ * @version	$Id:  $
+ * @ingroup ModulesTestQuestionPool
+ */
 class assCodeQuestionExport extends assQuestionExport
 {
 	/**
-	* Returns a QTI xml representation of the question
-	*
-	* @return string The QTI xml representation of the question
-	* @access public
-	*/
+	 * Returns a QTI xml representation of the question
+	 *
+	 * @return string The QTI xml representation of the question
+	 * @access public
+	 */
 	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string
 	{
 		global $ilias;
-		
+
 		include_once("./Services/Xml/classes/class.ilXmlWriter.php");
 		$a_xml_writer = new ilXmlWriter;
 		// set xml header
 		$a_xml_writer->xmlHeader();
 		$a_xml_writer->xmlStartTag("questestinterop");
 		$attrs = array(
-			"ident" => "il_".IL_INST_ID."_qst_".$this->object->getId(),
+			"ident" => "il_" . IL_INST_ID . "_qst_" . $this->object->getId(),
 			"title" => $this->object->getTitle(),
 			"maxattempts" => $this->object->getNrOfTries()
 		);
@@ -35,9 +35,9 @@ class assCodeQuestionExport extends assQuestionExport
 		// add question description
 		$a_xml_writer->xmlElement("qticomment", NULL, $this->object->getComment());
 		// add estimated working time
-		$workingtime = $this->object->getEstimatedWorkingTime();
-		$duration = sprintf("P0Y0M0DT%dH%dM%dS", $workingtime["h"], $workingtime["m"], $workingtime["s"]);
-		$a_xml_writer->xmlElement("duration", NULL, $duration);
+		//$workingtime = $this->object->getEstimatedWorkingTime();
+		//$duration = sprintf("P0Y0M0DT%dH%dM%dS", $workingtime["h"], $workingtime["m"], $workingtime["s"]);
+		//$a_xml_writer->xmlElement("duration", NULL, $duration);
 		// add ILIAS specific metadata
 		$a_xml_writer->xmlStartTag("itemmetadata");
 		$a_xml_writer->xmlStartTag("qtimetadata");
@@ -79,7 +79,7 @@ class assCodeQuestionExport extends assQuestionExport
 		// add flow to presentation
 		$a_xml_writer->xmlStartTag("flow");
 		// add material with question text to presentation
-		$this->object->addQTIMaterial($a_xml_writer, $this->object->getQuestion());
+		$this->addQTIMaterial($a_xml_writer, $this->object->getQuestion());
 
 		$a_xml_writer->xmlEndTag("flow");
 		$a_xml_writer->xmlEndTag("presentation");
@@ -87,11 +87,13 @@ class assCodeQuestionExport extends assQuestionExport
 
 		// PART III: qti itemfeedback
 		$feedback_allcorrect = $this->object->feedbackOBJ->getGenericFeedbackExportPresentation(
-			$this->object->getId(), true
+			$this->object->getId(),
+			true
 		);
 
 		$feedback_onenotcorrect = $this->object->feedbackOBJ->getGenericFeedbackExportPresentation(
-			$this->object->getId(), false
+			$this->object->getId(),
+			false
 		);
 
 		$attrs = array(
@@ -106,8 +108,7 @@ class assCodeQuestionExport extends assQuestionExport
 		$a_xml_writer->xmlEndTag("material");
 		$a_xml_writer->xmlEndTag("flow_mat");
 		$a_xml_writer->xmlEndTag("itemfeedback");
-		if (strlen($feedback_allcorrect))
-		{
+		if (strlen($feedback_allcorrect)) {
 			$attrs = array(
 				"ident" => "response_allcorrect",
 				"view" => "All"
@@ -115,12 +116,11 @@ class assCodeQuestionExport extends assQuestionExport
 			$a_xml_writer->xmlStartTag("itemfeedback", $attrs);
 			// qti flow_mat
 			$a_xml_writer->xmlStartTag("flow_mat");
-			$this->object->addQTIMaterial($a_xml_writer, $feedback_allcorrect);
+			$this->addQTIMaterial($a_xml_writer, $feedback_allcorrect);
 			$a_xml_writer->xmlEndTag("flow_mat");
 			$a_xml_writer->xmlEndTag("itemfeedback");
 		}
-		if (strlen($feedback_onenotcorrect))
-		{
+		if (strlen($feedback_onenotcorrect)) {
 			$attrs = array(
 				"ident" => "response_onenotcorrect",
 				"view" => "All"
@@ -128,7 +128,7 @@ class assCodeQuestionExport extends assQuestionExport
 			$a_xml_writer->xmlStartTag("itemfeedback", $attrs);
 			// qti flow_mat
 			$a_xml_writer->xmlStartTag("flow_mat");
-			$this->object->addQTIMaterial($a_xml_writer, $feedback_onenotcorrect);
+			$this->addQTIMaterial($a_xml_writer, $feedback_onenotcorrect);
 			$a_xml_writer->xmlEndTag("flow_mat");
 			$a_xml_writer->xmlEndTag("itemfeedback");
 		}
@@ -137,8 +137,7 @@ class assCodeQuestionExport extends assQuestionExport
 		$a_xml_writer->xmlEndTag("questestinterop");
 
 		$xml = $a_xml_writer->xmlDumpMem(FALSE);
-		if (!$a_include_header)
-		{
+		if (!$a_include_header) {
 			$pos = strpos($xml, "?>");
 			$xml = substr($xml, $pos + 2);
 		}

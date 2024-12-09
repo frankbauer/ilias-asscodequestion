@@ -31,7 +31,7 @@ class assCodeQuestionImport extends assQuestionImport
 		// empty session variable for imported xhtml mobs
 		unset($_SESSION["import_mob_xhtml"]);
 		$presentation = $item->getPresentation();
-		$duration = $item->getDuration();
+		//$duration = $item->getDuration();
 		$now = getdate();
 		$created = sprintf("%04d%02d%02d%02d%02d%02d", $now['year'], $now['mon'], $now['mday'], $now['hours'], $now['minutes'], $now['seconds']);
 
@@ -99,7 +99,7 @@ class assCodeQuestionImport extends assQuestionImport
 		$this->object->setComment($item->getComment());
 		$this->object->setAuthor($item->getAuthor());
 		$this->object->setOwner($ilUser->getId());
-		$this->object->setQuestion($this->object->QTIMaterialToString($item->getQuestiontext()));
+		$this->object->setQuestion($this->QTIMaterialToString($item->getQuestiontext()));
 		$this->object->setObjId($questionpool_id);
 		//TODO: Find how this is done in ilias 9
 		//$this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
@@ -117,7 +117,7 @@ class assCodeQuestionImport extends assQuestionImport
 		// convert the generic feedback
 		foreach ($feedbacksgeneric as $correctness => $material)
 		{
-			$m = $this->object->QTIMaterialToString($material);
+			$m = $this->QTIMaterialToString($material);
 			$feedbacksgeneric[$correctness] = $m;
 		}
 
@@ -177,6 +177,8 @@ class assCodeQuestionImport extends assQuestionImport
 		{
 			$import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
 		}
+
+		return $import_mapping;
 	}
 }
 

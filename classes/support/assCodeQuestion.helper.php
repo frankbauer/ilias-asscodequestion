@@ -1,5 +1,5 @@
 <?php 
-    function initPluginObject(string $plugin_name):ilPlugin{
+    function initPluginObject(string $plugin_name):ilPlugin|null{
         // init the plugin object
         try {
             global $DIC;
@@ -17,7 +17,8 @@
             }
         } catch (ilPluginException $e) {
             global $tpl;
-            $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
+            //$tpl->setOnScreenMessage('failure', $e->getMessage(), true);
+            return null;
         }
     }
 ?>
