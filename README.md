@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  2.0.5
+**Version**:  2.0.6
 
 **Company**:  Visual Computing Erlangen (FAU)
 

@@ -74,3 +74,13 @@ if ($res->numRows() == 0)
 		));		
     }
 ?>
+<#4>
+<?php
+/**
+ * Insert plugin name into qpl_qst_type as this appears to be required now
+ */
+if($ilDB->tableColumnExists('qpl_qst_type', 'plugin_name'))
+{
+    $ilDB->manipulate("UPDATE qpl_qst_type set plugin_name = type_tag WHERE type_tag ='assCodeQuestion'");
+}
+?>
