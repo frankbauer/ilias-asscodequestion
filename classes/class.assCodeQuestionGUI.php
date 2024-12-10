@@ -238,7 +238,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 				$questiontext, 
 				$this->question_object->blocks()->getRandomSet(($value2!=NULL && isset($value2->rid))?$value2->rid:-1)
 			);
-			$questiontext = ilLegacyFormElementsUtil::prepareTextareaOutput($questiontext, TRUE);			
+			$questiontext = self::prepareTextareaOutput($questiontext, TRUE);			
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
@@ -442,7 +442,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
-		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", ilLegacyFormElementsUtil::prepareTextareaOutput( $feedback, true ));
+		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", self::prepareTextareaOutput( $feedback, true ));
 
 		$solutionoutput = $solutiontemplate->get();	
 		if(!$show_question_only)
@@ -469,7 +469,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	{
 		// By default no answer specific feedback is defined
 		$output = '';
-		return ilLegacyFormElementsUtil::prepareTextareaOutput($output, TRUE);
+		return self::prepareTextareaOutput($output, TRUE);
 	}
 	
 	
