@@ -9,16 +9,14 @@ include_once "./Modules/TestQuestionPool/classes/export/qti12/class.assQuestionE
  * @version	$Id:  $
  * @ingroup ModulesTestQuestionPool
  */
-class assCodeQuestionExport extends assQuestionExport
-{
+class assCodeQuestionExport extends assQuestionExport {
 	/**
 	 * Returns a QTI xml representation of the question
 	 *
 	 * @return string The QTI xml representation of the question
 	 * @access public
 	 */
-	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string
-	{
+	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string {
 		global $ilias;
 
 		include_once("./Services/Xml/classes/class.ilXmlWriter.php");

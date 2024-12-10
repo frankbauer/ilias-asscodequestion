@@ -1,8 +1,7 @@
 <?php
 require_once 'codeblocks-conf-0.2.14.php';
 
-class codeBlocks implements ArrayAccess
-{
+class codeBlocks implements ArrayAccess {
 	const DEFAULT_DATA_VERSION = '101';
 
 	/* custom data we need to store fpr this question type. This array is serialized to json and stored in the db */
@@ -14,8 +13,7 @@ class codeBlocks implements ArrayAccess
 	var $plugin = null;
 	var $id = 0;
 
-	public function __construct($plugin, $json_data, $id)
-	{
+	public function __construct($plugin, $json_data, $id) {
 		$this->plugin = $plugin;
 		$this->id = $id;
 		// $this->getPlugin()->includeClass("./ui/codeBlocksUI.php");
@@ -43,8 +41,7 @@ class codeBlocks implements ArrayAccess
 	 * Used to generate a token for each solution. 
 	 * We will use this when talking to a solution as a salt.
 	 */
-	function guidv4()
-	{
+	function guidv4() {
 		if (function_exists('com_create_guid') === true)
 			return trim(com_create_guid(), '{}');
 
@@ -54,32 +51,27 @@ class codeBlocks implements ArrayAccess
 		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 	}
 
-	public function getPlugin()
-	{
+	public function getPlugin() {
 		return $this->plugin;
 	}
 
-	public function getId()
-	{
+	public function getId() {
 		return $this->id;
 	}
 
 	var $ui = null;
-	function ui()
-	{
+	function ui() {
 		if ($this->ui == null) {
 			$this->ui = new codeBlocksUI($this);
 		}
 		return $this->ui;
 	}
 
-	function updateWithJSONEncodedAdditionalData($data)
-	{
+	function updateWithJSONEncodedAdditionalData($data) {
 		$this->setJSONEncodedAdditionalData($data);
 	}
 
-	private function setJSONEncodedAdditionalData($data)
-	{
+	private function setJSONEncodedAdditionalData($data) {
 		$this->additional_data = json_decode($data, true);
 
 		if (!isset($this->additional_data['version'])) {
@@ -110,9 +102,9 @@ class codeBlocks implements ArrayAccess
 				if ($nr == 0)
 					$t = isset($this->additional_data['prefixCode']) ? $this->additional_data['prefixCode'] : '';
 				else if ($nr == 1)
-					$t = isset($this->additional_data['bestSolution']) ?$this->additional_data['bestSolution'] : '';
+					$t = isset($this->additional_data['bestSolution']) ? $this->additional_data['bestSolution'] : '';
 				else if ($nr == 2)
-					$t = isset($this->additional_data['postfixCode']) ?$this->additional_data['postfixCode'] : '';
+					$t = isset($this->additional_data['postfixCode']) ? $this->additional_data['postfixCode'] : '';
 				$this->additional_data['blocks'][$nr]['content'] = $t;
 			}
 
@@ -146,8 +138,7 @@ class codeBlocks implements ArrayAccess
 	/**
 	 * Loads the blocks structure from the internal attribute 'additional_data'
 	 */
-	private function loadBlocks($forecReload = false)
-	{
+	private function loadBlocks($forecReload = false) {
 		$ct = count($this->additional_data['blocks']);
 
 		if ($forecReload || $this->blocks == null /*|| $ct!=count($this->blocks)*/) {
@@ -159,8 +150,7 @@ class codeBlocks implements ArrayAccess
 		return $this->blocks;
 	}
 
-	function tidyAdditionalData()
-	{
+	function tidyAdditionalData() {
 		$this->additional_data['storageUUID'] = $this->guidv4();
 		$bls = array();
 		foreach ($this->blocks as $cbl) {
@@ -171,18 +161,15 @@ class codeBlocks implements ArrayAccess
 		return $this->additional_data;
 	}
 
-	function getJSONEncodedAdditionalData()
-	{
+	function getJSONEncodedAdditionalData() {
 		return json_encode($this->tidyAdditionalData());
 	}
 
-	public function getDataVersion()
-	{
+	public function getDataVersion() {
 		return $this->additional_data['version'];
 	}
 
-	public function getStorageUUID()
-	{
+	public function getStorageUUID() {
 		if (!isset($this->additional_data['storageUUID'])) {
 			return NULL;
 		}
@@ -190,8 +177,7 @@ class codeBlocks implements ArrayAccess
 		return $this->additional_data['storageUUID'];
 	}
 
-	public function getMinCanvasVersion()
-	{
+	public function getMinCanvasVersion() {
 		$v = 999999;
 		foreach ($this->blocks as $cbl) {
 			if ($cbl->getType() == assCodeQuestionBlockTypes::Canvas) {
@@ -204,8 +190,7 @@ class codeBlocks implements ArrayAccess
 		return $v;
 	}
 
-	public function setFromPOST($P)
-	{
+	public function setFromPOST($P) {
 		if (!isset($P['block_settings']) || !isset($P['block_settings'][$this->getID()])) {
 			return;
 		}
@@ -278,8 +263,7 @@ class codeBlocks implements ArrayAccess
 		}
 	}
 
-	function processStringWithSet($str, $set)
-	{
+	function processStringWithSet($str, $set) {
 		if ($set == NULL)
 			return $str;
 		return preg_replace_callback(
@@ -291,8 +275,7 @@ class codeBlocks implements ArrayAccess
 		);
 	}
 
-	function getRandomSet($setNr)
-	{
+	function getRandomSet($setNr) {
 		$set = $this->getRandomizerSets();
 		if ($setNr >= 0 && $setNr < count($set))
 			$set = $set[$setNr];
@@ -306,8 +289,7 @@ class codeBlocks implements ArrayAccess
 		return $set;
 	}
 
-	function getBestRandomSolution($setNr)
-	{
+	function getBestRandomSolution($setNr) {
 		$res = array();
 		$set = ($this->getRandomizerActive()) ? $this->getRandomSet($setNr) : NULL;
 
@@ -318,8 +300,7 @@ class codeBlocks implements ArrayAccess
 	}
 
 
-	function getRandomBlocks($setNr)
-	{
+	function getRandomBlocks($setNr) {
 		$res = array();
 		$set = ($this->getRandomizerActive()) ? $this->getRandomSet($setNr) : NULL;
 
@@ -333,8 +314,7 @@ class codeBlocks implements ArrayAccess
 		return $res;
 	}
 
-	function getCombinedBlocks($state = NULL, $withSolution = false, $solutions = NULL)
-	{
+	function getCombinedBlocks($state = NULL, $withSolution = false, $solutions = NULL) {
 		$res = array();
 
 		for ($i = 0; $i < count($this->blocks); $i++) {
@@ -344,93 +324,74 @@ class codeBlocks implements ArrayAccess
 	}
 
 
-	function getRandomizerActive()
-	{
+	function getRandomizerActive() {
 		return isset($this->additional_data['rndAct']) ? $this->additional_data['rndAct'] : false;
 	}
 
-	function setRandomizerActive($newValue)
-	{
+	function setRandomizerActive($newValue) {
 		$this->additional_data['rndAct'] = $newValue;
 	}
 
-	function getRandomizerPreviewIndex()
-	{
+	function getRandomizerPreviewIndex() {
 		return isset($this->additional_data['rndIdx']) ? $this->additional_data['rndIdx'] : 0;
 	}
 
-	function setRandomizerPreviewIndex($newValue)
-	{
+	function setRandomizerPreviewIndex($newValue) {
 		$this->additional_data['rndIdx'] = $newValue;
 	}
 
-	function getRandomizerTags()
-	{
+	function getRandomizerTags() {
 		return isset($this->additional_data['rndTags']) ? $this->additional_data['rndTags'] : array();
 	}
 
-	function setRandomizerTags($newValue)
-	{
+	function setRandomizerTags($newValue) {
 		$this->additional_data['rndTags'] = $newValue;
 	}
 
-	function getRandomizerSets()
-	{
+	function getRandomizerSets() {
 		return isset($this->additional_data['rndSets']) ? $this->additional_data['rndSets'] : array();
 	}
 
-	function setRandomizerSets($newValue)
-	{
+	function setRandomizerSets($newValue) {
 		$this->additional_data['rndSets'] = $newValue;
 	}
 
-	function getContinuousCompilation()
-	{
+	function getContinuousCompilation() {
 		return isset($this->additional_data['continuousCompilation']) ? $this->additional_data['continuousCompilation'] : false;
 	}
-	function setContinuousCompilation($newValue)
-	{
+	function setContinuousCompilation($newValue) {
 		return $this->additional_data['continuousCompilation'] = $newValue;
 	}
 
-	function getPersistentArguments()
-	{
+	function getPersistentArguments() {
 		return isset($this->additional_data['persistentArguments']) ? $this->additional_data['persistentArguments'] : false;
 	}
-	function setPersistentArguments($newValue)
-	{
+	function setPersistentArguments($newValue) {
 		return $this->additional_data['persistentArguments'] = $newValue;
 	}
-	function getMessagePassing()
-	{
+	function getMessagePassing() {
 		return isset($this->additional_data['messagePassing']) ? $this->additional_data['messagePassing'] : false;
 	}
-	function setMessagePassing($newValue)
-	{
+	function setMessagePassing($newValue) {
 		return $this->additional_data['messagePassing'] = $newValue;
 	}
-	function getKeepAlive()
-	{
+	function getKeepAlive() {
 		return isset($this->additional_data['keepAlive']) ? $this->additional_data['keepAlive'] : false;
 	}
-	function setKeepAlive($newValue)
-	{
+	function setKeepAlive($newValue) {
 		return $this->additional_data['keepAlive'] = $newValue;
 	}
 
 
-	function getDomLibs()
-	{
+	function getDomLibs() {
 		return $this->additional_data['domlibs'];
 	}
 
-	function getWorkerLibs()
-	{
+	function getWorkerLibs() {
 		return $this->additional_data['workerlibs'];
 	}
 
-	function getCompilerLanguage()
-	{
+	function getCompilerLanguage() {
 		//old style
 		if (
 			$this->getDataVersion() == '100' ||
@@ -444,8 +405,7 @@ class codeBlocks implements ArrayAccess
 		return $this->additional_data['compiler']['language'];
 	}
 
-	function getCompilerVersion()
-	{
+	function getCompilerVersion() {
 		//old style
 		if ($this->getDataVersion() == '100') {
 			$v = $this->_getLanguage();
@@ -464,91 +424,74 @@ class codeBlocks implements ArrayAccess
 			: 'default';
 	}
 
-	private function _getLanguage()
-	{
+	private function _getLanguage() {
 		return isset($this->additional_data['language']) && is_string($this->additional_data['language']) ? $this->additional_data['language'] : 'javascript';
 	}
 
-	function getLanguage()
-	{
+	function getLanguage() {
 		$v = $this->_getLanguage();
 		if ($v == 'java2')
 			$v = 'java';
 		return $v;
 	}
 
-	function setLanguage($newLanguage)
-	{
+	function setLanguage($newLanguage) {
 		$this->additional_data['language'] = $newLanguage;
 	}
 
-	function getAllowRun()
-	{
+	function getAllowRun() {
 		return isset($this->additional_data['allowRun']) ? $this->additional_data['allowRun'] : true;
 	}
 
-	function setAllowRun($newValue)
-	{
+	function setAllowRun($newValue) {
 		$this->additional_data['allowRun'] = (bool) $newValue;
 	}
 
-	function getTimeoutMS()
-	{
+	function getTimeoutMS() {
 		return isset($this->additional_data['timeoutMS']) ? $this->additional_data['timeoutMS'] : 5000;
 	}
 
-	function setTimeoutMS($newValue)
-	{
+	function setTimeoutMS($newValue) {
 		$this->additional_data['timeoutMS'] = (int) $newValue;
 	}
 
-	function getMaxChars()
-	{
+	function getMaxChars() {
 		return isset($this->additional_data['maxChars']) ? $this->additional_data['maxChars'] : 6000;
 	}
 
-	function setMaxChars($newValue)
-	{
+	function setMaxChars($newValue) {
 		$this->additional_data['maxChars'] = (int) $newValue;
 	}
 
-	function getTheme()
-	{
+	function getTheme() {
 		return isset($this->additional_data['theme']) ? $this->additional_data['theme'] : 'solarized light';
 	}
 
-	function setTheme($newValue)
-	{
+	function setTheme($newValue) {
 		$this->additional_data['theme'] = '' . $newValue;
 	}
 
-	function getROTheme()
-	{
+	function getROTheme() {
 		return isset($this->additional_data['themeRO']) ? $this->additional_data['themeRO'] : 'xq-light';
 	}
 
-	function setROTheme($newValue)
-	{
+	function setROTheme($newValue) {
 		$this->additional_data['themeRO'] = '' . $newValue;
 	}
 
-	function getOutputParser()
-	{
+	function getOutputParser() {
 		return isset($this->additional_data['outputParser']) ? $this->additional_data['outputParser'] : 'auto';
 	}
 
-	function setOutputParser($newValue)
-	{
+	function setOutputParser($newValue) {
 		$this->additional_data['outputParser'] = $newValue;
 	}
 
-	public function __get($property)
-	{
+	public function __get($property) {
 		return $this->additional_data[$porperty];
 	}
 
-	public function __set($property, $value)
-	{
+	public function __set($property, $value) {
 		if (property_exists($this, $property)) {
 			return $this->additional_data[$porperty] = $value;
 		}
@@ -561,46 +504,38 @@ class codeBlocks implements ArrayAccess
 
 
 
-	public function offsetSet($offset, $value): void
-	{
+	public function offsetSet($offset, $value): void {
 		//we do not support the change of an offset
 	}
 
-	public function offsetExists($offset): bool
-	{
+	public function offsetExists($offset): bool {
 		return isset($this->blocks[$offset]);
 	}
 
-	public function offsetUnset($offset): void
-	{
+	public function offsetUnset($offset): void {
 		unset($this->blocks[$offset]);
 	}
 
-	public function offsetGet($offset): mixed
-	{
+	public function offsetGet($offset): mixed {
 		return isset($this->blocks[$offset]) ? $this->blocks[$offset] : null;
 	}
 
-	function getNumberOfBlocks(): int
-	{
+	function getNumberOfBlocks(): int {
 		return count($this->blocks);
 	}
 
-	function getBlock($idx): mixed
-	{
+	function getBlock($idx): mixed {
 		return $this->blocks[idx];
 	}
 
-	function clearBlocks(): void
-	{
+	function clearBlocks(): void {
 		$this->additional_data['blocks'] = array();
 		$this->blocks = array();
 	}
 
 
 
-	function getCompleteCombinedCode($state = NULL, $withSolution = false, $solutions = NULL): void
-	{
+	function getCompleteCombinedCode($state = NULL, $withSolution = false, $solutions = NULL): void {
 		$blocks = $this->getCombinedBlocks($state, $withSolution, $solutions);
 	}
 }

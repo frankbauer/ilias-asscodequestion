@@ -10,7 +10,6 @@ require_once 'Modules/TestQuestionPool/classes/feedback/class.ilAssSingleOptionQ
  *
  */
 
-class ilAssCodeQuestionFeedback extends ilAssSingleOptionQuestionFeedback
-{
-    
+class ilAssCodeQuestionFeedback extends ilAssSingleOptionQuestionFeedback {
+
 }

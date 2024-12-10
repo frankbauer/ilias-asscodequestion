@@ -9,8 +9,7 @@
 
 $res = $ilDB->queryF("SELECT * FROM qpl_qst_type WHERE type_tag = %s", array('text'), array('assCodeQuestion'));
 
-if ($res->numRows() == 0) 
-{
+if ($res->numRows() == 0) {
     $res = $ilDB->query("SELECT MAX(question_type_id) maxid FROM qpl_qst_type");
     $data = $ilDB->fetchAssoc($res);
     $max = $data["maxid"] + 1;
@@ -28,8 +27,7 @@ if ($res->numRows() == 0)
 	 * Add table for additional settings
 	 *
 	 */
-    if(!$ilDB->tableExists('il_qpl_qst_codeqst_dat'))
-    {
+    if(!$ilDB->tableExists('il_qpl_qst_codeqst_dat')) {
 		$fields = array(
 			'question_fi' => array(
 				'type' => 'integer',
@@ -52,8 +50,7 @@ if ($res->numRows() == 0)
 	 * Add table for additional settings
 	 *
 	 */
-    if(!$ilDB->tableExists('il_qpl_qst_codeqst_cfg'))
-    {
+    if(!$ilDB->tableExists('il_qpl_qst_codeqst_cfg')) {
 		$fields = array(
 			'config_fi' => array(
 				'type' => 'integer',
@@ -79,8 +76,7 @@ if ($res->numRows() == 0)
 /**
  * Insert plugin name into qpl_qst_type as this appears to be required now
  */
-if($ilDB->tableColumnExists('qpl_qst_type', 'plugin_name'))
-{
+if($ilDB->tableColumnExists('qpl_qst_type', 'plugin_name')) {
     $ilDB->manipulate("UPDATE qpl_qst_type set plugin_name = type_tag WHERE type_tag ='assCodeQuestion'");
 }
 ?>

@@ -5,7 +5,7 @@ require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoringAdjustable.php';
 require_once "./Services/Component/classes/class.ilPlugin.php";
-		
+
 /**
  * Example GUI class for question type plugins
  *
@@ -16,8 +16,7 @@ require_once "./Services/Component/classes/class.ilPlugin.php";
  * @ilctrl_iscalledby assCodeQuestionGUI: ilObjQuestionPoolGUI, ilObjTestGUI, ilQuestionEditGUI, ilTestExpressPageObjectGUI
  * @ilCtrl_Calls assCodeQuestionGUI: ilFormPropertyDispatchGUI
  */
-class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
-{
+class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable {
 	/**
 	 * @const	string	URL base path for including special javascript and css files
 	 */
@@ -35,27 +34,26 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	var assCodeQuestion $question_object;
 
 	var $lang_user = 'en';
-	
+
 	/**
-	* Constructor
-	*
-	* @param integer $id The database id of a question object
-	* @access public
-	*/
-	public function __construct($id = -1)
-	{
+	 * Constructor
+	 *
+	 * @param integer $id The database id of a question object
+	 * @access public
+	 */
+	public function __construct($id = -1) {
 		parent::__construct();
 		$this->plugin = assCodeQuestion::initPluginObject("assCodeQuestion");
 		$this->question_object = new assCodeQuestion();
 		$this->object = $this->question_object;
-		if ($id >= 0)
-		{
+		if ($id >= 0) {
 			$this->question_object->loadFromDb($id);
-		}		
+		}
 		global $DIC;
-		
+
 		$this->lang_user = $this->plugin->txt('used_lang');
-		if ('-qpl_qst_codeqst_used_lang-' == $this->lang_user) $this->lang_user = 'en';		
+		if ('-qpl_qst_codeqst_used_lang-' == $this->lang_user)
+			$this->lang_user = 'en';
 	}
 
 	function getLanguage() {
@@ -64,47 +62,47 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	var $didPrepare = false;
 	var $didAddLinksToSolutions = false;
-	private function getLanguageData(){
+	private function getLanguageData() {
 		$language = $this->getLanguage();
 		$inLanguage = $language;
 		// prepare language for hilight.js
 		$hljslanguage = $language;
 		$mode = $language;
-		if ($language=="java") {
+		if ($language == "java") {
 			$language = "clike";
 			$mode = "text/x-java";
-		} if ($language=="java2") {
+		}
+		if ($language == "java2") {
 			$language = "java";
 			$mode = "text/x-java";
-		} else if ($language=="c++") {
+		} else if ($language == "c++") {
 			$hljslanguage = 'cpp';
 			$language = "clike";
 			$mode = "text/x-c++src";
-		} else if ($language=="c") {
+		} else if ($language == "c") {
 			$language = "clike";
 			$mode = "text/x-csrc";
-		} else if ($language=="objectivec") {
+		} else if ($language == "objectivec") {
 			$language = "clike";
 			$mode = "text/x-objectivec";
-		} else if ($language=="glsl") {
+		} else if ($language == "glsl") {
 			$language = "clike";
 			$mode = "text/x-glsl";
-		} 
+		}
 
 		return array(
-			'cmLanguage'=>$language,
-			'cmMode'=>$mode,
-			'hljsLanguage'=>$hljslanguage,
-			'org'=>$inLanguage
-			);
+			'cmLanguage' => $language,
+			'cmMode' => $mode,
+			'hljsLanguage' => $hljslanguage,
+			'org' => $inLanguage
+		);
 	}
 
-	private function prepareTemplate($force=false, $negativeQuestionID=false)
-	{
-		$qidf = $negativeQuestionID?-1:1;
+	private function prepareTemplate($force = false, $negativeQuestionID = false) {
+		$qidf = $negativeQuestionID ? -1 : 1;
 		$lngData = $this->getLanguageData();
-		
-		$this->question_object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);			
+
+		$this->question_object->blocks()->ui()->prepareTemplate($this->tpl, self::URL_PATH);
 	}
 
 	/**
@@ -113,8 +111,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @param bool $checkonly
 	 * @return bool
 	 */
-	public function editQuestion($checkonly = FALSE)
-	{
+	public function editQuestion($checkonly = FALSE) {
 		include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
 
 		global $lng;
@@ -132,32 +129,31 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$form->setTableWidth("100%");
 		$form->setId("codeqst");
 		$form->setDescription($this->plugin->txt('question_edit_info'));
-		$this->addBasicQuestionFormProperties( $form );
+		$this->addBasicQuestionFormProperties($form);
 
 		$errors = false;
 
-		if ($save)
-		{            
+		if ($save) {
 			$form->setValuesByPost();
 			$errors = !$form->checkInput();
 			$form->setValuesByPost(); // again, because checkInput now performs the whole stripSlashes handling and we need this if we don't want to have duplication of backslashes
-			
+
 			//this reloads the posted data into the object
 			global $_POST;
 			$this->question_object->blocks()->setFromPOST($_POST);
-			
-			if ($errors) $checkonly = false;
+
+			if ($errors)
+				$checkonly = false;
 		}
 
-		$this->populateQuestionSpecificFormPart( $form );
-		$this->populateAnswerSpecificFormPart( $form );
+		$this->populateQuestionSpecificFormPart($form);
+		$this->populateAnswerSpecificFormPart($form);
 
 		// Here you can add question type specific form properties
 		$this->populateTaxonomyFormSection($form);
 		$this->addQuestionFormCommandButtons($form);
 
-		if (!$checkonly)
-		{
+		if (!$checkonly) {
 			$this->tpl->setVariable("QUESTION_DATA", $form->getHTML());
 		}
 		return $errors;
@@ -169,11 +165,9 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @param bool $always
 	 * @return integer A positive value, if one of the required fields wasn't set, else 0
 	 */
-	public function writePostData(bool $always = false): int
-	{
+	public function writePostData(bool $always = false): int {
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
-		if (!$hasErrors)
-		{			
+		if (!$hasErrors) {
 			$this->writeQuestionGenericPostData();
 			$this->writeQuestionSpecificPostData(new ilPropertyFormGUI());
 			$this->writeAnswerSpecificPostData(new ilPropertyFormGUI());
@@ -191,12 +185,11 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @see assAccountingQuestion::getSolutionSubmit()
 	 */
-	private function getQuestionOutput($value1, $value2, $template=NULL, $show_question_text=true, $htmlResults=false, $readOnly=false, $negativeQuestionID=false, $active_id=NULL, $print=false, $student_solution=true)
-	{		
+	private function getQuestionOutput($value1, $value2, $template = NULL, $show_question_text = true, $htmlResults = false, $readOnly = false, $negativeQuestionID = false, $active_id = NULL, $print = false, $student_solution = true) {
 		//$dddddd = print_r("[getQuestionOutput value1=".print_r($value1, true).", value2=".print_r($value2, true).", tmpl=".($template==NULL).", show_question_text=$show_question_text, htmlResults=$htmlResults, readOnly=$readOnly, negativeQuestionID=$negativeQuestionID, active_id=$active_id, print=$print] ", true); 
-		$qidf = $negativeQuestionID?-1:1;
+		$qidf = $negativeQuestionID ? -1 : 1;
 		$this->prepareTemplate(false, $negativeQuestionID);
-		$language = $this->getLanguage();				
+		$language = $this->getLanguage();
 
 		if ($template == NULL) {
 			$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output.html");
@@ -204,40 +197,40 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		$oldUUID = $this->question_object->blocks()->ui()->getUUID();
 		if ($negativeQuestionID) {
-			$this->question_object->blocks()->ui()->setUUID("0-".$oldUUID);
+			$this->question_object->blocks()->ui()->setUUID("0-" . $oldUUID);
 		}
 		$template->setVariable("UUID", $this->question_object->blocks()->ui()->getUUID());
-		if ($show_question_text==true){
+		if ($show_question_text == true) {
 			$questiontext = $this->question_object->getQuestion();
 			$questiontext = $this->question_object->blocks()->processStringWithSet(
-				$questiontext, 
-				$this->question_object->blocks()->getRandomSet(($value2!=NULL && isset($value2->rid))?$value2->rid:-1)
+				$questiontext,
+				$this->question_object->blocks()->getRandomSet(($value2 != NULL && isset($value2->rid)) ? $value2->rid : -1)
 			);
-			$questiontext = self::prepareTextareaOutput($questiontext, TRUE);			
+			$questiontext = self::prepareTextareaOutput($questiontext, TRUE);
 			$template->setVariable("QUESTIONTEXT", $questiontext);
 		} else {
 			$template->setVariable("QUESTIONTEXT", "");
-		}			
+		}
 
 		$html = '';
 
-		
+
 		//get the student solution		
 		$solutions = $value1;
-		$state = $value2;					
+		$state = $value2;
 
-		if ($print){	
+		if ($print) {
 			$withCtrlChars = $this->question_object->getSettings()->printctrlchars;
-			$html = $this->question_object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state, $withCtrlChars);			
+			$html = $this->question_object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state, $withCtrlChars);
 		} else {
 			$html = $this->question_object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
 		}
 
-		$template->setVariable("BLOCK_HTML", $html);			
+		$template->setVariable("BLOCK_HTML", $html);
 		$template->setVariable("LANGUAGE", $language);
-		
-		$template->setVariable("QUESTION_ID", $this->question_object->getId()*$qidf);
-		$template->setVariable("LABEL_VALUE1", $this->plugin->txt($student_solution?'label_value1':'label_value_best'));
+
+		$template->setVariable("QUESTION_ID", $this->question_object->getId() * $qidf);
+		$template->setVariable("LABEL_VALUE1", $this->plugin->txt($student_solution ? 'label_value1' : 'label_value_best'));
 
 		if ($negativeQuestionID) {
 			$this->question_object->blocks()->ui()->setUUID($oldUUID);
@@ -257,12 +250,10 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @param boolean $show_feedback		Show a feedback
 	 * @return string
 	 */
-	public function getTestOutput($active_id, $pass = -1, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
-	{
+	public function getTestOutput($active_id, $pass = -1, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE) {
 		//print_r("getTestOutput(active_id=" . $active_id . ", pass=".$pass . ", is_postponed=".$is_postponed . ", use_post_solutions=".$use_post_solutions . ", show_feedback=".$show_feedback . ")");  die;
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		if ($pass<0)
-		{
+		if ($pass < 0) {
 			$pass = ilObjTest::_getPass($active_id);
 		}
 		$solutions = $this->question_object->getSolutionValuesOrInit($active_id, $pass, true, true);
@@ -271,26 +262,24 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		return $pageoutput;
 	}
 
-	
+
 	/**
 	 * Get the output for question preview ("Preview Button")
 	 * (called from ilObjQuestionPoolGUI)
 	 * 
 	 * @param boolean	show only the question instead of embedding page (true/false)
 	 */
-	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE)
-	{
-		 	// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
-			// print_r($this->getPreviewSession()->getParticipantsSolution());
+	public function getPreview($show_question_only = FALSE, $showInlineFeedback = FALSE) {
+		// print_r("getPreview(show_question_only=" . $show_question_only . ", showInlineFeedback=".$showInlineFeedback . ")");
+		// print_r($this->getPreviewSession()->getParticipantsSolution());
 		$solution = (array) $this->question_object->getPreviewValuesOrInit($this->getPreviewSession(), true, true);
 		//  print_r($this->getPreviewSession());	
 		//  print_r($solution);
 		//  echo "count:".count($solution)."\n";	
 		//  die;
 
-		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);		
-		if(!$show_question_only)
-		{
+		$questionoutput = $this->getQuestionOutput($solution['value1'], $solution['value2']);
+		if (!$show_question_only) {
 			// get page object output
 			$questionoutput = $this->getILIASPage($questionoutput);
 		}
@@ -322,68 +311,65 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$show_correct_solution = FALSE,
 		$show_manual_scoring = FALSE,
 		$show_question_text = TRUE
-	):string
-	{
-		
+	): string {
 
-		$print = $this->isRenderPurposePrintPdf();			
+
+		$print = $this->isRenderPurposePrintPdf();
 		//($active_id > 0) will default back to the best solution if no answer is present, this might cause problems when priting the solutions...
 		$showStudentResults = ($active_id > 0) && (!$show_correct_solution);
 		//$showStudentResults = (!$show_correct_solution);
 
 		//$debugInfo = print_r("<pre>!!! DEBUG MODE !!! getSolutionOutput active_id=$active_id pass=$pass\n show_solutions=$show_solutions\n result_output=$result_output\n show_question_only=$show_question_only\n show_feedback=$show_feedback\n show_correct_solution=$show_correct_solution\n show_manual_scoring=$show_manual_scoring\n show_question_text=$show_question_text\n\n showStudentResults=$showStudentResults\n print=$print</pre>", true); 
-		
-		//echo "showStudentResults=".$showStudentResults."<br>";
-		
-		// get the solution template
-		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");	        
-        //this is requested through ajax and added to the already loaded DOM
-		if ($show_manual_scoring){
-            $activeGlobalTpl = null;
-            $global = true;
-            if ($show_question_only==false || $this->tpl==null){                                               
-                $global = false;
-                $activeGlobalTpl = $template;
-            } else {
-                $global = true;
-                $activeGlobalTpl = $this->tpl;                                
 
-                // always load jQuery
-			    include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
-			    iljQueryUtil::initjQuery($activeGlobalTpl);
-			    iljQueryUtil::initjQueryUI($activeGlobalTpl);
-            }                  
+		//echo "showStudentResults=".$showStudentResults."<br>";
+
+		// get the solution template
+		$template = $this->plugin->getTemplate("tpl.il_as_qpl_codeqst_output_solution.html");
+		//this is requested through ajax and added to the already loaded DOM
+		if ($show_manual_scoring) {
+			$activeGlobalTpl = null;
+			$global = true;
+			if ($show_question_only == false || $this->tpl == null) {
+				$global = false;
+				$activeGlobalTpl = $template;
+			} else {
+				$global = true;
+				$activeGlobalTpl = $this->tpl;
+
+				// always load jQuery
+				include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
+				iljQueryUtil::initjQuery($activeGlobalTpl);
+				iljQueryUtil::initjQueryUI($activeGlobalTpl);
+			}
 
 			$this->question_object->blocks()->ui()->prepareTemplate($activeGlobalTpl, self::URL_PATH);
 
-            if ($global){
-			    //we need this for the manual scoring view, otherwise the boxes have to get clicked
-			    $activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
-                $activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 1000)");
-            }
+			if ($global) {
+				//we need this for the manual scoring view, otherwise the boxes have to get clicked
+				$activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 500)");
+				$activeGlobalTpl->addOnLoadCode("setTimeout(function() {document.querySelectorAll('.CodeMirror').forEach(e => e.CodeMirror.refresh());}, 1000)");
+			}
 
-			$template->setCurrentBlock("DEFAULT");            
+			$template->setCurrentBlock("DEFAULT");
 		}
 
 		// get the solution of the user for the active pass or from the last pass if allowed
 		$solutions = array();
-		if ($showStudentResults)
-		{			
+		if ($showStudentResults) {
 			// get the answers of the user for the active pass or from the last pass if allowed
-			$solutions = $this->question_object->getSolutionValuesOrInit($active_id, $pass, true, false);	
-			
+			$solutions = $this->question_object->getSolutionValuesOrInit($active_id, $pass, true, false);
+
 			//$debugInfo .= "<pre>STUDENT</pre>";	
-		}
-		else
-		{	
+		} else {
 			//build best solution, but start with the student results	
 			$stored = $this->question_object->getSolutionValuesOrInit($active_id, $pass, true, false);
-			
+
 			//generate the best solution for the picked random id
 			$rid = -1;
-			if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
-			$solutions = $this->question_object->blocks()->getBestRandomSolution($rid);	
-									
+			if (isset($stored['value2']) && isset($stored['value2']->rid))
+				$rid = $stored['value2']->rid;
+			$solutions = $this->question_object->blocks()->getBestRandomSolution($rid);
+
 			//override the loaded best solution (with placeholders) with the one that fits the rid
 			$stored['value2']->blocks = $solutions;
 
@@ -391,41 +377,39 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$solutions = array(
 				"value1" => $solutions,
 				"value2" => $stored['value2']
-			);		
+			);
 			//$debugInfo .= "<pre>SOLUTION</pre>";	
 		}
 
 		$value1 = $solutions['value1'];
 		$value2 = $solutions['value2'];
-		
-			
-		if ($showStudentResults)
-		{
-			if ($show_solutions)
-			{
-				// copied from assNumericGUI, yet not really understood
-				if($this->question_object->getStep() === NULL) 
-					$reached_points = $this->question_object->getReachedPoints($active_id, $pass);				
-				else 
-					$reached_points = $this->question_object->calculateReachedPoints($active_id, $pass);	
-			}
-		}		
 
-		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail'?$active_id :NULL, $print, $showStudentResults);
-		
+
+		if ($showStudentResults) {
+			if ($show_solutions) {
+				// copied from assNumericGUI, yet not really understood
+				if ($this->question_object->getStep() === NULL)
+					$reached_points = $this->question_object->getReachedPoints($active_id, $pass);
+				else
+					$reached_points = $this->question_object->calculateReachedPoints($active_id, $pass);
+			}
+		}
+
+		$questionoutput = $this->getQuestionOutput($value1, $value2, $template, $show_question_text, true, true, !$showStudentResults, $_GET['cmd'] == 'getAnswerDetail' ? $active_id : NULL, $print, $showStudentResults);
+
 		$solutiontemplate = new ilTemplate("tpl.il_as_tst_solution_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
 		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
-		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", self::prepareTextareaOutput( $feedback, true ));
+		if (strlen($feedback))
+			$solutiontemplate->setVariable("FEEDBACK", self::prepareTextareaOutput($feedback, true));
 
-		$solutionoutput = $solutiontemplate->get();	
-		if(!$show_question_only)
-		{
+		$solutionoutput = $solutiontemplate->get();
+		if (!$show_question_only) {
 			// get page object output
 			$solutionoutput = $this->getILIASPage($solutionoutput);
 		}
-		
+
 		//return $debugInfo . '<hr>' . $solutionoutput;
 		return $solutionoutput;
 	}
@@ -440,65 +424,68 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 * @return string HTML Code with the answer specific feedback
 	 * @access public
 	 */
-	function getSpecificFeedbackOutput(array $userSolution): string
-	{
+	function getSpecificFeedbackOutput(array $userSolution): string {
 		// By default no answer specific feedback is defined
 		$output = '';
 		return self::prepareTextareaOutput($output, TRUE);
 	}
-	
-	
+
+
 	/**
-	* Sets the ILIAS tabs for this question type
-	* called from ilObjTestGUI and ilObjQuestionPoolGUI
-	*/
-	public function setQuestionTabs():void
-	{
+	 * Sets the ILIAS tabs for this question type
+	 * called from ilObjTestGUI and ilObjQuestionPoolGUI
+	 */
+	public function setQuestionTabs(): void {
 		global $rbacsystem, $ilTabs;
-		
+
 		$ilTabs->clearTargets();
 
 		$this->ctrl->setParameterByClass("ilAssQuestionPageGUI", "q_id", $_GET["q_id"]);
 		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 		$q_type = $this->question_object->getQuestionType();
 
-		if (strlen($q_type))
-		{
+		if (strlen($q_type)) {
 			$classname = $q_type . "GUI";
 			$this->ctrl->setParameterByClass(strtolower($classname), "sel_question_types", $q_type);
 			$this->ctrl->setParameterByClass(strtolower($classname), "q_id", $_GET["q_id"]);
 		}
 
 		$force_active = false;
-		if ($_GET["q_id"])
-		{
-			if ($rbacsystem->checkAccess('write', $_GET["ref_id"]))
-			{
+		if ($_GET["q_id"]) {
+			if ($rbacsystem->checkAccess('write', $_GET["ref_id"])) {
 				// edit page
-				$ilTabs->addTarget("edit_page",
+				$ilTabs->addTarget(
+					"edit_page",
 					$this->ctrl->getLinkTargetByClass("ilAssQuestionPageGUI", "edit"),
 					array("edit", "insert", "exec_pg"),
-					"", "", $force_active);
+					"",
+					"",
+					$force_active
+				);
 			}
-	
+
 			// edit page
 			// TODO: How to do this in ILIAS 9?
 			//$this->addTab_QuestionPreview($ilTabs);
 		}
 
-		
-		if ($rbacsystem->checkAccess('write', $_GET["ref_id"]))
-		{
+
+		if ($rbacsystem->checkAccess('write', $_GET["ref_id"])) {
 			$url = "";
 
-			if ($classname) $url = $this->ctrl->getLinkTargetByClass($classname, "editQuestion");
-			
+			if ($classname)
+				$url = $this->ctrl->getLinkTargetByClass($classname, "editQuestion");
+
 
 			// edit question properties
-			$ilTabs->addTarget("edit_question",
+			$ilTabs->addTarget(
+				"edit_question",
 				$url,
 				array("editQuestion", "save", "saveEdit", "originalSyncForm"),
-				$classname, "", $force_active);
+				$classname,
+				"",
+				$force_active
+			);
 		}
 
 		// add tab for question feedback within common class assQuestionGUI
@@ -508,59 +495,57 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->addTab_QuestionHints($ilTabs);
 
 		// add tab for question's suggested solution within common class assQuestionGUI
-		$this->addTab_SuggestedSolution($ilTabs, $classname);		
+		$this->addTab_SuggestedSolution($ilTabs, $classname);
 
 		// Assessment of questions sub menu entry
-		if ($_GET["q_id"])
-		{
-			$ilTabs->addTarget("statistics",
+		if ($_GET["q_id"]) {
+			$ilTabs->addTarget(
+				"statistics",
 				$this->ctrl->getLinkTargetByClass($classname, "assessment"),
 				array("assessment"),
-				$classname, "");
+				$classname,
+				""
+			);
 		}
-		
+
 		$this->addBackTab($ilTabs);
 	}
 
-	public function populateQuestionSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI 
-	{
+	public function populateQuestionSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI {
 		global $lng;
 
 		// We only add an input field for the maximum points
 		// NOTE: in complex question types the maximum points are summed up by partial points
-		$points = new ilNumberInputGUI($lng->txt('maximum_points'),'points');
+		$points = new ilNumberInputGUI($lng->txt('maximum_points'), 'points');
 		$points->setSize(3);
 		$points->setMinValue(1);
 		$points->allowDecimals(0);
 		$points->setRequired(true);
 		$points->setValue($this->question_object->getPoints());
 		$form->addItem($points);
-	
+
 		$item = new ilCustomInputGUI('');
-		$item->setPostVar('codeblock');	
+		$item->setPostVar('codeblock');
 		$item->setHTML($this->question_object->blocks()->ui()->render(true));
 		$form->addItem($item);
 
 		return $form;
 	}
 
-	public function populateAnswerSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI
-	{
+	public function populateAnswerSpecificFormPart(ilPropertyFormGUI $form): ilPropertyFormGUI {
 		return $form;
 	}
 
 	/**
 	 * Store the information from "Edit Question" in the Database
 	 */
-	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
-	{		
+	public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void {
 		$this->question_object->setPoints((int) $_POST["points"]);
-		$this->question_object->blocks()->setFromPOST($_POST);			
+		$this->question_object->blocks()->setFromPOST($_POST);
 	}
 
-	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form): void
-	{
-		
+	public function writeAnswerSpecificPostData(ilPropertyFormGUI $form): void {
+
 	}
 
 	/**
@@ -572,8 +557,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @return string[]
 	 */
-	public function getAfterParticipationSuppressionAnswerPostVars() :array
-	{
+	public function getAfterParticipationSuppressionAnswerPostVars(): array {
 		return array('block', 'source_lang');
 	}
 
@@ -586,8 +570,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @return string[]
 	 */
-	public function getAfterParticipationSuppressionQuestionPostVars(): array
-	{
+	public function getAfterParticipationSuppressionQuestionPostVars(): array {
 		return getAfterParticipationSuppressionAnswerPostVars();
 	}
 
@@ -599,8 +582,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	 *
 	 * @return string
 	 */
-	public function getAggregatedAnswersView($relevant_answers):string
-	{
+	public function getAggregatedAnswersView($relevant_answers): string {
 		return ''; //print_r($relevant_answers,true);
 	}
 
