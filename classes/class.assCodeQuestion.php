@@ -57,8 +57,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->blocks = new codeBlocks($this->getPlugin(), null, $question);
 	}
 
-
-
 	public static function initPluginObject(string $plugin_name): ilPlugin|null {
 		global $DIC;
 		$ilLog = $DIC->logger()->root();
@@ -562,7 +560,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$solution['value1'] = json_encode($solution['value1']);
 		$solution['value2'] = json_encode($initialSolution['value2']);
 
-		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function () use ($solution, $active_id, $pass, $authorized, $value1, $value2) {
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function () use ($solution, $active_id, $pass, $authorized) {
 			$this->removeCurrentSolution($active_id, $pass, $authorized);
 			$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], true/*$authorized*/);
 		});
