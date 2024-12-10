@@ -4,8 +4,8 @@ require_once "./Modules/TestQuestionPool/classes/class.assQuestionGUI.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoringAdjustable.php';
-require_once 'support/assCodeQuestion.helper.php';
-
+require_once "./Services/Component/classes/class.ilPlugin.php";
+		
 /**
  * Example GUI class for question type plugins
  *
@@ -45,10 +45,7 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	public function __construct($id = -1)
 	{
 		parent::__construct();
-		include_once "./Services/Component/classes/class.ilPlugin.php";
-		$this->plugin = initPluginObject("assCodeQuestion");
-		//$this->plugin->includeClass("ui/codeBlockUI.php");
-		//$this->plugin->includeClass("class.assCodeQuestion.php");
+		$this->plugin = assCodeQuestion::initPluginObject("assCodeQuestion");
 		$this->question_object = new assCodeQuestion();
 		$this->object = $this->question_object;
 		if ($id >= 0)
@@ -60,28 +57,6 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$this->lang_user = $this->plugin->txt('used_lang');
 		if ('-qpl_qst_codeqst_used_lang-' == $this->lang_user) $this->lang_user = 'en';		
 	}
-
-	// private function initPluginObject(string $plugin_name):ilPlugin{
-	// 	// init the plugin object
-    //     try {
-    //         global $DIC;
-
-    //         $component_repository = $DIC["component.repository"];
-    //         $component_factory = $DIC["component.factory"];
-    //         $info = $component_repository->getPluginByName($plugin_name);
-
-    //         $plugin_obj = $component_factory->getPlugin($info->getId());
-
-    //         if (!is_null($info) && $info->isActive()) {
-    //            return $plugin_obj;
-    //         } else {
-    //             throw new ilPluginException($plugin_name . ' plugin is not active');
-    //         }
-    //     } catch (ilPluginException $e) {
-    //         global $tpl;
-    //         $tpl->setOnScreenMessage('failure', $e->getMessage(), true);
-    //     }
-	// }
 
 	function getLanguage() {
 		return $this->question_object->blocks()->getLanguage();

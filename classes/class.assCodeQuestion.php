@@ -3,7 +3,6 @@ require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
-require_once 'support/assCodeQuestion.helper.php';
 require_once 'export/qti12/class.assCodeQuestionExport.php';
 require_once 'import/qti12/class.assCodeQuestionImport.php';
 
@@ -60,6 +59,31 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->blocks = new codeBlocks($this->getPlugin(), null, $question);
 	}
 
+
+
+	public static function initPluginObject(string $plugin_name): ilPlugin|null {
+		global $DIC;
+		$ilLog = $DIC->logger()->root();
+
+		try {
+			$component_repository = $DIC["component.repository"];
+			$component_factory = $DIC["component.factory"];
+			$info = $component_repository->getPluginByName($plugin_name);
+
+			$plugin_obj = $component_factory->getPlugin($info->getId());
+
+			if (!is_null($info) && $info->isActive()) {
+				return $plugin_obj;
+			} else {
+				throw new ilPluginException($plugin_name . ' plugin is not active');
+			}
+		} catch (ilPluginException $e) {
+			$ilLog->write("Error loading Plugin " . $plugin_name . ": " . $e->getMessage(), $ilLog->ERROR);
+		}
+
+		return null;
+	}
+
 	/**
 	 * Get the plugin object
 	 *
@@ -71,8 +95,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		if ($this->plugin == null) {
 			$component_factory = $DIC["component.factory"];
 			$this->plugin = $component_factory->getPlugin('codeqst');
-			//include_once "./Services/Component/classes/class.ilPlugin.php";
-			//$this->plugin = initPluginObject("assCodeQuestion");
 
 		}
 		return $this->plugin;
