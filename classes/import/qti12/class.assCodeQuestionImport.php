@@ -149,7 +149,7 @@ class assCodeQuestionImport extends assQuestionImport
 						$feedbacksgeneric[$correctness] = str_replace("src=\"" . $mob["mob"] . "\"", "src=\"" . "il_" . IL_INST_ID . "_mob_" . $media_object->getId() . "\"", $material);
 					}
 				} catch (Exception $e) {
-					$ilLog->write("Error importing file: " . $importfile . " (" . $e->getMessage() . ")");
+					$ilLog->write("Error importing file: " . $importfile . " (" . $e->getMessage() . ")", $ilLog->ERROR);
 				}
 			}
 		}
