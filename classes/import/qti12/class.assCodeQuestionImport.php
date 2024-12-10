@@ -1,6 +1,8 @@
 <?php
 
 include_once "./Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php";
+include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
+include_once "./Services/RTE/classes/class.ilRTE.php";
 
 /**
  * Class for accounting question import
@@ -26,10 +28,14 @@ class assCodeQuestionImport extends assQuestionImport
 	 */
 	function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array
 	{
-		global $ilUser, $ilLog;
+		global $DIC;
+
+		$ilUser = $DIC->user();
+		$ilLog = $DIC->logger()->root();
 
 		// empty session variable for imported xhtml mobs
-		unset($_SESSION["import_mob_xhtml"]);
+		ilSession::clear('import_mob_xhtml');
+
 		$presentation = $item->getPresentation();
 		//$duration = $item->getDuration();
 		$now = getdate();
@@ -101,8 +107,6 @@ class assCodeQuestionImport extends assQuestionImport
 		$this->object->setOwner($ilUser->getId());
 		$this->object->setQuestion($this->QTIMaterialToString($item->getQuestiontext()));
 		$this->object->setObjId($questionpool_id);
-		//TODO: Find how this is done in ilias 9
-		//$this->object->setEstimatedWorkingTime($duration["h"], $duration["m"], $duration["s"]);
 		$this->object->setPoints($item->getMetadataEntry("POINTS"));
 		$this->object->blocks()->updateWithJSONEncodedAdditionalData($item->getMetadataEntry("ADDITIONAL_DATA"));
 		// additional content editing mode information
@@ -123,33 +127,29 @@ class assCodeQuestionImport extends assQuestionImport
 
 		// handle the import of media objects in XHTML code
 		$questiontext = $this->object->getQuestion();
-		if (is_array($_SESSION["import_mob_xhtml"]))
-		{
-			include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
-			include_once "./Services/RTE/classes/class.ilRTE.php";
-			foreach ($_SESSION["import_mob_xhtml"] as $mob)
-			{
-				if ($tst_id > 0)
-				{
+		if (is_array(ilSession::get("import_mob_xhtml"))) {			
+			foreach (ilSession::get("import_mob_xhtml") as $mob) {
+				if ($tst_id > 0) {
 					$importfile = $this->getTstImportArchivDirectory() . '/' . $mob["uri"];
-				}
-				else
-				{
+				} else {
 					$importfile = $this->getQplImportArchivDirectory() . '/' . $mob["uri"];
-				}
-				global $ilLog;
-				$ilLog->write($importfile);
+				}				
+				$ilLog->write("Importing File: " . $importfile . " (" . basename($importfile) . ")");
 
-				$media_object =& ilObjMediaObject::_saveTempFileAsMediaObject(basename($importfile), $importfile, FALSE);
-				ilObjMediaObject::_saveUsage($media_object->getId(), "qpl:html", $this->object->getId());
+				try {
+					$media_object = ilObjMediaObject::_saveTempFileAsMediaObject(basename($importfile), $importfile, false);
+					ilObjMediaObject::_saveUsage($media_object->getId(), "qpl:html", $this->object->getId());
 
-				// images in question text
-				$questiontext = str_replace("src=\"" . $mob["mob"] . "\"", "src=\"" . "il_" . IL_INST_ID . "_mob_" . $media_object->getId() . "\"", $questiontext);
+					// images in question text
+					$questiontext = str_replace("src=\"" . $mob["mob"] . "\"", "src=\"" . "il_" . IL_INST_ID . "_mob_" . $media_object->getId() . "\"", $questiontext);
 
-				// images in feedback
-				foreach ($feedbacksgeneric as $correctness => $material)
-				{
-					$feedbacksgeneric[$correctness] = str_replace("src=\"" . $mob["mob"] . "\"", "src=\"" . "il_" . IL_INST_ID . "_mob_" . $media_object->getId() . "\"", $material);
+					// images in feedback
+					foreach ($feedbacksgeneric as $correctness => $material)
+					{
+						$feedbacksgeneric[$correctness] = str_replace("src=\"" . $mob["mob"] . "\"", "src=\"" . "il_" . IL_INST_ID . "_mob_" . $media_object->getId() . "\"", $material);
+					}
+				} catch (Exception $e) {
+					$ilLog->write("Error importing file: " . $importfile . " (" . $e->getMessage() . ")");
 				}
 			}
 		}
