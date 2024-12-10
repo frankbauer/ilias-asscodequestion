@@ -95,3 +95,8 @@ main.il-layout-page-content>div {
 label[for="codeblock"] {
     display: none;
 }
+
+div.blockParent .block-container .row{
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 0;
+}
