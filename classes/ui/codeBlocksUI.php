@@ -73,6 +73,11 @@ class codeBlocksUI {
 
     public function mountyJSCode($basePath, $mountOnly = false): string {
         $loader = "if (typeof $ !== 'undefined') {\n";
+        $loader .= "// Make sure that the codeblocks are expanded, otherwise the codemirror text boxes will not load properly!!\n";
+        $loader .= "const expandable = $('div.il-table-presentation-row-expanded')\n";
+        $loader .= "if (expandable!==undefined && expandable.find('div.blockParent')!==undefined) {\n";
+        $loader .= "    expandable.css('display', 'block')\n";
+        $loader .= "}\n";
         $loader .= 'if (window.mountCodeBlocks) {' . "\n";
         //$loader .= '    console.log("MOUNTING")' . "\n";
         $loader .= '    mountCodeBlocks()' . "\n";
