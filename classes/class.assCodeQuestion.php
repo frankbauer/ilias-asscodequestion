@@ -200,7 +200,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		$this->setPoints($data["points"] ?? 1);
 
 		include_once("./Services/RTE/classes/class.ilRTE.php");
-		$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"], 1));
+		
+		$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"] ?? "", 1));
 		//TODO: Find how this is done in ilias 9
 		//$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 
@@ -225,7 +226,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	function loadDataToBlocks($data, $question_id) {
-		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"], $question_id);
+		$this->blocks = new codeBlocks($this->getPlugin(), $data["data"] ?? [], $question_id);
 	}
 
 	function createBlocksFromPost($P, $question_id) {
