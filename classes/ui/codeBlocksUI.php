@@ -89,16 +89,16 @@ class codeBlocksUI {
             $loader .= "    window.codeBlocksJS = true\n";
             $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
             $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/' . CODEBLOCKS_REL_PATH . "\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/loader.css\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/roboto.css\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/main.css\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/app.css\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/chunk-vendors.css\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css?&v=3\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/loader.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/roboto.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/main.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/app.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/chunk-vendors.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css?&v=2025_03_01\" shadow>')\n";
 
             $loader .= "    try {\n";
-            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/chunk-vendors.js')\n";
-            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/app.js')\n";
+            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/chunk-vendors.js?&v=2025_03_01')\n";
+            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/app.js?&v=2025_03_01')\n";
             $loader .= "    } catch (error) {\n";
             $loader .= "        console.error(error)\n";
             $loader .= "        const s = document.createElement('STYLE');\n";
@@ -126,7 +126,7 @@ class codeBlocksUI {
             $this->PREPARED_TEMPLATES[] = $tpl;
 
             $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
-            $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'css/main.css';
+            $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'css/main.css?&v=2025_03_01';
             $on_load_code = $this->mountyJSCode($basePath, false);
 
             iljQueryUtil::initjQuery($tpl);
