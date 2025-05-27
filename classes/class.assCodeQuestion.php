@@ -241,7 +241,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 
 	public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = "") {
-		return $this->duplicate(false, $targetQuestionTitle, "", "", $targetParentId);
+		return $this->duplicate(false, $targetQuestionTitle, "", -1, $targetParentId);
 	}
 
 
