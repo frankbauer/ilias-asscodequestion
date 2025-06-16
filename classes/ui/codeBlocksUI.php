@@ -129,9 +129,8 @@ class codeBlocksUI {
             $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'css/main.css?&v=2025_03_01';
             $on_load_code = $this->mountyJSCode($basePath, false);
 
-            iljQueryUtil::initjQuery($tpl);
-
             if ($tpl instanceof ilGlobalTemplateInterface) {
+                iljQueryUtil::initjQuery($tpl);
                 $tpl->addInlineCss($inline_css);
                 $tpl->addCss($css_file);
                 $tpl->addOnLoadCode($on_load_code);
