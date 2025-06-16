@@ -961,15 +961,19 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		return '// ' . $str;
 	}
 
-	function getJustAnswers($solution, $trimall = false) {
-		$blocks = $this->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
+	function getJustAnswers($solution, $trim_all = false) {
+		$blocks = $this->blocks->getCombinedBlocks(
+			$solution === NULL ? NULL : $solution['value2'],
+			true,
+			$solution === NULL ? NULL : $solution['value1']
+		);
 
 		$res = '';
 		for ($i = 0; $i < count($blocks); $i++) {
 			$t = $this->blocks[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				if (isset($blocks[$i])) {
-					if ($trimall) {
+					if ($trim_all) {
 						$res .= trim($blocks[$i]) . "\n";
 					} else {
 						$res .= $blocks[$i] . "\n";
