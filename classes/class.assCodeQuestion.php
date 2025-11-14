@@ -3,6 +3,7 @@ require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
+require_once './Modules/TestQuestionPool/interfaces/interface.ilAssQuestionAutosaveable.php';
 require_once 'export/qti12/class.assCodeQuestionExport.php';
 require_once 'import/qti12/class.assCodeQuestionImport.php';
 
@@ -24,7 +25,7 @@ abstract class assCodeQuestionBlockTypes {
  * @version	$Id:  $
  * @ingroup ModulesTestQuestionPool
  */
-class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable {
+class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, ilAssQuestionAutosaveable {
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
