@@ -1,9 +1,5 @@
 <?php
 
-include_once "./Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php";
-include_once "./Services/MediaObjects/classes/class.ilObjMediaObject.php";
-include_once "./Services/RTE/classes/class.ilRTE.php";
-
 /**
  * Class for accounting question import
  *
@@ -25,10 +21,18 @@ class assCodeQuestionImport extends assQuestionImport {
 	 * @param array $import_mapping An array containing references to included ILIAS objects
 	 * @access public
 	 */
-	function fromXML(&$item, $questionpool_id, &$tst_id, &$tst_object, &$question_counter, $import_mapping): array {
+	function fromXML(
+		string $importdirectory,
+		int $user_id,
+		ilQTIItem $item,
+		int $questionpool_id,
+		?int $tst_id,
+		?ilObject &$tst_object,
+		int &$question_counter,
+		array $import_mapping
+	): array {
 		global $DIC;
 
-		$ilUser = $DIC->user();
 		$ilLog = $DIC->logger()->root();
 
 		// empty session variable for imported xhtml mobs
@@ -82,13 +86,13 @@ class assCodeQuestionImport extends assQuestionImport {
 		// set question properties
 		$this->addGeneralMetadata($item);
 		$this->object->setTitle($item->getTitle());
-		$this->object->setNrOfTries($item->getMaxattempts());
+		$this->object->setNrOfTries((int) $item->getMaxattempts());
 		$this->object->setComment($item->getComment());
 		$this->object->setAuthor($item->getAuthor());
-		$this->object->setOwner($ilUser->getId());
+		$this->object->setOwner($user_id);
 		$this->object->setQuestion($this->QTIMaterialToString($item->getQuestiontext()));
 		$this->object->setObjId($questionpool_id);
-		$this->object->setPoints($item->getMetadataEntry("POINTS"));
+		$this->object->setPoints((float) $item->getMetadataEntry("POINTS"));
 		$this->object->blocks()->updateWithJSONEncodedAdditionalData($item->getMetadataEntry("ADDITIONAL_DATA"));
 		// additional content editing mode information
 		$this->object->setAdditionalContentEditingMode(
@@ -97,6 +101,7 @@ class assCodeQuestionImport extends assQuestionImport {
 
 		// first save the question to get a new question id
 		$this->object->saveToDb();
+		$this->importSuggestedSolutions($this->object->getId(), $item->suggested_solutions);
 
 
 		// convert the generic feedback
@@ -109,11 +114,7 @@ class assCodeQuestionImport extends assQuestionImport {
 		$questiontext = $this->object->getQuestion();
 		if (is_array(ilSession::get("import_mob_xhtml"))) {
 			foreach (ilSession::get("import_mob_xhtml") as $mob) {
-				if ($tst_id > 0) {
-					$importfile = $this->getTstImportArchivDirectory() . '/' . $mob["uri"];
-				} else {
-					$importfile = $this->getQplImportArchivDirectory() . '/' . $mob["uri"];
-				}
+				$importfile = $importdirectory . DIRECTORY_SEPARATOR . $mob["uri"];
 				$ilLog->write("Importing File: " . $importfile . " (" . basename($importfile) . ")");
 
 				try {
@@ -146,14 +147,12 @@ class assCodeQuestionImport extends assQuestionImport {
 		$this->object->saveToDb();
 
 		// import mapping for tests
-		if ($tst_id > 0) {
-			$q_1_id = $this->object->getId();
-			$question_id = $this->object->duplicate(true, null, null, null, $tst_id);
-			$tst_object->questions[$question_counter++] = $question_id;
-			$import_mapping[$item->getIdent()] = array("pool" => $q_1_id, "test" => $question_id);
-		} else {
-			$import_mapping[$item->getIdent()] = array("pool" => $this->object->getId(), "test" => 0);
-		}
+		$import_mapping[$item->getIdent()] = $this->addQuestionToParentObjectAndBuildMappingEntry(
+			$questionpool_id,
+			$tst_id,
+			$question_counter,
+			$tst_object
+		);
 
 		return $import_mapping;
 	}

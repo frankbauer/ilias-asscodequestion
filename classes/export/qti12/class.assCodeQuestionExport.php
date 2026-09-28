@@ -1,7 +1,5 @@
 <?php
 
-include_once "./Modules/TestQuestionPool/classes/export/qti12/class.assQuestionExport.php";
-
 /**
  * Example question export
  *
@@ -17,9 +15,9 @@ class assCodeQuestionExport extends assQuestionExport {
 	 * @access public
 	 */
 	function toXML($a_include_header = true, $a_include_binary = true, $a_shuffle = false, $test_output = false, $force_image_references = false): string {
-		global $ilias;
+		global $DIC;
+		$ilias = $DIC['ilias'];
 
-		include_once("./Services/Xml/classes/class.ilXmlWriter.php");
 		$a_xml_writer = new ilXmlWriter;
 		// set xml header
 		$a_xml_writer->xmlHeader();
@@ -53,7 +51,7 @@ class assCodeQuestionExport extends assQuestionExport {
 		$a_xml_writer->xmlEndTag("qtimetadatafield");
 		$a_xml_writer->xmlStartTag("qtimetadatafield");
 		$a_xml_writer->xmlElement("fieldlabel", NULL, "POINTS");
-		$a_xml_writer->xmlElement("fieldentry", NULL, $this->object->getPoints());
+		$a_xml_writer->xmlElement("fieldentry", NULL, (string) $this->object->getPoints());
 		$a_xml_writer->xmlEndTag("qtimetadatafield");
 
 		//plugin specific info

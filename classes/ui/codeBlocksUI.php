@@ -5,6 +5,8 @@ class codeBlocksUI {
     var $model = null;
     var $uuid = null;
     var $PREPARED_TEMPLATES = [];
+    //false: blocks that are only displayed must not create form fields (they would be posted with any surrounding form)
+    var $formFields = true;
 
     public function __construct($model) {
         $this->uuid = $model->guidv4() . '-' . $model->getId();
@@ -19,6 +21,10 @@ class codeBlocksUI {
 
     public function setUUID($newUUID) {
         $this->uuid = $newUUID;
+    }
+
+    public function setFormFields(bool $formFields) {
+        $this->formFields = $formFields;
     }
 
     public function print($editMode = false, $readOnly = false, $withSolution = false, $solutions = NULL, $state = NULL, $withCtrlChars = true) {
@@ -52,6 +58,7 @@ class codeBlocksUI {
             "data-dom-libs='" . json_encode($this->model->getDomLibs()) . "' " .
             "data-worker-libs='" . json_encode($this->model->getWorkerLibs()) . "' " .
             ($readOnly ? 'data-readonly ' : '') .
+            ($this->formFields ? '' : 'data-form-fields="false" ') .
             'data-output-parser="' . $this->model->getOutputParser() . '" ' .
             ($editMode ? 'data-randomizer-active="' . ($this->model->getRandomizerActive() ? 'true' : 'false') . '" ' : '') .
             ($editMode ? 'data-randomizer-preview-index="' . $this->model->getRandomizerPreviewIndex() . '" ' : '') .
@@ -78,33 +85,31 @@ class codeBlocksUI {
         $loader .= "if (expandable!==undefined && expandable.find('div.blockParent')!==undefined) {\n";
         $loader .= "    expandable.css('display', 'block')\n";
         $loader .= "}\n";
-        $loader .= 'if (window.mountCodeBlocks) {' . "\n";
-        //$loader .= '    console.log("MOUNTING")' . "\n";
-        $loader .= '    mountCodeBlocks()' . "\n";
+        $loader .= 'if (window.codeblocks) {' . "\n";
+        $loader .= '    window.codeblocks.loadAndMount()' . "\n";
+        $loader .= '    if (window.codeblocks.observe) window.codeblocks.observe()' . "\n";
         if ($mountOnly) {
             $loader .= '}' . "\n";
         } else {
+            $v = '?v=' . CODEBLOCKS_VERSION;
+            $lib = $basePath . '/' . CODEBLOCKS_REL_PATH . 'js/codeblocks-js/';
             $loader .= '} else if (!window.codeBlocksJS) {' . "\n";
-            //$loader .= '    console.log("IMPORTING")' . "\n";
             $loader .= "    window.codeBlocksJS = true\n";
             $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
             $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/' . CODEBLOCKS_REL_PATH . "\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/loader.css?&v=2025_03_01\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/roboto.css?&v=2025_03_01\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/main.css?&v=2025_03_01\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/app.css?&v=2025_03_01\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/chunk-vendors.css?&v=2025_03_01\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css?&v=2025_03_01\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/roboto.css" . $v . "\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $lib . "codeblocks.css" . $v . "\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css" . $v . "\" shadow>')\n";
 
-            $loader .= "    try {\n";
-            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/chunk-vendors.js?&v=2025_03_01')\n";
-            $loader .= "        import('" . $basePath . '/' . CODEBLOCKS_REL_PATH . "js/app.js?&v=2025_03_01')\n";
-            $loader .= "    } catch (error) {\n";
+            // the library mounts all blocks on the page once it is loaded
+            $loader .= "    import('" . $lib . "codeblocks.umd.js" . $v . "').then(function () {\n";
+            $loader .= "        if (window.codeblocks && window.codeblocks.observe) window.codeblocks.observe()\n";
+            $loader .= "    }).catch(function (error) {\n";
             $loader .= "        console.error(error)\n";
             $loader .= "        const s = document.createElement('STYLE');\n";
             $loader .= "        s.innerHTML = 'codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {content:\"\"}'\n";
             $loader .= "        Array.prototype.forEach.call(document.getElementsByTagName('loading'),e => {const p = e.parentElement; p.appendChild(s); const c=document.createElement('DIV'); c.className='ilc_Paragraph ilc_text_block_Attention'; c.innerHTML='<b>An Error Occured while loading the Page</b><p>Your Browser does not support this Element. If possible update your browser (the latest Versions of FireFox, Edge, Safari or Chrome should work fine).</p>'; c.style='display:block;height:100%;margin:0'; p.replaceChild(c, e)});\n";
-            $loader .= "    } \n";
+            $loader .= "    })\n";
             $loader .= '}' . "\n";
 
             if ($this->model->getMinCanvasVersion() <= 100) {
@@ -112,8 +117,8 @@ class codeBlocksUI {
                 $loader .= "    import('" . $basePath . "/js/legacyHelper.js#20200409')\n";
                 $loader .= '}' . "\n";
             }
-            $loader .= '}' . "\n";
         }
+        $loader .= '}' . "\n";
 
         return $loader;
     }
@@ -126,7 +131,7 @@ class codeBlocksUI {
             $this->PREPARED_TEMPLATES[] = $tpl;
 
             $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
-            $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'css/main.css?&v=2025_03_01';
+            $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'js/codeblocks-js/codeblocks.css?v=' . CODEBLOCKS_VERSION;
             $on_load_code = $this->mountyJSCode($basePath, false);
 
             if ($tpl instanceof ilGlobalTemplateInterface) {

@@ -1,11 +1,7 @@
 <?php
-require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
-require_once "./Modules/Test/classes/inc.AssessmentConstants.php";
-require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
-require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
-require_once './Modules/TestQuestionPool/interfaces/interface.ilAssQuestionAutosaveable.php';
-require_once 'export/qti12/class.assCodeQuestionExport.php';
-require_once 'import/qti12/class.assCodeQuestionImport.php';
+
+use ILIAS\TestQuestionPool\Questions\QuestionAutosaveable;
+use ILIAS\Test\Logging\AdditionalInformationGenerator;
 
 abstract class assCodeQuestionBlockTypes {
 	const Text = 0;
@@ -25,7 +21,7 @@ abstract class assCodeQuestionBlockTypes {
  * @version	$Id:  $
  * @ingroup ModulesTestQuestionPool
  */
-class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, ilAssQuestionAutosaveable {
+class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, QuestionAutosaveable {
 	/**
 	 * @var ilassCodeQuestionPlugin	The plugin object
 	 */
@@ -46,11 +42,11 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @see assQuestion:assQuestion()
 	 */
 	function __construct(
-		$title = "",
-		$comment = "",
-		$author = "",
-		$owner = -1,
-		$question = ""
+		string $title = "",
+		string $comment = "",
+		string $author = "",
+		int $owner = -1,
+		string $question = ""
 	) {
 		parent::__construct($title, $comment, $author, $owner, $question);
 		// needed for excel export
@@ -135,9 +131,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access 	public
 	 * @see assQuestion::saveToDb()
 	 */
-	function saveToDb(int $original_id = -1): void {
-		global $ilDB;
-
+	function saveToDb(?int $original_id = null): void {
 		// save the basic data (implemented in parent)
 		// a new question is created if the id is -1
 		// afterwards the new id is set
@@ -151,8 +145,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function saveAdditionalQuestionDataToDb() {
-		/** @var ilDBInterface $ilDB */
-		global $ilDB;
+		$ilDB = $this->db;
 
 		// Now you can save additional data
 		// save data to DB
@@ -169,9 +162,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function saveAnswerSpecificDataToDb() {
-		/** @var ilDBInterface $ilDB */
-		global $ilDB;
-
 	}
 
 	/**
@@ -182,7 +172,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @see assQuestion::loadFromDb()
 	 */
 	public function loadFromDb(int $question_id): void {
-		global $ilDB;
+		$ilDB = $this->db;
 
 		// load the basic question data
 		$result = $ilDB->query("SELECT qpl_questions.* FROM qpl_questions WHERE question_id = "
@@ -195,13 +185,21 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 		//TODO: Find how this is done in ilias 9
 		//$this->setSuggestedSolution($data["solution_hint"]);
 		$this->setOriginalId($data["original_id"]);
-		$this->setObjId($data["obj_fi"]);
+		$this->setObjId((int) $data["obj_fi"]);
 		$this->setAuthor($data["author"] ?? "");
-		$this->setOwner($data["owner"]);
-		$this->setPoints($data["points"] ?? 1);
+		$this->setOwner((int) $data["owner"]);
+		$this->setPoints((float) ($data["points"] ?? 1));
+		$this->setNrOfTries((int) ($data["nr_of_tries"] ?? 0));
+		try {
+			$this->setLifecycle(ilAssQuestionLifecycle::getInstance($data['lifecycle']));
+		} catch (ilTestQuestionPoolInvalidArgumentException $e) {
+			$this->setLifecycle(ilAssQuestionLifecycle::getDraftInstance());
+		}
+		try {
+			$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
+		} catch (ilTestQuestionPoolException $e) {
+		}
 
-		include_once("./Services/RTE/classes/class.ilRTE.php");
-		
 		$this->setQuestion(ilRTE::_replaceMediaObjectImageSrc($data["question_text"] ?? "", 1));
 		//TODO: Find how this is done in ilias 9
 		//$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
@@ -215,12 +213,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		$data = $ilDB->fetchAssoc($result);
 		$this->loadDataToBlocks($data, $question_id);
-
-		try {
-			if (isset($data['add_cont_edit_mode']))
-				$this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
-		} catch (ilTestQuestionPoolException $e) {
-		}
 
 		// loads additional stuff like suggested solutions
 		parent::loadFromDb($question_id);
@@ -240,97 +232,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 
-
-	public function createNewOriginalFromThisDuplicate($targetParentId, $targetQuestionTitle = "") {
-		return $this->duplicate(false, $targetQuestionTitle, "", -1, $targetParentId);
-	}
-
-
-	/**
-	 * Duplicates a question
-	 * This is used for copying a question to a test
-	 *
-	 * @access public
-	 */
-	function duplicate(?bool $for_test = true, ?string $title = '', ?string $author = '', ?int $owner = -1, $testObjId = null): int {
-		if ($this->getId() <= 0) {
-			// The question has not been saved. It cannot be duplicated
-			return -1;
-		}
-
-		// make a real clone to keep the object unchanged
-		$clone = clone $this;
-
-		$original_id = $this->questioninfo->getOriginalId($this->getId());
-		$clone->setId(-1);
-
-		if ((int) $testObjId > 0) {
-			$clone->setObjId($testObjId);
-		}
-
-		if ($title) {
-			$clone->setTitle($title);
-		}
-		if ($author) {
-			$clone->setAuthor($author);
-		}
-		if ($owner) {
-			$clone->setOwner($owner);
-		}
-
-		if ($for_test) {
-			$clone->saveToDb($original_id);
-		} else {
-			$clone->saveToDb();
-		}
-
-		// copy question page content
-		$clone->copyPageOfQuestion($this->getId());
-		// copy XHTML media objects
-		$clone->copyXHTMLMediaObjectsOfQuestion($this->getId());
-
-		// call the event handler for duplication
-		$clone->onDuplicate($this->getObjId(), $this->getId(), $clone->getObjId(), $clone->getId());
-
-		return $clone->getId();
-	}
-
-	/**
-	 * Copies a question
-	 * This is used when a question is copied on a question pool
-	 *
-	 * @access public
-	 */
-	function copyObject($target_questionpool_id, $title = "") {
-		if ($this->getId() <= 0) {
-			// The question has not been saved. It cannot be duplicated
-			return;
-		}
-
-		// make a real clone to keep the object unchanged
-		$clone = clone $this;
-
-		$original_id = assQuestion::_getOriginalId($this->getId());
-		$source_questionpool_id = $this->getObjId();
-		$clone->setId(-1);
-		$clone->setObjId($target_questionpool_id);
-		if ($title) {
-			$clone->setTitle($title);
-		}
-
-		// save the clone data
-		$clone->saveToDb();
-
-		// copy question page content
-		$clone->copyPageOfQuestion($original_id);
-		// copy XHTML media objects
-		$clone->copyXHTMLMediaObjectsOfQuestion($original_id);
-
-		// call the event handler for copy
-		$clone->onCopy($source_questionpool_id, $original_id, $clone->getObjId(), $clone->getId());
-
-		return $clone->getId();
-	}
 
 	/**
 	 * Synchronize a question with its original
@@ -355,12 +256,13 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @return	array	('value1' => string)
 	 */
 	protected function getSolutionSubmit() {
-		$data = $_POST['block'][$this->getId()];
+		$body = $this->http->request()->getParsedBody();
+		$data = $body['block'][$this->getId()] ?? [];
 
 		$result = array();
 		for ($i = 0; $i < $this->blocks->getNumberOfBlocks(); $i++) {
 			if ($this->blocks[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode) {
-				$result[$i] = $data[$i];
+				$result[$i] = $data[$i] ?? '';
 			}
 		}
 		return array(
@@ -430,26 +332,33 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			}
 			return $res;
 		} else {
-			$value1 = '';
-			$value2 = new \stdClass();
-			;
-
-			foreach ($rows as $solution) {
-				$v1 = isset($solution["value1"]) ? $solution["value1"] : '{}';
-				$v2 = isset($solution["value2"]) ? $solution["value2"] : '{}';
-				$f = strlen($v1) > 0 ? $v1[0] : '';
-				if ($f != 'T') { //original style
-					$value1 = $this->decodeSolution($v1);
-					$value2 = $this->decodeSolution('{}');
-				} else if ($v1 == 'TSolution') {
-					$value1 = $this->decodeSolution($v2);
-				} else if ($v1 == 'TState') {
-					$value2 = $this->decodeSolution($v2);
-				}
-			}
-
-			return array('value1' => $value1, 'value2' => $value2);
+			return $this->solutionRowsToValues($rows);
 		}
+	}
+
+	/**
+	 * Converts the stored tst_solutions rows (TSolution / TState records) into the
+	 * array('value1' => answers, 'value2' => state) structure used throughout the plugin
+	 */
+	public function solutionRowsToValues(array $rows): array {
+		$value1 = '';
+		$value2 = new \stdClass();
+
+		foreach ($rows as $solution) {
+			$v1 = isset($solution["value1"]) ? $solution["value1"] : '{}';
+			$v2 = isset($solution["value2"]) ? $solution["value2"] : '{}';
+			$f = strlen($v1) > 0 ? $v1[0] : '';
+			if ($f != 'T') { //original style
+				$value1 = $this->decodeSolution($v1);
+				$value2 = $this->decodeSolution('{}');
+			} else if ($v1 == 'TSolution') {
+				$value1 = $this->decodeSolution($v2);
+			} else if ($v1 == 'TState') {
+				$value2 = $this->decodeSolution($v2);
+			}
+		}
+
+		return array('value1' => $value1, 'value2' => $value2);
 	}
 
 	/**
@@ -458,12 +367,12 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @param	array	('value1' => string)
 	 * @return  float	reached points
 	 */
-	protected function calculateReachedPointsForSolution($solution) {
+	protected function calculateReachedPointsForSolution($solution): float {
 		// in our example we take the points entered by the student
 		// and adjust them to be in the allowed range
-		$points = 0;
+		$points = 0.0;
 		if (empty($points) or $points < 0 or $points > $this->getMaximumPoints()) {
-			$points = 0;
+			$points = 0.0;
 		}
 
 		// return the raw points given to the answer
@@ -483,12 +392,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access public
 	 * @see  assQuestion::calculateReachedPoints()
 	 */
-	function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): array|float {
-		if ($returndetails) {
-			throw new ilTestException('return details not implemented for ' . __METHOD__);
-		}
-
-		if ($pass < 0) {
+	function calculateReachedPoints(int $active_id, ?int $pass = null, bool $authorizedSolution = true): float {
+		if ($pass === null || $pass < 0) {
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
@@ -498,35 +403,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 
 		// there may be more solutions stored due to race conditions
 		// the last saved solution record wins
-		return $this->calculateReachedPointsForSolution(empty($solutions) ? array() : end($solutions));
-	}
-
-	/**
-	 * Sets the points, a learner has reached answering the question
-	 *
-	 * @param integer $user_id The database ID of the learner
-	 * @param integer $test_id The database Id of the test containing the question
-	 * @param integer $points The points the user has reached answering the question
-	 * @return boolean true on success, otherwise false
-	 * @access public
-	 */
-	function setReachedPoints($active_id, $points, $pass = -1) {
-		global $ilDB;
-
-		if (($points > 0) && ($points <= $this->getPoints())) {
-			if ($pass < 0) {
-				$pass = $this->getSolutionMaxPass($active_id);
-			}
-			$affectedRows = $ilDB->manipulateF(
-				"UPDATE tst_test_result SET points = %s WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-				array('float', 'integer', 'integer', 'integer'),
-				array($points, $active_id, $this->getId(), $pass)
-			);
-			self::_updateTestPassResults($active_id, $pass);
-			return TRUE;
-		} else {
-			return TRUE;
-		}
+		return $this->calculateReachedPointsForSolution($solutions);
 	}
 
 	private function mylog($s) {
@@ -544,12 +421,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @access 	public
 	 * @see 	assQuestion::saveWorkingData()
 	 */
-	function saveWorkingData(int $active_id, int $pass = -1, bool $authorized = true): bool {
-		global $ilDB;
-		global $ilUser;
-
-		if ($pass < 0) {
-			include_once "./Modules/Test/classes/class.ilObjTest.php";
+	function saveWorkingData(int $active_id, ?int $pass = null, bool $authorized = true): bool {
+		if ($pass === null || $pass < 0) {
 			$pass = ilObjTest::_getPass($active_id);
 		}
 
@@ -567,10 +440,6 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 			$this->saveCurrentSolution($active_id, $pass, 'TSolution', $solution['value1'], true/*$authorized*/);
 		});
 
-		// log the saving, we assume that values have been entered
-		if (ilObjAssessmentFolder::_enabledAssessmentLogging()) {
-			$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
-		}
 		return true;
 	}
 
@@ -579,26 +448,10 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @param ilAssQuestionPreviewSession $previewSession
 	 * @return float
 	 */
-	public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession) {
-		$solution = (array) $previewSession->getParticipantsSolution();
-
-		return 0;
+	public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $preview_session) {
+		return 0.0;
 	}
 
-
-	/**
-	 * Reworks the already saved working data if neccessary
-	 *
-	 * @abstract
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
-	 * * @param boolean $authorized
-	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized) {
-		// nothing to rework!
-	}
 
 	/**
 	 * Remove the current user solution
@@ -607,7 +460,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @inheritdoc
 	 */
 	public function removeCurrentSolution(int $active_id, int $pass, bool $authorized = true): int {
-		global $ilDB;
+		$ilDB = $this->db;
 		if ($this->getStep() !== NULL) {
 			$query = "
 				DELETE FROM tst_solutions
@@ -646,7 +499,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @inheritdoc
 	 */
 	public function removeExistingSolutions(int $activeId, int $pass): int {
-		global $ilDB;
+		$ilDB = $this->db;
 		$query = "
 			DELETE FROM tst_solutions
 			WHERE active_fi = %s
@@ -670,8 +523,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 * @inheritdoc
 	 */
 	public function lookupForExistingSolutions(int $activeId, int $pass): array {
-		/** @var $ilDB \ilDBInterface  */
-		global $ilDB;
+		$ilDB = $this->db;
 		$return = array(
 			'authorized' => false,
 			'intermediate' => false
@@ -722,8 +574,8 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 *
 	 * @return mixed 	the name(s) of the additional tables (array or string)
 	 */
-	public function getAdditionalTableName() {
-		return array('il_qpl_qst_codeqst_dat');
+	public function getAdditionalTableName(): string {
+		return 'il_qpl_qst_codeqst_dat';
 	}
 
 
@@ -741,110 +593,42 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 
-	/**
-	 * Creates an Excel worksheet for the detailed cumulated results of this question
-	 *
-	 * @access public
-	 * @see assQuestion::setExportDetailsXLS()
-	 */
-	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass, &$format_title = '', &$format_bold = '') {
-		global $lng;
+	/*-----------------*/
+	/* Logging / Export */
+	/*-----------------*/
 
-		$il52 = file_exists('./Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php');
-		if (!$il52) {
-			include_once("./Services/Excel/classes/class.ilExcelUtils.php");
-		} else {
-			include_once './Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
-		}
-
-
-		$solutions = $this->getSolutionValuesOrInit($active_id, $pass, true, false);
-
-		if ($il52) {
-			// also see parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
-			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(0) . $startrow, $this->plugin->txt($this->getQuestionType()));
-			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord(1) . $startrow, $this->getTitle());
-		} else {
-			$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->plugin->txt($this->getQuestionType())), $format_title);
-			$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
-		}
-		$i = 1;
-
-		// now provide a result string and write it to excel
-		// it is also possible to write multiple rows
-		if ($il52) {
-			$stringEscaping = $worksheet->getStringEscaping();
-			$worksheet->setStringEscaping(false);
-			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value1"));
-			$worksheet->setCell($startrow + $i, 1, (print_r($solutions['value1'], true)));
-			$worksheet->setStringEscaping($stringEscaping);
-		} else {
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value1")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value1'], true)));
-		}
-		$i++;
-
-		if ($il52) {
-			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_value2"));
-			$worksheet->setCell($startrow + $i, 1, print_r($solutions['value2'], true));
-		} else {
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_value2")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text(print_r($solutions['value2'], true)));
-		}
-
-		if ($il52) {
-			$worksheet->setCell($startrow + $i, 0, $this->plugin->txt("label_points"));
-			$worksheet->setCell($startrow + $i, 1, $points);
-		} else {
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->plugin->txt("label_points")), $format_bold);
-			$worksheet->write($startrow + $i, 1, ilExcelUtils::_convert_text($points));
-		}
-		$i++;
-
-		return $startrow + $i + 1;
+	public function toLog(AdditionalInformationGenerator $additional_info): array {
+		return [
+			AdditionalInformationGenerator::KEY_QUESTION_TYPE => (string) $this->getQuestionType(),
+			AdditionalInformationGenerator::KEY_QUESTION_TITLE => $this->getTitleForHTMLOutput(),
+			AdditionalInformationGenerator::KEY_QUESTION_TEXT => $this->formatSAQuestion($this->getQuestion()),
+			AdditionalInformationGenerator::KEY_QUESTION_REACHABLE_POINTS => $this->getPoints(),
+			AdditionalInformationGenerator::KEY_FEEDBACK => [
+				AdditionalInformationGenerator::KEY_QUESTION_FEEDBACK_ON_INCOMPLETE => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+				AdditionalInformationGenerator::KEY_QUESTION_FEEDBACK_ON_COMPLETE => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
+			]
+		];
 	}
 
-	/**
-	 * Creates a question from a QTI file
-	 * Receives parameters from a QTI parser and creates a valid ILIAS question object
-	 * Extension needed to get the plugin path for the import class
-	 *
-	 * @access public
-	 * @see assQuestion::fromXML()
-	 */
-	function fromXML($item, int $questionpool_id, ?int $tst_id, &$tst_object, int &$question_counter, array $import_mapping, array &$solutionhints = []): array {
-		$import = new assCodeQuestionImport($this);
-		return $import->fromXML($item, $questionpool_id, $tst_id, $tst_object, $question_counter, $import_mapping);
+	protected function solutionValuesToLog(AdditionalInformationGenerator $additional_info, array $solution_values): string {
+		return $this->solutionValuesToText($solution_values);
 	}
 
-	/**
-	 * Returns a QTI xml representation of the question and sets the internal
-	 * domxml variable with the DOM XML representation of the QTI xml representation
-	 * Extension needed to get the plugin path for the import class
-	 *
-	 * @return string The QTI xml representation of the question
-	 * @access public
-	 * @see assQuestion::toXML()
-	 */
-	function toXML(bool $a_include_header = true, bool $a_include_binary = true, bool $a_shuffle = false, bool $test_output = false, bool $force_image_references = false): string {
-		$export = new assCodeQuestionExport($this);
-		return $export->toXML($a_include_header, $a_include_binary, $a_shuffle, $test_output, $force_image_references);
+	public function solutionValuesToText(array $solution_values): string {
+		if (count($solution_values) == 0) {
+			return '';
+		}
+		return $this->getJustAnswers($this->solutionRowsToValues($solution_values));
 	}
 
-	/**
-	 * returns boolean wether it is possible to set
-	 * this question type as obligatory or not
-	 * considering the current question configuration
-	 *
-	 * (overwrites method in class assQuestion)
-	 *
-	 * @param integer $questionId
-	 * @return boolean $obligationPossible
-	 */
-	public static function isObligationPossible(int $questionId): bool {
-		return true;
+	public function getCorrectSolutionForTextOutput(int $active_id, int $pass): array|string {
+		$stored = $this->getSolutionValuesOrInit($active_id, $pass, true, false, false);
+		$rid = isset($stored['value2']->rid) ? $stored['value2']->rid : -1;
+		return $this->getJustAnswers(array(
+			'value1' => $this->blocks()->getBestRandomSolution($rid),
+			'value2' => $stored['value2']
+		));
 	}
-
 
 	/*-----------------*/
 	/* EST Integration */
@@ -922,7 +706,7 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	}
 
 	public function getExportSolution($active_id = NULL, $pass = -1) {
-		if ($pass < 0) {
+		if ($pass === null || $pass < 0) {
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 

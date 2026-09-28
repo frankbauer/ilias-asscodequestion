@@ -1,7 +1,5 @@
 <?php
 
-include_once "./Modules/TestQuestionPool/classes/class.ilQuestionsPlugin.php";
-
 /**
  * Question plugin Example
  *
