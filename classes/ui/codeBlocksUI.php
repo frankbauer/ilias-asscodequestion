@@ -5,8 +5,8 @@ class codeBlocksUI {
     var $model = null;
     var $uuid = null;
     var $PREPARED_TEMPLATES = [];
-    //false: blocks that are only displayed must not create form fields (they would be posted with any surrounding form)
-    var $formFields = true;
+    //true: form fields are named block_<id>_<nr> instead of block[<id>][<nr>] (see data-field-names in the codeblocks wiki)
+    var $flatFieldNames = false;
 
     public function __construct($model) {
         $this->uuid = $model->guidv4() . '-' . $model->getId();
@@ -23,8 +23,8 @@ class codeBlocksUI {
         $this->uuid = $newUUID;
     }
 
-    public function setFormFields(bool $formFields) {
-        $this->formFields = $formFields;
+    public function setFlatFieldNames(bool $flat) {
+        $this->flatFieldNames = $flat;
     }
 
     public function print($editMode = false, $readOnly = false, $withSolution = false, $solutions = NULL, $state = NULL, $withCtrlChars = true) {
@@ -58,7 +58,7 @@ class codeBlocksUI {
             "data-dom-libs='" . json_encode($this->model->getDomLibs()) . "' " .
             "data-worker-libs='" . json_encode($this->model->getWorkerLibs()) . "' " .
             ($readOnly ? 'data-readonly ' : '') .
-            ($this->formFields ? '' : 'data-form-fields="false" ') .
+            ($this->flatFieldNames ? 'data-field-names="flat" ' : '') .
             'data-output-parser="' . $this->model->getOutputParser() . '" ' .
             ($editMode ? 'data-randomizer-active="' . ($this->model->getRandomizerActive() ? 'true' : 'false') . '" ' : '') .
             ($editMode ? 'data-randomizer-preview-index="' . $this->model->getRandomizerPreviewIndex() . '" ' : '') .
@@ -87,7 +87,6 @@ class codeBlocksUI {
         $loader .= "}\n";
         $loader .= 'if (window.codeblocks) {' . "\n";
         $loader .= '    window.codeblocks.loadAndMount()' . "\n";
-        $loader .= '    if (window.codeblocks.observe) window.codeblocks.observe()' . "\n";
         if ($mountOnly) {
             $loader .= '}' . "\n";
         } else {
@@ -102,9 +101,7 @@ class codeBlocksUI {
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css" . $v . "\" shadow>')\n";
 
             // the library mounts all blocks on the page once it is loaded
-            $loader .= "    import('" . $lib . "codeblocks.umd.js" . $v . "').then(function () {\n";
-            $loader .= "        if (window.codeblocks && window.codeblocks.observe) window.codeblocks.observe()\n";
-            $loader .= "    }).catch(function (error) {\n";
+            $loader .= "    import('" . $lib . "codeblocks.umd.js" . $v . "').catch(function (error) {\n";
             $loader .= "        console.error(error)\n";
             $loader .= "        const s = document.createElement('STYLE');\n";
             $loader .= "        s.innerHTML = 'codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {content:\"\"}'\n";
