@@ -258,12 +258,14 @@ class assCodeQuestion extends assQuestion implements ilObjQuestionScoringAdjusta
 	 */
 	protected function getSolutionSubmit() {
 		$body = $this->http->request()->getParsedBody();
-		$data = $body['block'][$this->getId()] ?? [];
+		// the answer is rendered with flat field names (block_<id>_<nr>, see assCodeQuestionGUI::getQuestionOutput);
+		// block[<id>][<nr>] is still accepted for pages that were loaded before the switch
+		$legacy = $body['block'][$this->getId()] ?? [];
 
 		$result = array();
 		for ($i = 0; $i < $this->blocks->getNumberOfBlocks(); $i++) {
 			if ($this->blocks[$i]->getType() == assCodeQuestionBlockTypes::SolutionCode) {
-				$result[$i] = $data[$i] ?? '';
+				$result[$i] = $body['block_' . $this->getId() . '_' . $i] ?? ($legacy[$i] ?? '');
 			}
 		}
 		return array(

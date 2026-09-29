@@ -23,6 +23,18 @@ class codeBlocksUI {
         $this->uuid = $newUUID;
     }
 
+    /**
+     * URL of a file of this plugin, with a version parameter that changes whenever the file is
+     * deployed again (the codeblocks version alone stays the same across builds, so browsers
+     * would keep using a cached bundle)
+     *
+     * @param string $relFile path relative to the plugin directory, e.g. 'css/custom.css'
+     */
+    private function assetUrl(string $basePath, string $relFile): string {
+        $mtime = @filemtime(dirname(__DIR__, 2) . '/' . $relFile);
+        return $basePath . '/' . $relFile . '?v=' . CODEBLOCKS_VERSION . ($mtime ? '-' . $mtime : '');
+    }
+
     public function setFlatFieldNames(bool $flat) {
         $this->flatFieldNames = $flat;
     }
@@ -94,18 +106,17 @@ class codeBlocksUI {
         if ($mountOnly) {
             $loader .= '}' . "\n";
         } else {
-            $v = '?v=' . CODEBLOCKS_VERSION;
-            $lib = $basePath . '/' . CODEBLOCKS_REL_PATH . 'js/codeblocks-js/';
+            $lib = CODEBLOCKS_REL_PATH . 'js/codeblocks-js/';
             $loader .= '} else if (!window.codeBlocksJS) {' . "\n";
             $loader .= "    window.codeBlocksJS = true\n";
             $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
             $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/' . CODEBLOCKS_REL_PATH . "\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/" . CODEBLOCKS_REL_PATH . "css/roboto.css" . $v . "\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $lib . "codeblocks.css" . $v . "\" shadow>')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $basePath . "/css/custom.css" . $v . "\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, CODEBLOCKS_REL_PATH . 'css/roboto.css') . "\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, $lib . 'codeblocks.css') . "\" shadow>')\n";
+            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, 'css/custom.css') . "\" shadow>')\n";
 
             // the library mounts all blocks on the page once it is loaded
-            $loader .= "    import('" . $lib . "codeblocks.umd.js" . $v . "').catch(function (error) {\n";
+            $loader .= "    import('" . $this->assetUrl($basePath, $lib . 'codeblocks.umd.js') . "').catch(function (error) {\n";
             $loader .= "        console.error(error)\n";
             $loader .= "        const s = document.createElement('STYLE');\n";
             $loader .= "        s.innerHTML = 'codeblockseditor::before, codeblocks::before, [codeblockseditor]::before, [codeblocks]::before {content:\"\"}'\n";
@@ -115,7 +126,7 @@ class codeBlocksUI {
 
             if ($this->model->getMinCanvasVersion() <= 100) {
                 $loader .= 'if (window.processMixedOutput === undefined) {' . "\n";
-                $loader .= "    import('" . $basePath . "/js/legacyHelper.js#20200409')\n";
+                $loader .= "    import('" . $this->assetUrl($basePath, 'js/legacyHelper.js') . "')\n";
                 $loader .= '}' . "\n";
             }
         }
@@ -132,13 +143,15 @@ class codeBlocksUI {
             $this->PREPARED_TEMPLATES[] = $tpl;
 
             $inline_css = "codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}";
-            $css_file = $basePath . '/' . CODEBLOCKS_REL_PATH . 'js/codeblocks-js/codeblocks.css?v=' . CODEBLOCKS_VERSION;
+            $css_file = $this->assetUrl($basePath, CODEBLOCKS_REL_PATH . 'js/codeblocks-js/codeblocks.css');
             $on_load_code = $this->mountyJSCode($basePath, false);
 
             if ($tpl instanceof ilGlobalTemplateInterface) {
                 iljQueryUtil::initjQuery($tpl);
                 $tpl->addInlineCss($inline_css);
-                $tpl->addCss($css_file);
+                // no addCss($css_file): ILIAS replaces the query of added stylesheets with its own
+                // version parameter, so the file would stay cached across deploys. The loader in
+                // $on_load_code adds the stylesheet with the versioned URL.
                 $tpl->addOnLoadCode($on_load_code);
             } else {
                 // set onLoadCode

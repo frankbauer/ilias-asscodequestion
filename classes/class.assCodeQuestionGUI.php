@@ -216,12 +216,16 @@ class assCodeQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$solutions = $value1;
 		$state = $value2;
 
+		// flat field names: the answer is posted with the page's form, which may also contain
+		// questions that expect plain string values only (e.g. STACK in a learning module)
+		$this->question_object->blocks()->ui()->setFlatFieldNames(true);
 		if ($print) {
 			$withCtrlChars = false;
 			$html = $this->question_object->blocks()->ui()->print(false, $readOnly, true, $solutions, $state, $withCtrlChars);
 		} else {
 			$html = $this->question_object->blocks()->ui()->render(false, $readOnly, true, $solutions, $state);
 		}
+		$this->question_object->blocks()->ui()->setFlatFieldNames(false);
 
 		$template->setVariable("BLOCK_HTML", $html);
 		$template->setVariable("LANGUAGE", $language);
