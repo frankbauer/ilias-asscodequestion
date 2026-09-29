@@ -64,36 +64,69 @@ class codeBlock {
 	}
 
 	function tidyUnusedProperties() {
-		if ($this->getType() != assCodeQuestionBlockTypes::SolutionCode) {
+		$type = $this->getType();
+		if ($type != assCodeQuestionBlockTypes::SolutionCode) {
 			unset($this->block['lines']);
 			unset($this->block['altContent']);
 			unset($this->block['hasAltContent']);
 		}
-		if ($this->getType() != assCodeQuestionBlockTypes::Canvas && $this->getType() != assCodeQuestionBlockTypes::Blockly) {
+		if ($type != assCodeQuestionBlockTypes::Canvas && $type != assCodeQuestionBlockTypes::Blockly) {
 			unset($this->block['width']);
 			unset($this->block['height']);
 			unset($this->block['align']);
+		}
+		if ($type != assCodeQuestionBlockTypes::Canvas) {
+			unset($this->block['autoreset']);
+			unset($this->block['reloadResources']);
+			unset($this->block['generateTemplate']);
+		}
+		if ($type != assCodeQuestionBlockTypes::Canvas && $type != assCodeQuestionBlockTypes::Blockly && $type != assCodeQuestionBlockTypes::Library) {
 			unset($this->block['version']);
 		}
-		if ($this->getType() != assCodeQuestionBlockTypes::Canvas && $this->getType() != assCodeQuestionBlockTypes::Data) {
+		if ($type != assCodeQuestionBlockTypes::Canvas && $type != assCodeQuestionBlockTypes::Data && $type != assCodeQuestionBlockTypes::Library) {
 			unset($this->block['codeExpanded']);
+		}
+		if ($type != assCodeQuestionBlockTypes::Library) {
+			unset($this->block['embeddedLibrary']);
+			unset($this->block['libraryPlacement']);
+		}
+		if ($type != assCodeQuestionBlockTypes::Text) {
+			unset($this->block['layout']);
+		}
+		if ($type != assCodeQuestionBlockTypes::Blockly) {
+			unset($this->block['blockly']);
 		}
 	}
 
-	public static function createFromPreparedPOST($nr, $options, $content, $altContent, $object) {
-		$t = assCodeQuestionBlockTypes::StaticCode;
-		if ($options->type == 'BLOCK') {
-			if ($options->static == 1 || $options->static == 'true')
-				$t = assCodeQuestionBlockTypes::StaticCode;
-			else if ($options->hidden == 1 || $options->hidden == 'true')
+	private static function isTrueOption($value) {
+		return $value === true || $value === 1 || $value === '1' || $value === 'true';
+	}
+
+	/**
+	 * $fallbackType - type to use if the editor did not send one (see setFromPOST in codeBlocks)
+	 */
+	public static function createFromPreparedPOST($nr, $options, $content, $altContent, $object, $fallbackType = NULL) {
+		//the editor does not send every option for every block type
+		$opt = function ($name, $default = NULL) use ($options) {
+			return isset($options->$name) ? $options->$name : $default;
+		};
+
+		$t = $fallbackType ?? assCodeQuestionBlockTypes::StaticCode;
+		// codeblocks keeps the type in _type (with a getter named type)
+		$type = $opt('type', $opt('_type'));
+		if ($type == 'BLOCK') {
+			// hidden wins over static, as in codeblocks
+			if (self::isTrueOption($opt('hidden')))
 				$t = assCodeQuestionBlockTypes::HiddenCode;
+			else if (self::isTrueOption($opt('static')))
+				$t = assCodeQuestionBlockTypes::StaticCode;
 			else
 				$t = assCodeQuestionBlockTypes::SolutionCode;
-		} else if ($options->type == 'PLAYGROUND') {
+		} else if ($type == 'PLAYGROUND') {
 			$t = assCodeQuestionBlockTypes::Canvas;
-		} else if ($options->type == 'TEXT') {
+		} else if ($type == 'TEXT') {
 			$t = assCodeQuestionBlockTypes::Text;
-		} else if ($options->type == 'BLOCKLY') {
+		} else if ($type == 'BLOCKLY') {
 			$t = assCodeQuestionBlockTypes::Blockly;
 			if (isset($options->blockly) && is_object($options->blockly)) {
 				//convert from std class (object) to array				
@@ -103,28 +136,34 @@ class codeBlock {
 				}
 				$options->blockly = $ar;
 			}
-		} else if ($options->type == 'REPL') {
+		} else if ($type == 'REPL') {
 			$t = assCodeQuestionBlockTypes::REPL;
-		} else if ($options->type == 'DATA') {
+		} else if ($type == 'DATA') {
 			$t = assCodeQuestionBlockTypes::Data;
+		} else if ($type == 'LIBRARY') {
+			$t = assCodeQuestionBlockTypes::Library;
 		}
 
 		$data = array(
-			'expanded' => $options->expanded == 1 || $options->expanded == 'true',
-			'codeExpanded' => $options->codeExpanded + 0,
+			'expanded' => $opt('expanded') === NULL || self::isTrueOption($opt('expanded')),
+			'codeExpanded' => (int) $opt('codeExpanded', 1),
 			'type' => $t,
-			'content' => codeBlock::fixSentCode($content),
-			'lines' => $options->visibleLines,
-			'width' => $options->width,
-			'height' => $options->height,
-			'name' => $options->name,
-			'align' => $options->align,
-			'version' => $options->version,
-			'autoreset' => $options->shouldAutoreset == 1 || $options->shouldAutoreset == 'true',
-			'generateTemplate' => $options->generateTemplate == 1 || $options->generateTemplate == 'true',
-			'hasAltContent' => $options->hasAlternativeContent == 1 || $options->hasAlternativeContent == 'true',
+			'content' => codeBlock::fixSentCode($content ?? ''),
+			'lines' => $opt('visibleLines', 'auto'),
+			'width' => $opt('width'),
+			'height' => $opt('height'),
+			'name' => $opt('name', ''),
+			'align' => $opt('align'),
+			'version' => $opt('version'),
+			'autoreset' => self::isTrueOption($opt('shouldAutoreset')),
+			'reloadResources' => self::isTrueOption($opt('shouldReloadResources')),
+			'generateTemplate' => $opt('generateTemplate') === NULL || self::isTrueOption($opt('generateTemplate')),
+			'hasAltContent' => self::isTrueOption($opt('hasAlternativeContent')),
 			'altContent' => $altContent,
-			'blockly' => isset($options->blockly) ? $options->blockly : NULL,
+			'layout' => $opt('layout', 'auto'),
+			'embeddedLibrary' => $opt('embeddedLibrary', 'custom'),
+			'libraryPlacement' => $opt('libraryPlacement', 'inline'),
+			'blockly' => $opt('blockly'),
 		);
 
 		$o = new codeBlock($nr, $data, $object);
@@ -186,7 +225,7 @@ class codeBlock {
 	}
 
 	function getName() {
-		return $this->block['name'];
+		return isset($this->block['name']) ? $this->block['name'] : '';
 	}
 
 	function setName($value) {
@@ -389,6 +428,55 @@ class codeBlock {
 		if (!isset($this->block['align']))
 			return 'left';
 		return $this->block['align'];
+	}
+
+	function getShouldReloadResources() {
+		if (!isset($this->block['reloadResources']))
+			return false;
+		return $this->block['reloadResources'];
+	}
+
+	function setShouldReloadResources($value) {
+		$this->block['reloadResources'] = (bool) $value;
+	}
+
+	/**
+	 * Layout of a TEXT block while editing: auto, vertical or horizontal
+	 */
+	function getLayout() {
+		if (!isset($this->block['layout']) || !in_array($this->block['layout'], ['auto', 'vertical', 'horizontal']))
+			return 'auto';
+		return $this->block['layout'];
+	}
+
+	function setLayout($value) {
+		$this->block['layout'] = $value;
+	}
+
+	/**
+	 * Id of the built-in library a LIBRARY block uses, or 'custom' if it uses its own content
+	 */
+	function getEmbeddedLibrary() {
+		if (!isset($this->block['embeddedLibrary']) || !is_string($this->block['embeddedLibrary']) || $this->block['embeddedLibrary'] === '')
+			return 'custom';
+		return $this->block['embeddedLibrary'];
+	}
+
+	function setEmbeddedLibrary($value) {
+		$this->block['embeddedLibrary'] = $value;
+	}
+
+	/**
+	 * Where a LIBRARY block renders its UI: inline, aboveOutput or belowOutput
+	 */
+	function getLibraryPlacement() {
+		if (!isset($this->block['libraryPlacement']) || !in_array($this->block['libraryPlacement'], ['inline', 'aboveOutput', 'belowOutput']))
+			return 'inline';
+		return $this->block['libraryPlacement'];
+	}
+
+	function setLibraryPlacement($value) {
+		$this->block['libraryPlacement'] = $value;
 	}
 }
 

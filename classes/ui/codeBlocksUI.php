@@ -49,8 +49,12 @@ class codeBlocksUI {
             'data-execution-timeout="' . $this->model->getTimeoutMS() . '" ' .
             'data-max-characters="' . $this->model->getMaxChars() . '" ' .
             'data-run-code="' . ($this->model->getAllowRun() ? 'true' : 'false') . '" ' .
+            // codeblocks only falls back to the legacy themes if data-ui-theme is missing
+            ($this->model->getUITheme() !== NULL ? 'data-ui-theme="' . $this->model->getUITheme() . '" ' : '') .
             'data-solution-theme="' . $this->model->getTheme() . '" ' .
             'data-code-theme="' . $this->model->getROTheme() . '" ' .
+            'data-enable-completion-in-view-mode="' . ($this->model->getEnableCompletionInViewMode() ? 'true' : 'false') . '" ' .
+            'data-emit-ast="' . ($this->model->getEmitAST() ? 'true' : 'false') . '" ' .
             'data-continuous-compilation="' . ($this->model->getContinuousCompilation() ? 'true' : 'false') . '" ' .
             'data-persistent-arguments="' . ($this->model->getPersistentArguments() ? 'true' : 'false') . '" ' .
             'data-message-passing="' . ($this->model->getMessagePassing() ? 'true' : 'false') . '" ' .
@@ -71,7 +75,7 @@ class codeBlocksUI {
 
         //$set = ($this->model->getRandomizerActive() && $state!=NULL)?$this->model->getRandomSet($state->rid):NULL;
         for ($i = 0; $i < $this->model->getNumberOfBlocks(); $i++) {
-            $html .= $this->model[$i]->ui()->render($withSolution, $solutions, $state);
+            $html .= $this->model[$i]->ui()->render($withSolution, $solutions, $state, $editMode);
         }
 
         $html .= '</div>';

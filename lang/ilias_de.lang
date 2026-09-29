@@ -45,3 +45,5 @@ config_print_control_chars#:#Steuerzeichen in Druckansicht einblenden
 config_save#:#Speichern
 config_saved#:#Konfiguration erfolgreich gespeichert.
 config_save_failed#:#Konfiguration konnte nicht gespeichert werden.
+block_type_unsupported#:#%s-Blöcke werden nicht mehr unterstützt und können nicht angezeigt werden.
+block_type_unsupported_edit#:#Der Inhalt dieses Blocks geht beim Speichern der Frage verloren.

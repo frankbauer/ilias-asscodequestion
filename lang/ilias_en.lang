@@ -45,3 +45,5 @@ config_print_control_chars#:#Display Control-Characters when printing
 config_save#:#Save
 config_saved#:#Configuration was saved succesfully.
 config_save_failed#:#Unable to store Configuration.
+block_type_unsupported#:#%s blocks are no longer supported and can not be displayed.
+block_type_unsupported_edit#:#The content of this block will be lost when you save the question.

@@ -12,6 +12,7 @@ abstract class assCodeQuestionBlockTypes {
 	const Blockly = 5;
 	const REPL = 6;
 	const Data = 7;
+	const Library = 8;
 }
 
 /**

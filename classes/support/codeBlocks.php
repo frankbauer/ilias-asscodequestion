@@ -195,7 +195,11 @@ class codeBlocks implements ArrayAccess {
 			return;
 		}
 		$settings = json_decode($P['block_settings'][$this->getID()]);
-		$randomizer = $settings->randomizer;
+		//the editor does not send every setting (e.g. the old themes are gone since codeblocks 0.3.0)
+		$get = function ($name, $default = NULL) use ($settings) {
+			return isset($settings->$name) ? $settings->$name : $default;
+		};
+		$randomizer = $get('randomizer', new stdClass());
 
 		$blocks = $P['block'][$this->getID()];
 		$blockOptions = $P['block_options'][$this->getID()];
@@ -208,7 +212,7 @@ class codeBlocks implements ArrayAccess {
 
 		$this->additional_data['version'] = self::DEFAULT_DATA_VERSION;
 		$this->additional_data['vcodeblocks'] = CODEBLOCKS_VERSION;
-		$this->additional_data['language'] = $settings->language;
+		$this->additional_data['language'] = $get('language', 'javascript');
 
 		if (isset($settings->compiler)) {
 			$this->additional_data['compiler'] = array(
@@ -219,24 +223,49 @@ class codeBlocks implements ArrayAccess {
 			unset($this->additional_data['compiler']);
 		}
 
-		$this->additional_data['domlibs'] = $settings->domLibs;
-		$this->additional_data['workerlibs'] = $settings->workerLibs;
+		$this->additional_data['domlibs'] = $get('domLibs', array());
+		$this->additional_data['workerlibs'] = $get('workerLibs', array());
 
-		$this->setTimeoutMS($settings->executionTimeout);
-		$this->setMaxChars($settings->maxCharacters);
-		$this->setAllowRun($settings->runCode == 1 || $settings->runCode == 'true');
-		$this->setTheme($settings->solutionTheme);
-		$this->setROTheme($settings->codeTheme);
-		$this->setOutputParser($settings->outputParser);
-		$this->setContinuousCompilation($settings->continuousCompilation);
-		$this->setPersistentArguments($settings->persistentArguments);
-		$this->setMessagePassing($settings->messagePassing);
-		$this->setKeepAlive($settings->keepAlive);
+		$this->setTimeoutMS($get('executionTimeout', 5000));
+		$this->setMaxChars($get('maxCharacters', 10000));
+		$this->setAllowRun($get('runCode') == 1 || $get('runCode') == 'true');
+		if (isset($settings->uiTheme)) {
+			$this->setUITheme($settings->uiTheme);
+		}
+		//legacy editors (codeblocks < 0.3.0)
+		if (isset($settings->solutionTheme)) {
+			$this->setTheme($settings->solutionTheme);
+		}
+		if (isset($settings->codeTheme)) {
+			$this->setROTheme($settings->codeTheme);
+		}
+		$this->setOutputParser($get('outputParser', 'auto'));
+		$this->setContinuousCompilation((bool) $get('continuousCompilation', false));
+		$this->setPersistentArguments((bool) $get('persistentArguments', false));
+		$this->setMessagePassing((bool) $get('messagePassing', false));
+		$this->setKeepAlive((bool) $get('keepAlive', false));
+		$this->setEnableCompletionInViewMode((bool) $get('enableCompletionInViewMode', true));
+		$this->setEmitAST((bool) $get('emitAST', false));
 
-		$this->setRandomizerActive($randomizer->active);
-		$this->setRandomizerPreviewIndex($randomizer->previewIndex);
-		$this->setRandomizerTags($randomizer->knownTags);
-		$this->setRandomizerSets($randomizer->sets);
+		$this->setRandomizerActive($randomizer->active ?? false);
+		$this->setRandomizerPreviewIndex($randomizer->previewIndex ?? 0);
+		$this->setRandomizerTags($randomizer->knownTags ?? array());
+		$this->setRandomizerSets($randomizer->sets ?? array());
+
+		// codeblocks 0.3.0 does not include the block type in block_options (it is a getter
+		// on the JS side). Until the editor sends it again, keep the type the block had at
+		// this position before. This is only correct as long as blocks were not added,
+		// removed or reordered in the editor.
+		// Blockly and REPL blocks are shown as a TEXT block with a notice (see codeBlockUI)
+		// and are saved as such.
+		$previousTypes = array();
+		foreach ($this->blocks ?? array() as $cbl) {
+			$t = $cbl->getType();
+			if ($t == assCodeQuestionBlockTypes::Blockly || $t == assCodeQuestionBlockTypes::REPL) {
+				$t = assCodeQuestionBlockTypes::Text;
+			}
+			$previousTypes[] = $t;
+		}
 
 		//handle blocks
 		$this->clearBlocks();
@@ -259,7 +288,7 @@ class codeBlocks implements ArrayAccess {
 			}
 
 
-			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i], $abl, $this);
+			$this->blocks[] = codeBlock::createFromPreparedPOST($i, $blockOptions[$i], $blocks[$i] ?? '', $abl, $this, $previousTypes[$i] ?? NULL);
 		}
 	}
 
@@ -477,6 +506,33 @@ class codeBlocks implements ArrayAccess {
 
 	function setROTheme($newValue) {
 		$this->additional_data['themeRO'] = '' . $newValue;
+	}
+
+	/**
+	 * light or dark (codeblocks >= 0.3.0), NULL if the question was never saved with a newer editor
+	 */
+	function getUITheme() {
+		return isset($this->additional_data['uiTheme']) ? $this->additional_data['uiTheme'] : NULL;
+	}
+
+	function setUITheme($newValue) {
+		$this->additional_data['uiTheme'] = $newValue === 'dark' ? 'dark' : 'light';
+	}
+
+	function getEnableCompletionInViewMode() {
+		return isset($this->additional_data['completionInViewMode']) ? $this->additional_data['completionInViewMode'] : true;
+	}
+
+	function setEnableCompletionInViewMode($newValue) {
+		$this->additional_data['completionInViewMode'] = (bool) $newValue;
+	}
+
+	function getEmitAST() {
+		return isset($this->additional_data['emitAST']) ? $this->additional_data['emitAST'] : false;
+	}
+
+	function setEmitAST($newValue) {
+		$this->additional_data['emitAST'] = (bool) $newValue;
 	}
 
 	function getOutputParser() {
