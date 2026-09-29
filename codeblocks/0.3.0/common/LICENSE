@@ -1,0 +1,8 @@
+CodeBlocks Shared Content (common/)
+
+- codeblocks.zip and the scene code in scene/ (*.java, *.js, *.html, *.css) are
+  part of CodeBlocks and released under the MIT License, see
+  ../js/codeblocks-js/LICENSE.
+- scene/maze/img/: CC BY-NC 4.0, see scene/maze/img/LICENSE.
+- scene/floatingworld/img/: licensed from Freepik, see
+  scene/floatingworld/img/LICENSE.

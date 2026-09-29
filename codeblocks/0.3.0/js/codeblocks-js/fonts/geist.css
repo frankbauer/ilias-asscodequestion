@@ -1,0 +1,66 @@
+/* Geist (SIL OFL 1.1, see LICENSE.md in this folder), shipped with CodeBlocks.
+   codeblocks.css already includes these rules; pages that don't load
+   codeblocks.css (e.g. lernwerk overview pages) can link this file instead. */
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 100;
+    src: url('geist-v3-latin-100.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 200;
+    src: url('geist-v3-latin-200.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 300;
+    src: url('geist-v3-latin-300.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 400;
+    src: url('geist-v3-latin-regular.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 500;
+    src: url('geist-v3-latin-500.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 600;
+    src: url('geist-v3-latin-600.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 700;
+    src: url('geist-v3-latin-700.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 800;
+    src: url('geist-v3-latin-800.woff2') format('woff2');
+}
+@font-face {
+    font-display: swap;
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 900;
+    src: url('geist-v3-latin-900.woff2') format('woff2');
+}

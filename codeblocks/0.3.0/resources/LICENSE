@@ -1,0 +1,27 @@
+CodeBlocks Game Resources (resources/)
+
+SPDX-License-Identifier: CC-BY-NC-4.0
+
+Copyright (c) Frank Bauer, Visual Computing Erlangen-Nuremberg (FAU)
+
+Unless otherwise stated in a subfolder, all files in this directory
+and its subdirectories are licensed under the
+Creative Commons Attribution-NonCommercial 4.0 International License
+(CC BY-NC 4.0).
+
+The sprite sheets and tiles in sprite/ and tile/ are generated from the
+images in assets/ (see sprite_rename.js) and share their license.
+
+You are free to:
+- Share - copy and redistribute the material in any medium or format
+- Adapt - remix, transform, and build upon the material
+
+Under the following terms:
+- Attribution - You must give appropriate credit, provide a link to
+  the license, and indicate if changes were made.
+  Suggested credit: "CodeBlocks assets by Frank Bauer, FAU Erlangen-Nuremberg,
+  CC BY-NC 4.0"
+- NonCommercial - You may not use the material for commercial purposes.
+
+Full license text:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode

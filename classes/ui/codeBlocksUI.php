@@ -111,7 +111,6 @@ class codeBlocksUI {
             $loader .= "    window.codeBlocksJS = true\n";
             $loader .= "    $('head').append('<style>codeblockseditor > *,  codeblocks > *, [codeblockseditor] > *,  [codeblocks] > *{ display:none;}</style>')\n";
             $loader .= "    $('head').append('<meta name=\"codeblocks-baseurl\" content=\"" . $basePath . '/' . CODEBLOCKS_REL_PATH . "\">')\n";
-            $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, CODEBLOCKS_REL_PATH . 'css/roboto.css') . "\" shadow>')\n";
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, $lib . 'codeblocks.css') . "\" shadow>')\n";
             $loader .= "    $('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $this->assetUrl($basePath, 'css/custom.css') . "\" shadow>')\n";
 
