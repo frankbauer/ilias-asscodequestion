@@ -1,6 +1,7 @@
 __dev/blockly/*
 # images licensed from Freepik (see the LICENSE file in each folder):
 # usable in the plugin, but not to be published in this repository
+codeblocks-licensed-assets.zip
 codeblocks/*/common/scene/floatingworld/img/*
 !codeblocks/*/common/scene/floatingworld/img/LICENSE
 codeblocks/*/assets/trees/tree.autumn.png

@@ -21,6 +21,18 @@
 
 There is nothing to configure for this plugin.
 
+### Licensed assets (optional)
+Some images used by the example scenes of CodeBlocks (e.g. the *Floating World* scene and the stylized trees) are licensed from [Freepik](https://www.freepik.com). They may be used with this plugin, but are not part of this repository. Without them, the plugin works, but those scenes show no images.
+
+To install them:
+1. Get `codeblocks-licensed-assets.zip` from the restricted download location (ask the maintainers).
+2. Extract it into the folder of the CodeBlocks version the plugin uses (see `CODEBLOCKS_VERSION` in `classes/support/codeblocks-conf-<version>.php`), e.g. for version 0.3.0:
+   ```
+   cd Customizing/global/plugins/Modules/TestQuestionPool/Questions/assCodeQuestion
+   unzip -o codeblocks-licensed-assets.zip -d codeblocks/0.3.0
+   ```
+The archive contains the license terms (`LICENSE` files next to the images). Do not redistribute the images or commit them to a public repository; they are listed in `.gitignore`.
+
 ## Usage
 This plugin enables source code questions. It basically provides a textarea with syntax 
 highlighting for various languages (based on Highlight.js and CodeMirror).

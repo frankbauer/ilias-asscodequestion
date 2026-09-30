@@ -1,0 +1,255 @@
+
+#floatingworld {      
+    --cb-fw-width: 550px;
+    --cb-fw-height: 609px;
+    --cb-fw-padding: 10px;
+    
+    position: relative;
+    width: calc(var(--cb-fw-width) + 2 * var(--cb-fw-padding));
+    height: calc(var(--cb-fw-height) + 2 * var(--cb-fw-padding));
+
+    background-image: url("./img/Background.jpg");
+    background-size: cover;
+    border-radius: 8px;
+    overflow: hidden;
+    transform-origin: top left;
+    transform: scale(0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+#floatingworld .animated {
+    transition: transform 0.4s cubic-bezier(0.5, 1.5, 0.3, 0.8), opacity 0.2s ease-out;
+}
+
+#floatingworld .animated.fast {
+    transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.2s ease-out;
+}
+
+#floatingworld .transparent {
+    opacity: 0;
+}
+
+div#content .playground {
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+#floatingworld .cloud {
+    position: absolute;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+#floatingworld .cloud.a {
+    background-image: url("./img/Cloud2.png");
+    width: 150px;
+    height: 64px;
+    animation-name: moveCloudA;
+}
+
+#floatingworld .cloud.b {
+    background-image: url("./img/Cloud3.png");
+    width: 115px;
+    height: 54px;
+    animation-name: moveCloudB;
+}
+
+#floatingworld .cloud.l1 {
+    top: 20px;
+    animation-duration: 27s;
+    animation-delay: -10s;
+    z-index: 200;
+}
+
+#floatingworld .cloud.l2 {
+    top: 80px;
+    animation-duration: 19s;
+    animation-delay: -2s;
+    z-index: 201;
+}
+
+#floatingworld .cloud.l3 {
+    top: 50px;
+    transform: scaleX(-1) scaleY(1.1);
+    animation-duration: 11s;
+    animation-delay: -9s;
+    z-index: 30;
+}
+
+@keyframes moveCloudA {
+    0% {
+        left: -150px;
+    }
+
+    100% {
+        left: var(--cb-fw-width);
+    }
+}
+
+@keyframes moveCloudB {
+    0% {
+        left: -115px;
+    }
+
+    100% {
+        left: var(--cb-fw-width);
+    }
+}
+
+#floatingworld .islandcontainer {
+    position: absolute;
+    left: var(--cb-fw-padding);
+    top: var(--cb-fw-padding);
+    width: var(--cb-fw-width);
+    height: var(--cb-fw-height);
+    transform-origin: center bottom;
+    z-index: 99;
+}
+
+#floatingworld .island {
+    position: absolute;
+    background-image: url("./img/World.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    left: 0;
+    top: 0;
+    width: var(--cb-fw-width);
+    height: var(--cb-fw-height);
+    z-index: 100;
+    transform-origin: center bottom;
+}
+
+#floatingworld .island.ghost {
+    background-image: url("./img/GhostWorld.png");
+    left: calc(var(--cb-fw-padding) + (var(--cb-fw-width) - 554px)/2);
+    top: calc(var(--cb-fw-padding) + (var(--cb-fw-height) - 613px)/2);
+    width: 554px;
+    height: 613px;
+    z-index: 98;
+}
+
+#floatingworld .tree {
+    position: absolute;
+    background-image: url("./img/Tree.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    left: calc(133px / -2);
+    top: -189px;
+    width: 133px;
+    height: 179px;
+    transform-origin: center bottom;
+    transform: translateX(295px) translateY(385px);
+    z-index: 120;
+}
+
+#floatingworld .grass {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+#floatingworld .grass.a {
+    background-image: url("./img/Gras1.png");
+    width: 20px;
+    height: 9px;
+    z-index: 130;
+
+    left: calc(20px / -2);
+    top: -19px;
+
+    transform-origin: center bottom;
+    transform: translateX(200px) translateY(380px);
+}
+
+#floatingworld .grass.b {
+    background-image: url("./img/Gras2.png");
+    width: 31px;
+    height: 14px;
+    z-index: 140;
+
+    left: calc(31px / -2);
+    top: -24px;
+
+    transform-origin: center bottom;
+    transform: translateX(302px) translateY(387px);
+}
+
+#floatingworld .stone {
+    position: absolute;
+    background-image: url("./img/Stone.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    width: 67px;
+    height: 37px;
+    z-index: 150;
+
+    left: calc(67px / -2);
+    top: -47px;
+
+    transform-origin: center bottom;
+    transform: translateX(150px) translateY(398px);
+}
+
+#floatingworld .player {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+#floatingworld .player.a {
+    background-image: url("./img/Player1.png");
+    width: 122px;
+    height: 204px;
+    left: calc(122px / -2);
+    top: -204px;
+    transform-origin: center bottom;
+    transform: translateX(480px) translateY(380px);
+    z-index: 160;
+}
+
+#floatingworld .player.b {
+    background-image: url("./img/Player2.png");
+    width: 129px;
+    height: 204px;
+    left: calc(129px / -2);
+    top: -204px;
+    transform-origin: center bottom;
+    transform: translateX(80px) translateY(390px);
+    z-index: 140;
+}
+
+#floatingworld .player.a.ghost {
+    background-image: url("./img/Ghost1.png");
+    width: 125px;
+    left: calc(122px / -2 - 3px);
+    top: -205px;
+    z-index: 159;
+}
+
+#floatingworld .player.b.ghost {
+    background-image: url("./img/Ghost2.png");
+    width: 132px;
+    height: 203px;
+    left: calc(122px / -2 - 4.5px);
+    top: -206px;
+    z-index: 139;
+}
+
+#floatingworld .cherry {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 64px;
+    height: 67px;
+    background-image: url("./img/Cherry.png");
+
+    left: calc(64px / -2);
+    top: -77px;
+    transform-origin: center bottom;
+    transform: translateX(340px) translateY(350px);
+    z-index: 170;
+}

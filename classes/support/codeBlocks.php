@@ -1,5 +1,5 @@
 <?php
-require_once 'codeblocks-conf-0.2.14.php';
+require_once 'codeblocks-conf-0.3.0.php';
 
 class codeBlocks implements ArrayAccess {
 	const DEFAULT_DATA_VERSION = '101';
