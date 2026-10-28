@@ -392,6 +392,11 @@ class codeBlocks implements ArrayAccess {
 	}
 
 	function getCompilerLanguage() {
+		//fallback if allowRun is not set (otherwise the code editor replaces the previously selected language)
+		if (!$this->getAllowRun()) {
+			return $this->getLanguage();
+		}
+
 		//old style
 		if (
 			$this->getDataVersion() == '100' ||
